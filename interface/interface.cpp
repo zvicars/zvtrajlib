@@ -34,5 +34,17 @@ int XDRTrajectory::nextFrame(){
 }
 
 void XDRTrajectory::getFrame(Box& box){
+  box.atoms.resize(natoms_);
+  for(int i = 0; i < natoms_; i++)
+  {
+    box.atoms[i].x[0] = x_[i][0];
+    box.atoms[i].x[1] = x_[i][1];
+    box.atoms[i].x[2] = x_[i][2];
+  }
+  for(int i = 0; i < 3; i++)
+  for(int j = 0; j < 3; j++)
+  {
+    box.boxvec[i][j] = box_[i][j];
+  }
   return;
 }
