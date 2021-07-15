@@ -1,8 +1,7 @@
 #pragma once
-#include <string>
-#include <cstring>
 #include <fstream>
 #include "datatypes.h"
+#include "utility.h" //perhaps use utility as a separate library?
 namespace xdr{ //to prevent any potential name clashes with the matrix type
 #include "../libxdr/xdrfile.h"
 #include "../libxdr/xdrfile_xtc.h"

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <array>
+#include <string>
 #include "bonded_functions.h"
 
 template <class T>
@@ -82,4 +83,6 @@ public:
   IndexInfo* idxinfo;
   TopologyInfo* topinfo;
   Vec3<Vec3<double> > boxvec;
+  double time;
+  int frame;
 };

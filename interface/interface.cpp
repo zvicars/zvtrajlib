@@ -1,4 +1,6 @@
 #include "interface.h"
+#include <iostream>
+#include <cstring>
 XDRTrajectory::XDRTrajectory(){
   //default constructor will set some invalid values that must be set later
   xdr::XDRFILE * xd = 0;
@@ -9,13 +11,17 @@ XDRTrajectory::XDRTrajectory(){
 
 XDRTrajectory::XDRTrajectory(std::string trajfile){
   trajfile_= trajfile;
-  char * tf = 0;
-  tf = strdup(trajfile.c_str());
-  xdr::read_xtc_natoms(tf, &natoms_);
+  char tf[1024];
+  strcpy(tf, trajfile.c_str());
+  int result = xdr::read_xtc_natoms(tf, &natoms_);
+  if(result == xdr::exdrFILENOTFOUND){
+    std::cout << "File not found." << std::endl;
+    throw result;
+    return;
+  }
 	x_ = new xdr::rvec[natoms_];
 	xd_ = xdr::xdrfile_open(tf, "r");
   nframes_ = 0;
-  free(tf);
   return;
 }
 
@@ -46,5 +52,7 @@ void XDRTrajectory::getFrame(Box& box){
   {
     box.boxvec[i][j] = box_[i][j];
   }
+  box.time = time_;
+  box.frame = frame_;
   return;
 }
