@@ -1,5 +1,5 @@
 # Prefer to keep flags private)
-add_library (XDRFILE 
+add_library (XDRFILE
 trr_seek.h
 trr_seek.c
 xdrfile_trr.h
@@ -12,4 +12,4 @@ xtc_seek.h
 xtc_seek.c
 )
 # Add source files
-target_include_directories(XDRFILE INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(XDRFILE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
