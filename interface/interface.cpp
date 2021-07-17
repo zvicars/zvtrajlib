@@ -1,4 +1,4 @@
-#include "interface.h"
+#include "interface.hpp"
 #include <iostream>
 #include <cstring>
 XDRTrajectory::XDRTrajectory(){
