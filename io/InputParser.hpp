@@ -18,7 +18,7 @@
 #include <string>
 #include <vector>
 
-#include "OrderParameters/tools/StringTools.h"
+#include "StringTools.hpp"
 
 
 // ParameterPack: 

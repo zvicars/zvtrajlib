@@ -1,6 +1,6 @@
-#include "interface/interface.h"
-#include "io/input_parser.hpp"
-#include "io/parser.h" 
+#include "interface/interface.hpp"
+#include "io/InputParser.hpp"
+#include "analysis/parser.hpp" 
 #include <iostream>
 int main()
 {
