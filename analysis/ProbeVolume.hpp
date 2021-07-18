@@ -13,19 +13,13 @@ private:
   std::string name_;
 };
 
-
-
-// Register ProbeVolumes using a GenericFactory
-// - Use these typedefs for brevity
-//Generic factory implementation shamelessly borrowed from Sean's OP code
 namespace ProbeVolumeRegistry {
-template<typename P>
-using Register = RegisterInFactory<
-  ProbeVolume,            // base class
-  P,                      // derived class
-  std::string,            // generating key
-  const InputPack&   // input type(s)
->;
 
-using Factory = GenericFactory< ProbeVolume, std::string, const InputPack& >;
-} // end namespace ProbeVolumeRegistry
+using Key  = std::string;
+using Base = ProbeVolume;
+using Factory = GenericFactory<Base, Key, InputPack&>;
+
+
+template<typename D>
+using Register = RegisterInFactory<Base, D, Key, InputPack&>;
+}
