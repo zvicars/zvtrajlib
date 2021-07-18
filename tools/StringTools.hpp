@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "Assert.h"
+#include "Assert.hpp"
 
 // Helper functions for dealing with std::strings
 namespace StringTools {
