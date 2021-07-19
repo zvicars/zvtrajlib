@@ -4,40 +4,37 @@
 #pragma once
 #include "../tools/Assert.hpp"
 #include "../tools/GenericFactory.hpp"
+#include "../tools/StringTools.hpp"
 #include "../interface/datatypes.hpp"
 #include "InputPack.hpp"
 #include "ProbeVolume.hpp"
-
 
 class Calculation{
 public:
   using KeyType = ParameterPack::KeyType;
   Calculation(InputPack& input);
-  virtual void calculate(const Box& box) = 0;
-  virtual void write(std::string base) = 0;
+  virtual void calculate(const Box& box)=0;
+  //virtual void write(std::string base) = 0;
 private:
   std::string name_;
 };
 
-class Calc_Nv : public Calculation{
-public:
-  Calc_Nv(InputPack& input);
-  void calculate(const Box& box);
-private:
-  Vec<double> time;
-  Vec<int> step;
-  Vec<int> count;
-  std::string pv_name_;
-  ProbeVolume* pv_;
-};
-
-
 namespace CalculationRegistry {
 
-using Key  = std::string;
-using Base = Calculation;
-using Factory = GenericFactory<Base, Key, InputPack&>;
+// Manages the creation of Steinhardt objects
+using Factory = GenericFactory<
+  Calculation,   // base class
+  std::string,  // key type
+  InputPack&  // input types
+>;
 
-template<typename D>
-using Register = RegisterInFactory<Base, D, Key, InputPack&>;
-}
+// Object that registers the mapping with the factory
+template<typename S>
+using Register = RegisterInFactory<
+  Calculation,   // base class
+  S,            // derived class
+  std::string,  // key type
+  InputPack&
+>;
+} 
+

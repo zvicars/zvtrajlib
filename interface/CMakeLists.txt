@@ -1,8 +1,8 @@
-add_library (ZVTRAJLIB 
+add_library (TRAJLIB SHARED
 datatypes.hpp
 interface.hpp
 interface.cpp
 )
-target_include_directories(ZVTRAJLIB PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ZVTRAJLIB PRIVATE XDRFILE)
+target_include_directories(TRAJLIB PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(TRAJLIB PRIVATE XDRFILE)
 

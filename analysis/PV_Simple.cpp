@@ -1,8 +1,9 @@
 #include "PV_Simple.hpp"
 namespace ProbeVolumeRegistry {
 static const Register<PV_DiscreteRect>
-  register_Calc_Nv("DiscreteRect");
+  registerType("DiscreteRect");
 }
+
 PV_DiscreteRect::PV_DiscreteRect(InputPack& input):ProbeVolume{input}
 {
   Vec<double> x_range, y_range, z_range;
@@ -19,7 +20,8 @@ PV_DiscreteRect::PV_DiscreteRect(InputPack& input):ProbeVolume{input}
   }
   return;
 }
-double PV_DiscreteRect::calculate(Vec3<double> position){
+
+double PV_DiscreteRect::compute(Vec3<double> position){
   for(int i = 0; i < 3; i++){
     if( position[i] < axis_ranges_[i] || position[i] > axis_ranges_[i+3] ) return 0.0; 
   }

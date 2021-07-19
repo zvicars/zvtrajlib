@@ -1,8 +1,9 @@
 #pragma once
 #include <map>
 #include "../tools/InputParser.hpp"
-#include "ProbeVolume.hpp"
-#include "Calculation.hpp"
+#include "../tools/Stacktrace.hpp"
+class ProbeVolume;
+class Calculation;
 
 //input packs contain a parameterpack and pointer to the registries that different calculations might need to functon,
 class InputPack{
@@ -16,12 +17,12 @@ public:
     return;
   }
   ~InputPack(){
-    if(is_master_pack()){ //only a pack that initialized the registries should delete them
-      for(auto it = pv_registry_.begin(); it!=pv_registry_.end(); it++) {
-        it = pv_registry_.erase(it);
+    if(is_master_pack){ //only a pack that initialized the registries should delete them
+      for(auto it = pv_registry_->begin(); it!=pv_registry_->end(); it++) {
+        it = pv_registry_->erase(it);
       }
-      for(auto it = calc_registry_.begin(); it!=calc_registry_.end(); it++) {
-       it = calc_registry_.erase(it);
+      for(auto it = calc_registry_->begin(); it!=calc_registry_->end(); it++) {
+       it = calc_registry_->erase(it);
       }
       delete pv_registry_;
       delete calc_registry_;
@@ -78,24 +79,29 @@ public:
   }
 
   const ParameterPack& params() const {
-    return params_; 
+    return *params_; 
+  }
+
+  void setParams(const ParameterPack* param){
+    params_ = param;
   }
 
   const std::map<std::string, ProbeVolume*>& ProbeVolumeMap() const {
-    return pv_registry_; 
+    return *pv_registry_; 
   }
 
   const std::map<std::string, Calculation*>& CalculationMap() const {
-    return calc_registry_; 
+    return *calc_registry_; 
   }  
 
   std::vector<InputPack> buildDerivedInputPacks(std::string key){
     std::vector<InputPack> inputpacks;
     auto parameterpacks = params().findParameterPacks(key, ParameterPack::KeyType::Required);
-    std::vector<InputPack> inputpacks.resize(parameterpacks.size());
-    for(std::size_t i = 0; i < parameterpacks; i++){
+    inputpacks.resize(parameterpacks.size());
+    for(std::size_t i = 0; i < parameterpacks.size(); i++){
       inputpacks[i].setCalculationRegistry(getCalculationRegistry());
       inputpacks[i].setProbeVolumeRegistry(getProbeVolumeRegistry());
+      inputpacks[i].setParams(parameterpacks[i]);
     }
     return inputpacks;
   }

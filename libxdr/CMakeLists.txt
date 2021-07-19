@@ -1,5 +1,5 @@
 # Prefer to keep flags private)
-add_library (XDRFILE
+add_library (XDRFILE SHARED
 trr_seek.h
 trr_seek.c
 xdrfile_trr.h

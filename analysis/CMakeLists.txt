@@ -1,13 +1,15 @@
-add_library (ANALYSIS
-bonded_functions.hpp
+add_library (ANALYSIS SHARED "")
+target_sources(ANALYSIS PRIVATE
 bonded_functions.cpp
-Calculation.hpp
 Calculation.cpp
-ProbeVolume.hpp
+Calc_Nv.cpp
 ProbeVolume.cpp
 PV_Simple.cpp
-PV_Simple.hpp
 InputPack.hpp
+Calculation.hpp
+Calc_Nv.hpp
+ProbeVolume.hpp
+PV_Simple.hpp
 )
 target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ANALYSIS PRIVATE INTERFACE TOOLS)
+target_link_libraries(ANALYSIS PRIVATE TRAJLIB TOOLS)

@@ -1,8 +1,8 @@
 #pragma once
 #include "../tools/Assert.hpp"
 #include "../tools/GenericFactory.hpp"
-#include "InputPack.hpp"
 #include "../interface/datatypes.hpp"
+#include "InputPack.hpp"
 
 class ProbeVolume{ //probe volumes allow you to specify a particle position and receive a floating point number corresponding to whether the particle is in the volume or not
 public:
@@ -15,11 +15,19 @@ private:
 
 namespace ProbeVolumeRegistry {
 
-using Key  = std::string;
-using Base = ProbeVolume;
-using Factory = GenericFactory<Base, Key, InputPack&>;
+// Manages the creation of Steinhardt objects
+using Factory = GenericFactory<
+  ProbeVolume,   // base class
+  std::string,  // key type
+  InputPack&  // input types
+>;
 
-
-template<typename D>
-using Register = RegisterInFactory<Base, D, Key, InputPack&>;
+// Object that registers the mapping with the factory
+template<typename S>
+using Register = RegisterInFactory<
+  ProbeVolume,   // base class
+  S,            // derived class
+  std::string,  // key type
+  InputPack&
+>;
 }

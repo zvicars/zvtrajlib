@@ -1,12 +1,11 @@
-add_library (TOOLS 
-InputParser.hpp
+add_library (TOOLS SHARED
+Stacktrace.hpp
+Stacktrace.cpp
+Assert.hpp
+GenericFactory.hpp
 InputParser.cpp
+InputParser.hpp
 StringTools.cpp
 StringTools.hpp
-Stacktrace.hpp
-Assert.hpp
-io_headers.hpp
-string_ops.hpp
-GenericFactory.hpp
 )
 target_include_directories(TOOLS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
