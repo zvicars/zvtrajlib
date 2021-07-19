@@ -30,7 +30,6 @@ void printSTL(const Mesh& mesh, std::string& frame)
 
 void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 {
-	double gs = v.get_gs();
 	int nx = v.getSize()[0];
 	int ny = v.getSize()[1];
 	int nz = v.getSize()[2];
@@ -69,5 +68,9 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
     output_mesh.triangles = triangles_;
     output_mesh.nvtx = nvtx;
     output_mesh.ntri = ntri;
+
+	delete[] vertex_data;
+	delete[] triangle_data;
+
 	return;
 }
