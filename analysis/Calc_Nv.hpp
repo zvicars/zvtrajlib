@@ -4,10 +4,12 @@ class Calc_Nv : public Calculation{
 public:
   Calc_Nv(InputPack& input);
   virtual void calculate(const Box& box);
+  virtual std::string printConsoleReport();
 private:
   Vec<double> time;
   Vec<int> step;
-  Vec<int> count;
+  Vec<double> count;
+  double value_;
   std::string pv_name_;
   ProbeVolume* pv_;
 };

@@ -7,6 +7,7 @@ static const Register<PV_DiscreteRect>
 PV_DiscreteRect::PV_DiscreteRect(InputPack& input):ProbeVolume{input}
 {
   Vec<double> x_range, y_range, z_range;
+  axis_ranges_.resize(6, 0.0);
   input.params().readVector("x_range", KeyType::Required, x_range);
   input.params().readVector("y_range", KeyType::Required, y_range);
   input.params().readVector("z_range", KeyType::Required, z_range);

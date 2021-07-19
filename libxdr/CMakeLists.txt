@@ -13,3 +13,4 @@ xtc_seek.c
 )
 # Add source files
 target_include_directories(XDRFILE PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(XDRFILE PRIVATE -fPIC)

@@ -10,3 +10,4 @@ add_executable(test test.cpp)
 target_link_libraries(test PRIVATE TRAJLIB 
                            PRIVATE TOOLS 
                            PRIVATE ANALYSIS)
+target_compile_options(test PRIVATE -fPIC)

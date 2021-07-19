@@ -5,5 +5,5 @@ public:
   PV_DiscreteRect(InputPack& input);
   virtual double compute(Vec3<double> position);
 private:
-  Vec3<double> axis_ranges_;
+  Vec<double> axis_ranges_;
 };

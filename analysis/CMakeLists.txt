@@ -1,4 +1,4 @@
-add_library (ANALYSIS SHARED "")
+add_library (ANALYSIS OBJECT "")
 target_sources(ANALYSIS PRIVATE
 bonded_functions.cpp
 Calculation.cpp
@@ -13,3 +13,4 @@ PV_Simple.hpp
 )
 target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(ANALYSIS PRIVATE TRAJLIB TOOLS)
+target_compile_options(ANALYSIS PRIVATE -fPIC)
