@@ -13,6 +13,9 @@ class Calculation{
 public:
   using KeyType = ParameterPack::KeyType;
   Calculation(InputPack& input);
+  virtual ~Calculation(){
+    return;
+  }
   virtual void calculate(const Box& box)=0;
   virtual std::string printConsoleReport()=0;
   //virtual void write(std::string base) = 0;

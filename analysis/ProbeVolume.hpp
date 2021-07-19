@@ -8,6 +8,9 @@ class ProbeVolume{ //probe volumes allow you to specify a particle position and 
 public:
   using KeyType = ParameterPack::KeyType;
   ProbeVolume(InputPack& input);
+  virtual ~ProbeVolume(){
+    return;
+  }
   virtual double compute(Vec3<double> position) = 0;
 private:
   std::string name_;

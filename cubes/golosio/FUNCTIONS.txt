@@ -1,0 +1,336 @@
+//////////////////////////////////////////////////////////////////////
+FUNCTIONS.txt
+//////////////////////////////////////////////////////////////////////
+Description of the most important functions of the program
+triangulate v2.4
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+TriangulateMain.c: int main(int argc, char *argv[])
+//////////////////////////////////////////////////////////////////////
+// Main function of the iso-surface triangulation program
+// (version with input volumetric data from file, output stored in files)
+// read command-line arguments:
+// inputfile : 3D volumetric data file containing Nx*Ny*Nz elements
+// vertexfile : file with vertex coordinates and gradient vector components
+// trianglefile : file with triangle vertex indexes
+// Nx, Ny, Nz : volumetric data array dimensions
+// Sidex, Sidey, Sidez : voxel sizes
+// thresh : Iso-Surface Threshold Value (iso-value)
+// sign : Sign defining volume inside iso-surface
+//       (< , <=, >=, >) : LT_THRESH, LE_THRESH, GE_THRESH, GT_THRESH
+///////////////////////////////////////////////////////////////////////////
+// DESCRIPTION:
+// Main function for Iso-surface triangulation using an improved marching cube
+// algorithm. It loads volumetric data from the file inputfile, builds a
+// triangulated model of the isosurface corresponding to the isovalue thresh,
+// and write the resulting mesh in two files, one (vertexfile) containing
+// the vertex coordinates and gradient vector components, the other
+// (trianglefile) containing, for each triangle of the mesh, the 3
+// indexes of the mesh vertexes corresponding to the triangle vertexes 
+// INPUT FILE FORMAT:
+// inputfile : 3D volumetric data file containing Nx*Ny*Nz elements
+////// binary (raw) format:
+////// Nx*Ny*Nz floats, Nx running faster
+// OUTPUT FILE FORMAT:
+// vertexfile : file with vertex coordinates and gradient vector components
+////// binary format:
+////// Nv (int type): number of vertexes in the mesh
+////// x1, y1, z1 (float type): coordinates of vertexes n. 1
+////// vx1, vy1, vz1 (float type): gradient components of vertexes n. 1
+////// ............
+////// xNv, yNv, zNv (float type): coordinates of vertexes n. Nv
+////// vxNv, vyNv, vzNv (float type): gradient components of vertexes n. Nv
+// trianglefile : file with triangle vertex indexes
+////// binary format:
+////// Nt (int type): number of triangles in the mesh
+////// i1, j1, k1 (float type): indexes of the mesh vertexes corresponding 
+////// to the 3 vertexes of triangle n. 1
+////// ............
+////// iNt, jNt, kNt (float type): indexes of the mesh vertexes corresponding 
+////// to the 3 vertexes of triangle n. Nt
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+TriangulateTest.c: int main(int argc, char *argv[])
+//////////////////////////////////////////////////////////////////////
+// Main function of the iso-surface triangulation program
+// (version with input/output arrays in memory)
+// read command-line arguments:
+// inputfile : 3D volumetric data file containing Nx*Ny*Nz elements
+// vertexfile : file with vertex coordinates and gradient vector components
+// trianglefile : file with triangle vertex indexes
+// Nx, Ny, Nz : volumetric data array dimensions
+// Sidex, Sidey, Sidez : voxel sizes
+// thresh : Iso-Surface Threshold Value (iso-value)
+// sign : Sign defining volume inside iso-surface
+//       (< , <=, >=, >) : LT_THRESH, LE_THRESH, GE_THRESH, GT_THRESH
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+// DESCRIPTION:
+// Main function for Iso-surface triangulation using an improved marching cube
+// algorithm. It loads volumetric data from the file inputfile, builds a
+// triangulated model of the isosurface corresponding to the isovalue thresh,
+// and write the resulting mesh in two files, one (vertexfile) containing
+// the vertex coordinates and gradient vector components, the other
+// (trianglefile) containing, for each triangle of the mesh, the 3
+// indexes of the mesh vertexes corresponding to the triangle vertexes 
+// INPUT FILE FORMAT:
+// inputfile : 3D volumetric data file containing Nx*Ny*Nz elements
+////// binary (raw) format:
+////// Nx*Ny*Nz floats, Nx running faster
+// OUTPUT FILE FORMAT:
+// vertexfile : file with vertex coordinates and gradient vector components
+////// binary format:
+////// Nv (int type): number of vertexes in the mesh
+////// x1, y1, z1 (float type): coordinates of vertexes n. 1
+////// vx1, vy1, vz1 (float type): gradient components of vertexes n. 1
+////// ............
+////// xNv, yNv, zNv (float type): coordinates of vertexes n. Nv
+////// vxNv, vyNv, vzNv (float type): gradient components of vertexes n. Nv
+// trianglefile : file with triangle vertex indexes
+////// binary format:
+////// Nt (int type): number of triangles in the mesh
+////// i1, j1, k1 (float type): indexes of the mesh vertexes corresponding 
+////// to the 3 vertexes of triangle n. 1
+////// ............
+////// iNt, jNt, kNt (float type): indexes of the mesh vertexes corresponding 
+////// to the 3 vertexes of triangle n. Nt
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+Triangulate.c: int Triangulate(float *vol_data, float **vertex_data,
+	       int **triangle_data, int *n, float *s, int *nvtx, int *ntri,
+	        float mu, int cmp)
+//////////////////////////////////////////////////////////////////////
+// Iso-surface triangulation algorithm
+// (version with input/output array in memory)
+// INPUT:
+// vol_data[Nx*Ny*Nz] : 3D volumetric data array
+// n : array dimensions Nx=n[0], Ny=n[1], Nz=n[2]
+// s : voxel sizes sx=s[0], sy=s[1], sz=s[2]
+// mu : Iso-Surface Threshold Value (iso-value)
+// cmp : Sign defining volume inside iso-surface
+//       (< , <=, >=, >) : LT_THRESH, LE_THRESH, GE_THRESH, GT_THRESH
+// OUTPUT:
+// ntri: number of triangles
+// nvtx: number of vertexes
+// vertex_data : array of vertex coordinates and gradient vector components
+// triangle_data : array of triangle vertex indexes
+//
+// DESCRIPTION:
+// Iso-surface triangulation algorithm. It makes a loop on all slices
+// of the input volumetric data array vol_data. The slice index is iz.
+// At each step of the loop, it keeps 4 consecutive slices in memory
+// by shifting the last 3 slices and loading a new one through the
+// function  LoadSlices(iz). Then it evaluates volumetric data gradients
+// at the logical cube edges through the function MkGrad(iz),
+// it evaluates intersection of isosurface with logical cube edges
+// through the function MkEdge(iz), and it perform a standard triangulation 
+// inside each logical cube through the function PolygonizeCube(iz)
+// For each vertex of the resulting mesh, the 3 vertex coordinates and the
+// 3 gradient vector components are written to the array vertex_data
+// as 6 consecutive floating point numbers (float type).
+// For each triangle of the resulting mesh, the 3 indexes associated to the
+// triangle vertexes are written to the array triangle_data
+// as 3 consecutive integers (int type)
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+Triangulate.c: int TriangulateFile(char *InputFile, char *VertexFile,
+	       char *TriangleFile, int *n, float *s, float mu, int cmp)
+//////////////////////////////////////////////////////////////////////
+// Iso-surface triangulation algorithm
+// (version with input volumetric data from file, output stored in files)
+// INPUT:
+// InputFile : 3D volumetric data file containing Nx*Ny*Nz elements
+////// binary (raw) format:
+////// Nx*Ny*Nz floats, Nx running faster
+// n : array dimensions Nx=n[0], Ny=n[1], Nz=n[2]
+// s : voxel sizes sx=s[0], sy=s[1], sz=s[2]
+// mu : Iso-Surface Threshold Value (iso-value)
+// cmp : Sign defining volume inside iso-surface
+//       (< , <=, >=, >) : LT_THRESH, LE_THRESH, GE_THRESH, GT_THRESH
+// OUTPUT:
+// ntri: number of triangles
+// nvtx: number of vertexes
+// VertexFile : file with vertex coordinates and gradient vector components
+////// binary format:
+////// Nv (int type): number of vertexes in the mesh
+////// x1, y1, z1 (float type): coordinates of vertexes n. 1
+////// vx1, vy1, vz1 (float type): gradient components of vertexes n. 1
+////// ............
+////// xNv, yNv, zNv (float type): coordinates of vertexes n. Nv
+////// vxNv, vyNv, vzNv (float type): gradient components of vertexes n. Nv
+// TriangleFile : file with triangle vertex indexes
+////// binary format:
+////// Nt (int type): number of triangles in the mesh
+////// i1, j1, k1 (float type): indexes of the mesh vertexes corresponding 
+////// to the 3 vertexes of triangle n. 1
+////// ............
+////// iNt, jNt, kNt (float type): indexes of the mesh vertexes corresponding 
+////// to the 3 vertexes of triangle n. Nt
+//
+// DESCRIPTION:
+// Iso-surface triangulation algorithm (version with input volumetric data
+// from file, output stored in files). It makes a loop on all slices
+// of the input volumetric data array vol_data. The slice index is iz.
+// At each step of the loop, it keeps 4 consecutive slices in memory
+// by shifting the last 3 slices and loading from the file
+// InputFile a new one through the
+// function  LoadSlices(iz). Then it evaluates volumetric data gradients
+// at the logical cube edges through the function MkGrad(iz),
+// it evaluates intersection of isosurface with logical cube edges
+// through the function MkEdge(iz), and it perform a standard triangulation 
+// inside each logical cube through the function PolygonizeCube(iz)
+// For each vertex of the resulting mesh, the 3 vertex coordinates and the
+// 3 gradient vector components are written to the file VertexFile
+// as 6 consecutive floating point numbers (float type) in binary format.
+// For each triangle of the resulting mesh, the 3 indexes associated to the
+// triangle vertexes are written to the file TriangleFile
+// as 3 consecutive integers (int type) in binary format
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+FindVertexes.c: int MkGrad(int iz)
+//////////////////////////////////////////////////////////////////////
+// Evaluates gradients in logical cube vertexes
+// RETURN VALUE: zero on success 
+// INPUT ARGUMENTS:
+// - iz: index of slice from volumetric data
+// INPUT FROM GLOBAL VARIABLES:
+// **Vertex[4]: Mu Values of logical cube vertexes in 4 slices
+// OUTPUT TO GLOBAL VARIABLES:
+// **Grad[3][2]: gradient in cube vertexes [component][z plane][y][x]
+//
+// DESCRIPTION:
+// This function is called by the function "Triangulate" (or "TriangulateFile")
+// as part of the marching cube algorithm.
+// It makes a loop on the logical cubes of a volumetric data slice. For
+// each vertex of the cube it evaluates the gradient by the finit differences
+// method, as described in the article
+// The gradient at each logical cube vertex is stored in the global array
+// **Grad[3][2]
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+FindVertexes.c: int MkEdge(int iz)
+//////////////////////////////////////////////////////////////////////
+// Evaluates intersection points of the IsoSurface with the logical cube edges
+// and volumetric data gradiet at the intersection positions.
+// RETURN VALUE: zero on success 
+// INPUT ARGUMENTS:
+// - iz: index of slice from volumetric data
+// INPUT FROM GLOBAL VARIABLES:
+// **Vertex[4]: Mu Values of logical cube vertexes in 4 slices
+// **Grad[3][2]: gradient in logical cube vertexes [component][z plane][y][x]
+// OUTPUT TO GLOBAL VARIABLES AND TO FILE (OR MEMORY):
+// **EdgeIpt[3][2]: indexes of intersection points of the IsoSurface
+//                  with the cube edges [edge axis][z plane][y][x]
+// Intersection point coordinates and gradient at the intersection positions
+// are stored in a file (or in memory) through a call to the function
+// "StoreVertex"
+//
+// DESCRIPTION:
+// This function is called by the function "Triangulate" (or "TriangulateFile")
+// as part of the marching cube algorithm.
+// It makes a loop on the logical cubes of a volumetric data slice. For
+// each vertex of the cube it checks whether it is intersected by the
+// isosurface, and in such case it evaluates the intersection position
+// and the volumetric data gradient at the intersection position 
+// by linear interpolation as described in the article.
+// The index of the intersection is stored in the global array EdgeIpt
+// The intersection point coordinates and gradient at the intersection
+// positions are stored in a file (or in memory) through a call to the
+// function "StoreVertex"
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+PolygonizeCube.c: int PolygonizeCube(int iz)
+//////////////////////////////////////////////////////////////////////
+// Performs a standard triangulation inside each logical cube
+// RETURN VALUE: zero on success 
+// INPUT ARGUMENTS:
+// - iz: index of slice from volumetric data
+// INPUT FROM GLOBAL VARIABLES:
+// **Vertex[4]: Mu Values of cube vertexes in 4 slices
+// **EdgeIpt[3][2]: indexes of intersection points of the IsoSurface
+//                  with the cube edges [edge axis][z plane][y][x]
+// alntri[256]: (from lookup table) alntri[ib] is the number of triangles
+//              inside logical cube for the standard triangulation num. ib 
+// alipt[256][5][3]: (from lookup table) alipt[ib][itr][iv]
+//      for the standard triangulation num. ib, for the triangle num. itr
+//      of that triangulation, and for vertex num. iv of that triangle,
+//      alipt[ib][itr][iv] is the index of the cube edge on which the vertex
+//      is positioned
+// OUTPUT TO FILE (OR MEMORY):
+// For each triangle of the mesh, the 3 indexes associated to the triangle
+// vertexes are stored in a file (or in memory) through a call to the function
+// "StoreTriangle"
+//
+// DESCRIPTION:
+// This function is called by the function "Triangulate" (or "TriangulateFile")
+// as part of the marching cube algorithm.
+// It makes a loop on the logical cubes of a volumetric data slice. For
+// each logical cube it checks if the 8 cube vertexes are above or below the
+// isovalue, thus obtaining 8 boolean values. Those values are converted to
+// a binary number, than the standard triangulation corresponding to that
+// binary number is retrieved from the lookup table.
+// This standard triangulation says how many triangles are present inside
+// the logical cube and on which edges of the logical cube the triangle
+// vertexes are positioned. In this way the algorithm associates to each
+// triangle vertex the index of the corresponding mesh vertex.
+// The 3 indexes associated to the triangle vertexes are stored in a file
+// (or in memory) through a call to the function "StoreTriangle"
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+OutputData.c: int StoreVertex(float *x, float *nrm)
+//////////////////////////////////////////////////////////////////////
+// Stores the coordinates and gradient components of a new mesh vertex
+// in a file or in memory
+////// global variable FileFlag=1 vertex data must be saved in a file
+////// global variable FileFlag=0 vertex data must be saved in memory
+// RETURN VALUE: zero on success 
+// INPUT ARGUMENTS:
+// x[3]: vertex x,y,z coordinates
+// nrm[3]: gradient x,y,z components
+// OUTPUT:
+// If FileFlag=1 the vertex coordinates and gradient components are written
+// to the file pointed by the global file pointer VertexFP as 6 consecutive
+// floating point numbers (float type) in binary format.
+// If FileFlag=0 they are written to the global array VertexData
+//
+// DESCRIPTION:
+// This function is called by the function "MkEdge"
+// as part of the marching cube algorithm.
+// It stores the coordinates and gradient components of a new mesh vertex
+// in a file (or in memory, depending on the flag
+//  FileFlag) by writing the 3 coordinates and the 3 gradient components
+// in the file (or in memory) as 6 consecutive floating point numbers
+// (float type) in binary format
+//////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////
+OutputData.c: int StoreTriangle(int *IVtx)
+//////////////////////////////////////////////////////////////////////
+// Store new triangle in file or in memory
+////// global variable FileFlag=1 triangle data must be saved in a file
+////// global variable FileFlag=0 triangle data must be saved in memory
+// RETURN VALUE: zero on success 
+// INPUT ARGUMENTS:
+// IVtx[3]: indexes of the 3 triangle vertexes 
+// OUTPUT:
+// If FileFlag=1 the 3 indexes are written to the file pointed by the global
+// file pointer TriangleFP as three consecutive integers (int type)
+// in binary format.
+// If FileFlag=0 the 3 indexes are written to the global array TriangleData
+//
+// DESCRIPTION:
+// This function is called by the function "PolygonizeCube"
+// as part of the marching cube algorithm.
+// It stores a new triangle in a file (or in memory, depending on the flag
+//  FileFlag) by writing 3 indexes associated to the triangle vertexes
+// in the file (or in memory) as 3 consecutive integers (int type) in
+// binary format
+//////////////////////////////////////////////////////////////////////
