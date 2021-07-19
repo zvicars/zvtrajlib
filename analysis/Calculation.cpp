@@ -5,6 +5,12 @@ Calculation::Calculation(InputPack& input)
     input.addCalculation(name_, this);
     return;
 }
+
+namespace CalculationRegistry {
+static const Register<Calc_Nv>
+  register_Calc_Nv("Nv");
+}
+
 Calc_Nv::Calc_Nv(InputPack& input):Calculation{input}
 {
     input.params().readString("probe_volume", KeyType::Required, pv_name_);

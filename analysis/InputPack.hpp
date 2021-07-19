@@ -81,12 +81,21 @@ public:
     return params_; 
   }
 
-  std::vector<InputPack> buildDerivedInputPacks(const InputPack& master_pack, std::string key){
-    auto parameterpacks = master_pack.params().findParameterPacks(key, ParameterPack::KeyType::Required);
-    std::vector<InputPack> inputpacks(parameterpacks.size());
+  const std::map<std::string, ProbeVolume*>& ProbeVolumeMap() const {
+    return pv_registry_; 
+  }
+
+  const std::map<std::string, Calculation*>& CalculationMap() const {
+    return calc_registry_; 
+  }  
+
+  std::vector<InputPack> buildDerivedInputPacks(std::string key){
+    std::vector<InputPack> inputpacks;
+    auto parameterpacks = params().findParameterPacks(key, ParameterPack::KeyType::Required);
+    std::vector<InputPack> inputpacks.resize(parameterpacks.size());
     for(std::size_t i = 0; i < parameterpacks; i++){
-      inputpacks[i].setCalculationRegistry(master_pack.getCalculationRegistry);
-      inputpacks[i].setProbeVolumeRegistry(master_pack.getProbeVolumeRegistry);
+      inputpacks[i].setCalculationRegistry(getCalculationRegistry());
+      inputpacks[i].setProbeVolumeRegistry(getProbeVolumeRegistry());
     }
     return inputpacks;
   }

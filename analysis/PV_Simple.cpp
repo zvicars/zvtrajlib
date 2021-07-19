@@ -1,5 +1,8 @@
 #include "PV_Simple.hpp"
-
+namespace ProbeVolumeRegistry {
+static const Register<PV_DiscreteRect>
+  register_Calc_Nv("DiscreteRect");
+}
 PV_DiscreteRect::PV_DiscreteRect(InputPack& input):ProbeVolume{input}
 {
   Vec<double> x_range, y_range, z_range;
