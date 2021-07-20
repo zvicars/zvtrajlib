@@ -4,8 +4,8 @@
 /////////////////////////////////////////
 
 //---------------------------------------------------------------------------
-#include "TriangulateGlobal.h"
-#include "TriangulateTab.h"
+#include "TriangulateGlobal.hpp"
+#include "TriangulateTab.hpp"
 //---------------------------------------------------------------------------
 
 int dx[8] = {1, 1, 1, 1, 0, 0, 0, 0}; // relative position of cube vertexes
@@ -16,7 +16,7 @@ int Edgy[12] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1};
 int Edgz[12] = {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1};
 int Edga[12] = {1, 2, 1, 2, 1, 2, 1, 2, 0, 0, 0, 0};
 
-int PolygonizeCube(int iz)
+int TriangulateGlobal::PolygonizeCube(int iz)
 //////////////////////////////////////////////////////////////////////
 // Performs a standard triangulation inside each logical cube
 // RETURN VALUE: zero on success 

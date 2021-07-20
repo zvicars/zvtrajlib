@@ -1,9 +1,7 @@
 #include "MarchingCubesInterface.hpp"
-#include "./golosio/TriangulateGlobal.h"
 #include <sstream>
 namespace golosio{
-extern "C" int Triangulate(float *vol_data, float **vertex_data,  int **triangle_data,
-		int *n, float *s, int *nvtx, int *ntri, float thresh, int cmp);
+#include "./golosio/TriangulateGlobal.hpp"
 }
 void printSTL(const Mesh& mesh, std::string& frame)
 {
@@ -34,30 +32,34 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 	int ny = v.getSize()[1];
 	int nz = v.getSize()[2];
 	double box_vec[3] = {v.getLength()[0], v.getLength()[1], v.getLength()[2]};
-	float* volume_data;
-	volume_data = (float*)malloc(sizeof(float)*nx*ny*nz);
+	std::vector<float> volume_data(nx*ny*nz, 0);
 	int iterator = 0;
 	for(int k = 0; k < nz; k++)
 	for(int j = 0; j < ny; j++)
 	for(int i = 0; i < nx; i++)
 	{
-		volume_data[iterator] = v.getGridVal(i, j, k);;
+		volume_data[iterator] = v.getGridVal(i, j, k);
 		iterator++;
 	}
-	float* vertex_data; int* triangle_data;
-	int nvtx; int ntri; int n[3] = {nx, ny, nz};
+	float* vertex_data; 
+	int* triangle_data;
+	int nvtx; 
+	int ntri; 
+	int n[3] = {nx, ny, nz};
+
 	float s[3] = {(float)v.get_gs()[0], (float)v.get_gs()[1], (float)v.get_gs()[2]}; 
 	float thresh = (float)v.getIsovalue(); 
-	golosio::Triangulate(volume_data, &vertex_data, &triangle_data, n, s, &nvtx, &ntri, thresh, 0);
-    std::vector<Vec3<double> > vertices_(nvtx);
-    std::vector<Vec3<double> > gradients_(nvtx);
-    std::vector<Triangle> triangles_(ntri);
-    for(int i = 0; i < nvtx; i++){
-        for(int j = 0; j < 3; j++){
-            vertices_[i][j] = vertex_data[6*i + j] + 0.5*v.getLength()[j];
-            gradients_[i][j] = vertex_data[6*i + j + 3];   
-        }
-    }
+	golosio::TriangulateGlobal g1;
+	g1.Triangulate(&volume_data[0], &vertex_data, &triangle_data, n, s, &nvtx, &ntri, thresh, 0);
+	std::vector<Vec3<double> > vertices_(nvtx);
+	std::vector<Vec3<double> > gradients_(nvtx);
+	std::vector<Triangle> triangles_(ntri);
+	for(int i = 0; i < nvtx; i++){
+			for(int j = 0; j < 3; j++){
+					vertices_[i][j] = vertex_data[6*i + j] + 0.5*v.getLength()[j];
+					gradients_[i][j] = vertex_data[6*i + j + 3];   
+			}
+	}
 	for(int i = 0; i < ntri; i++){
         Vec3<int> triangle_indices_;
         for(int j = 0; j < 3; j++){
@@ -73,6 +75,5 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 
 	free(vertex_data);
 	free(triangle_data);
-	free(volume_data);
 	return;
 }

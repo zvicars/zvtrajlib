@@ -5,8 +5,8 @@ class Calc_Isosurface : public Calculation{
 public:
   Calc_Isosurface(InputPack& input);
   ~Calc_Isosurface(){
-      delete frame_;
       delete average_;
+      delete frame_;
   }
   virtual void calculate(const Box& box);
   virtual std::string printConsoleReport();

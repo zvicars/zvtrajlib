@@ -13,7 +13,6 @@ VoxelGrid::VoxelGrid(Vec3<int> size, Vec3<double> box_size, double density, doub
     int dz = size[2];
     resize_grid(dx, dy, dz);
     for(int i = 0; i < 3; i++){
-        sz[i] = size[i];
         grid_spacing_[i] = box_size[i] / (double)(size[i]);
     }
     sigma_= sigma;

@@ -6,11 +6,11 @@
 //---------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
-#include "TriangulateGlobal.h"
+#include "TriangulateGlobal.hpp"
 //---------------------------------------------------------------------------
 #define EPS 1e-2
 
-int MkEdge(int iz)
+int TriangulateGlobal::MkEdge(int iz)
 //////////////////////////////////////////////////////////////////////
 // Evaluates intersection points of the IsoSurface with the logical cube edges
 // and volumetric data gradiet at the intersection positions.
@@ -88,7 +88,7 @@ int MkEdge(int iz)
   return 0;
 }
 
-int MkGrad(int iz)
+int TriangulateGlobal::MkGrad(int iz)
 //////////////////////////////////////////////////////////////////////
 // Evaluates gradients in logical cube vertexes
 // RETURN VALUE: zero on success 
