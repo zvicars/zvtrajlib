@@ -4,10 +4,6 @@
 class Calc_Isosurface : public Calculation{
 public:
   Calc_Isosurface(InputPack& input);
-  ~Calc_Isosurface(){
-      delete average_;
-      delete frame_;
-  }
   virtual void calculate(const Box& box);
   virtual std::string printConsoleReport();
   virtual void printOutput();
@@ -15,6 +11,7 @@ public:
 private:
   //number of actual frames computed
   int frame_counter_;
+  bool initialized_;
   //total surface area of the isosurface
   std::vector<double> areas_;
   //voxel grid input information
@@ -22,6 +19,6 @@ private:
   double area_, sigma_, density_, isovalue_;
   //voxel grid output
   Mesh mesh_;
-  VoxelGrid* frame_;
-  VoxelGrid* average_;
+  VoxelGrid frame_;
+  VoxelGrid average_;
 };

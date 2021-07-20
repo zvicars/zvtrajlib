@@ -1,6 +1,45 @@
 #include "TriangulateGlobal.hpp"
 #include <cmath>
 #include <cstring>
+int TriangulateGlobal::Triangulate(float *vol_data, std::vector<float>& vertex_data,  std::vector<int>& triangle_data, int *n, float *s, int *nvtx, int *ntri, float mu, int cmp)
+{
+  int i, iz;
+  // initializations:
+  NVtx = 0;
+  NTri = 0;
+  IsoValue = mu;
+  CmpSign = cmp;
+  for (i=0; i<3; i++) {
+    NVxl[i] = n[i];
+    Side[i] = s[i];
+  }
+  
+  VolData = vol_data;
+  TriangulateInit();
+  OutputDataInit();
+  
+  LoadSlices(-2);                   // load 4 slices in memory
+  LoadSlices(-1);                   // load 4 slices in memory
+  MkGrad(-1);                       // evaluate gradient
+  for (iz=0; iz<NVxl[2]; iz++) {
+    LoadSlices(iz);                   // load 4 slices in memory
+    MkGrad(iz);                       // evaluate gradient
+    MkEdge(iz);  // evaluate intersection of isosurface with cube edges
+    if (iz > 0) PolygonizeCube(iz); // perform standard triangulations
+    //printf("%d / %d\n", iz+1, NVxl[2]);   // update progress bar
+  }
+
+  TriangulateFree(); // deallocate memory
+
+  // set output pointers 
+  vertex_data = VertexData;
+  triangle_data = TriangleData;
+  *nvtx = NVtx;
+  *ntri = NTri;
+
+  return 0;
+}
+
 int TriangulateGlobal::LoadSlices(int iz)    // load 4 slices in memory
 {
   int ix, iy;
@@ -76,11 +115,7 @@ int TriangulateGlobal::StoreTriangle(int *IVtx)
   int i, ipt;
   if (NTri >= NTriLimit) { // check if it is necessary to reallocate memory
     NTriLimit += OUTPUT_INCREMENT; // increase limit and reallocate memory
-    TriangleData = (int*)realloc(TriangleData, sizeof(int)*3*NTriLimit);
-    if (!TriangleData) {
-      printf("Memory allocation error in StoreTriangle()\n");
-      throw 0; 
-    }
+    TriangleData.resize(3*NTriLimit);
   }
   ipt = 3*NTri;
   for (i=0; i<3; i++) TriangleData[ipt++] = IVtx[i];
@@ -106,11 +141,8 @@ int TriangulateGlobal::StoreVertex(float *x, float *nrm)
   int i, ipt;
   if (NVtx >= NVtxLimit) { // check if it is necessary to reallocate memory
     NVtxLimit += OUTPUT_INCREMENT; // increase limit and reallocate memory
-    VertexData = (float*)realloc(VertexData, sizeof(float)*6*NVtxLimit);
-    if (!VertexData) {
-      printf("Memory allocation error in StoreVertex()\n");
-      throw 0;
-    }
+    //VertexData = (float*)realloc(VertexData, sizeof(float)*6*NVtxLimit);
+    VertexData.resize(6*NVtxLimit);
   }
   ipt = 6*NVtx;
   for (i=0; i<3; i++) VertexData[ipt++] = x[i];
@@ -132,8 +164,5 @@ int TriangulateGlobal::OutputDataInit() // output data initialization
 
 int TriangulateGlobal::OutputDataFree() // free the memory allocated for output data
 {
-
-  free(VertexData);
-  free(TriangleData);
   return 0;
 }

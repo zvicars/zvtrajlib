@@ -10,13 +10,11 @@
 #define GT_THRESH 3
 #include <stdio.h>
 #include "matrix.hpp"
+#include <vector>
 class TriangulateGlobal{
 public:
-  int Triangulate(float *vol_data, float **vertex_data,  int **triangle_data, int *n, float *s, int *nvtx, int *ntri, float mu, int cmp);
+  int Triangulate(float *vol_data, std::vector<float>& vertex_data,  std::vector<int>& triangle_data, int *n, float *s, int *nvtx, int *ntri, float mu, int cmp);
 private:
-  //---------------------------------------------------------------------------
-  // Functions
-  //---------------------------------------------------------------------------
   int LoadSlices(int iz);         // load 4 slices in memory
   int TriangulateInit(); // initialize arrays
   int TriangulateFree(); // free arrays
@@ -44,8 +42,8 @@ private:
   float **Grad[3][2]; // gradient in logical cube vertexes
   int **EdgeIpt[3][2]; // indexes of intersection points of the IsoSurface
   float *VolData; // array of volumetric data
-  float *VertexData; // array of vertexes
-  int *TriangleData; // array of triangles
+  std::vector<float> VertexData; // array of vertexes
+  std::vector<int> TriangleData; // array of triangles
   int OUTPUT_INCREMENT = 65536;
 };
 #endif

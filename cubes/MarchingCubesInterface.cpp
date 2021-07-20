@@ -1,8 +1,7 @@
 #include "MarchingCubesInterface.hpp"
 #include <sstream>
-namespace golosio{
 #include "./golosio/TriangulateGlobal.hpp"
-}
+
 void printSTL(const Mesh& mesh, std::string& frame)
 {
 	std::stringstream ofile;
@@ -33,6 +32,8 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 	int nz = v.getSize()[2];
 	double box_vec[3] = {v.getLength()[0], v.getLength()[1], v.getLength()[2]};
 	std::vector<float> volume_data(nx*ny*nz, 0);
+	std::vector<int> triangle_data;
+	std::vector<float> vertex_data; 
 	int iterator = 0;
 	for(int k = 0; k < nz; k++)
 	for(int j = 0; j < ny; j++)
@@ -41,16 +42,14 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 		volume_data[iterator] = v.getGridVal(i, j, k);
 		iterator++;
 	}
-	float* vertex_data; 
-	int* triangle_data;
 	int nvtx; 
 	int ntri; 
 	int n[3] = {nx, ny, nz};
 
 	float s[3] = {(float)v.get_gs()[0], (float)v.get_gs()[1], (float)v.get_gs()[2]}; 
 	float thresh = (float)v.getIsovalue(); 
-	golosio::TriangulateGlobal g1;
-	g1.Triangulate(&volume_data[0], &vertex_data, &triangle_data, n, s, &nvtx, &ntri, thresh, 0);
+	TriangulateGlobal g1;
+	g1.Triangulate(&volume_data[0], vertex_data, triangle_data, n, s, &nvtx, &ntri, thresh, 0);
 	std::vector<Vec3<double> > vertices_(nvtx);
 	std::vector<Vec3<double> > gradients_(nvtx);
 	std::vector<Triangle> triangles_(ntri);
@@ -72,8 +71,5 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
     output_mesh.triangles = triangles_;
     output_mesh.nvtx = nvtx;
     output_mesh.ntri = ntri;
-
-	free(vertex_data);
-	free(triangle_data);
 	return;
 }

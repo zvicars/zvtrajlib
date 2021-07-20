@@ -15,6 +15,18 @@ int Edgx[12] = {1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0}; //
 int Edgy[12] = {0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1};
 int Edgz[12] = {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1};
 int Edga[12] = {1, 2, 1, 2, 1, 2, 1, 2, 0, 0, 0, 0};
+// converts a boolean array InVert[8] to a byte VertexByte
+int TriangulateGlobal::BoolToByte(int InVert[]) {
+  int VertexByte;
+  int i;
+  
+  VertexByte = 0;
+  for (i=7; i>=0; i--) {
+    VertexByte <<= 1;
+    if(InVert[i]) VertexByte ++;
+  }
+  return VertexByte;
+}
 
 int TriangulateGlobal::PolygonizeCube(int iz)
 //////////////////////////////////////////////////////////////////////
@@ -93,17 +105,4 @@ int TriangulateGlobal::PolygonizeCube(int iz)
   }
 
   return 0;
-}
-
-// converts a boolean array InVert[8] to a byte VertexByte
-int BoolToByte(int InVert[]) {
-  int VertexByte;
-  int i;
-  
-  VertexByte = 0;
-  for (i=7; i>=0; i--) {
-    VertexByte <<= 1;
-    if(InVert[i]) VertexByte ++;
-  }
-  return VertexByte;
 }
