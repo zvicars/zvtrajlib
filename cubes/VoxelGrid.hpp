@@ -14,7 +14,7 @@ public:
 	template <class T>
 	using Vec3 = std::array<T, 3>;
 	VoxelGrid(Vec3<int> size, Vec3<double> box_size, double density, double sigma, double isovalue);
-	int resize_grid(int dim_x, int dim_y, int dim_z, double ival = 0.0);
+	int resize_grid(int dim_x, int dim_y, int dim_z);
 	Vec3<int> getSize() const{
 		return sz;
 	}
@@ -23,11 +23,13 @@ public:
 		for(int i = 0; i < 3; i++){
 			ret[i] = sz[i]*grid_spacing_[i];
 		}
+		return ret;
 	}
-	Vec3<double> setLength(Vec3<double> length){
+	void setLength(Vec3<double> length){
 		for(int i = 0; i < 3; i++){
 			grid_spacing_[i] = length[i]/(double)(sz[i]+1);
 		}
+		return;
 	}
 	double getGridVal(int i, int j, int k) const{
 		return grid_density_[i][j][k];

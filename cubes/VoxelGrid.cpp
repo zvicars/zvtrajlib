@@ -22,10 +22,10 @@ VoxelGrid::VoxelGrid(Vec3<int> size, Vec3<double> box_size, double density, doub
     prefactor_ = pow(2*M_PI*sigma_*sigma_, (-1.0/2.0));
     return;
 }
-int VoxelGrid::resize_grid(int dim_x, int dim_y, int dim_z, double ival = 0.0)
+int VoxelGrid::resize_grid(int dim_x, int dim_y, int dim_z)
 {
     grid_density_.clear();
-    std::vector<double> col(dim_z, ival);
+    std::vector<double> col(dim_z, 0.0);
     std::vector<std::vector<double> > plane(dim_y, col);
     grid_density_.resize(dim_x, plane);
     sz[0] = dim_x; sz[1]= dim_y; sz[2] = dim_z;

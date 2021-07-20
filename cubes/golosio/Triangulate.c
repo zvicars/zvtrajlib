@@ -72,7 +72,6 @@ int Triangulate(float *vol_data, float **vertex_data,  int **triangle_data,
     MkGrad(iz);                       // evaluate gradient
     MkEdge(iz);  // evaluate intersection of isosurface with cube edges
     if (iz > 0) PolygonizeCube(iz); // perform standard triangulations
-    printf("%d / %d\n", iz+1, NVxl[2]);   // update progress bar
   }
 
   TriangulateFree(); // deallocate memory

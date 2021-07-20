@@ -25,6 +25,11 @@ Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
   return;
 }
 void Calc_Isosurface::calculate(const Box& box){
+  current_time_ = box.time;
+  current_frame_ = box.frame_counter;
+  if(output_freq_ <= 0) return;
+  if(current_time_ < equilibration_) return;
+  if(current_frame_%output_freq_ != 0) return;
   Vec3<double> box_size;
   for(int i = 0; i < 3; i++){
     box_size[i] = box.boxvec[i][i];
@@ -40,8 +45,34 @@ void Calc_Isosurface::calculate(const Box& box){
     frame_->add_gaussian(box.atoms[i].x);
   }
   marchingCubes("golosio", *frame_, mesh_);
+  *(average_) += *(frame_);
+  printOutput();
+  frame_counter_++;
   return;
 }
+
 std::string Calc_Isosurface::printConsoleReport(){
-  return;
+  return "";
 }
+
+void Calc_Isosurface::printOutput(){
+  std::string filepath = base_ + "_frame" + std::to_string(frame_counter_) + ".stl";
+  std::ofstream ofile(filepath);
+  FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface step calculation.");
+  std::string output;
+  printSTL(mesh_, output);
+  ofile << output;
+  ofile.close();
+};
+void Calc_Isosurface::finalOutput(){
+  if(output_freq_ <= 0) return;
+  *(average_) *= 1.0/(double)frame_counter_;
+  std::string filepath = base_ + "_average.stl";
+  std::ofstream ofile(filepath);
+  FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface average.");
+  std::string output;
+  printSTL(mesh_, output);
+  ofile << output;
+  ofile.close(); 
+  return;
+};

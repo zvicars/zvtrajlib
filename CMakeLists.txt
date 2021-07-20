@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 project(zvtrajlib VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_C_STANDARD 99)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 add_subdirectory(libxdr)
 add_subdirectory(interface)
 add_subdirectory(tools)
+add_subdirectory(cubes)
 add_subdirectory(analysis)
 add_executable(test test.cpp)
 target_link_libraries(test PRIVATE TRAJLIB 
                            PRIVATE TOOLS 
                            PRIVATE ANALYSIS)
-target_compile_options(test PRIVATE -fPIC)
+target_compile_options(test PRIVATE -O0)

@@ -1,6 +1,5 @@
-add_library (GOLOSIO STATIC "")
+add_library (GOLOSIO OBJECT "")
 target_sources(GOLOSIO PRIVATE
-TriangulateMain.c
 Triangulate.c
 TriangulateGlobal.c
 FindVertexes.c
@@ -9,4 +8,4 @@ PolygonizeCube.c
 matrix.c
 )
 target_include_directories(GOLOSIO PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_options(GOLOSIO PRIVATE -O3)
+target_compile_options(GOLOSIO PRIVATE -O4)

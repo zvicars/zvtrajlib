@@ -96,7 +96,7 @@ public:
 
   std::vector<InputPack> buildDerivedInputPacks(std::string key){
     std::vector<InputPack> inputpacks;
-    auto parameterpacks = params().findParameterPacks(key, ParameterPack::KeyType::Required);
+    auto parameterpacks = params().findParameterPacks(key, ParameterPack::KeyType::Optional);
     inputpacks.resize(parameterpacks.size());
     for(std::size_t i = 0; i < parameterpacks.size(); i++){
       inputpacks[i].setCalculationRegistry(getCalculationRegistry());

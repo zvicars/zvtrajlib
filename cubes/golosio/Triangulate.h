@@ -6,7 +6,6 @@
 #define TriangulateH
 
 #include <stdio.h>
-
 // Triangulate: Iso-surface triangulation algorithm
 // (version with input/output array in memory)
 int Triangulate(float *vol_data, float **vertex_data,  int **triangle_data,

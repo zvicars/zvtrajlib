@@ -83,5 +83,5 @@ public:
   TopologyInfo* topinfo;
   Vec3<Vec3<double> > boxvec;
   double time;
-  int frame;
+  int frame, frame_counter;
 };

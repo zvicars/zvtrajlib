@@ -8,6 +8,7 @@
 #include "../interface/datatypes.hpp"
 #include "InputPack.hpp"
 #include "ProbeVolume.hpp"
+#include <fstream>
 
 class Calculation{
 public:
@@ -18,10 +19,12 @@ public:
   }
   virtual void calculate(const Box& box)=0;
   virtual std::string printConsoleReport()=0;
-  //virtual void write(std::string base) = 0;
+  virtual void printOutput(){return;}
+  virtual void finalOutput(){return;}
 protected:
-std::string name_, type_;
-private:
+  std::string name_, type_, base_;
+  double equilibration_, current_time_;
+  int output_freq_, current_frame_; //number of frames to wait before outputting
 };
 
 namespace CalculationRegistry {

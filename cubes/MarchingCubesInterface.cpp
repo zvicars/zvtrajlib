@@ -25,7 +25,7 @@ void printSTL(const Mesh& mesh, std::string& frame)
 	}
 	ofile << "endsolid " << frame << std::endl;
 	frame = ofile.str();
-    return;
+  return;
 }
 
 void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
@@ -33,8 +33,9 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 	int nx = v.getSize()[0];
 	int ny = v.getSize()[1];
 	int nz = v.getSize()[2];
-	double box_vec[3] = {v.getSize()[0], v.getSize()[1], v.getSize()[2]};
-	std::vector<float> volume_data(nx*ny*nz, 0);
+	double box_vec[3] = {v.getLength()[0], v.getLength()[1], v.getLength()[2]};
+	float* volume_data;
+	volume_data = (float*)malloc(sizeof(float)*nx*ny*nz);
 	int iterator = 0;
 	for(int k = 0; k < nz; k++)
 	for(int j = 0; j < ny; j++)
@@ -45,8 +46,9 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 	}
 	float* vertex_data; int* triangle_data;
 	int nvtx; int ntri; int n[3] = {nx, ny, nz};
-	float s[3] = {v.getSize()[0], v.getSize()[1], v.getSize()[2]}; float thresh = v.getIsovalue(); 
-	golosio::Triangulate(&volume_data[0], &vertex_data, &triangle_data, n, s, &nvtx, &ntri, thresh, 0);
+	float s[3] = {(float)v.get_gs()[0], (float)v.get_gs()[1], (float)v.get_gs()[2]}; 
+	float thresh = (float)v.getIsovalue(); 
+	golosio::Triangulate(volume_data, &vertex_data, &triangle_data, n, s, &nvtx, &ntri, thresh, 0);
     std::vector<Vec3<double> > vertices_(nvtx);
     std::vector<Vec3<double> > gradients_(nvtx);
     std::vector<Triangle> triangles_(ntri);
@@ -69,8 +71,8 @@ void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
     output_mesh.nvtx = nvtx;
     output_mesh.ntri = ntri;
 
-	delete[] vertex_data;
-	delete[] triangle_data;
-
+	free(vertex_data);
+	free(triangle_data);
+	free(volume_data);
 	return;
 }

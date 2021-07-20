@@ -54,5 +54,6 @@ void XDRTrajectory::getFrame(Box& box){
   }
   box.time = time_;
   box.frame = frame_;
+  box.frame_counter = nframes_-1;
   return;
 }
