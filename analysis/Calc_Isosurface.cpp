@@ -39,7 +39,8 @@ void Calc_Isosurface::calculate(const Box& box){
     frame_ = new VoxelGrid(npoints_, box_size, density_, sigma_, isovalue_);
   }
   else{
-    average_->setLength(box_size);
+    frame_->setLength(box_size);
+    frame_->clear();
   }
   for(int i = 0; i < box.atoms.size(); i++ ){
     frame_->add_gaussian(box.atoms[i].x);

@@ -21,13 +21,13 @@ public:
 	Vec3<double> getLength() const{
 		Vec3<double> ret;
 		for(int i = 0; i < 3; i++){
-			ret[i] = sz[i]*grid_spacing_[i];
+			ret[i] = (sz[i])*grid_spacing_[i];
 		}
 		return ret;
 	}
 	void setLength(Vec3<double> length){
 		for(int i = 0; i < 3; i++){
-			grid_spacing_[i] = length[i]/(double)(sz[i]+1);
+			grid_spacing_[i] = length[i]/(double)(sz[i]);
 		}
 		return;
 	}
@@ -61,6 +61,15 @@ public:
 			grid_density_[i][j][k] *= rhs;
 		}
 		return *this;
+	}
+	void clear(){
+		for(int i = 0; i < sz[0]; i++)
+		for(int j = 0; j < sz[1]; j++)
+		for(int k = 0; k < sz[2]; k++)
+		{
+			grid_density_[i][j][k] = 0.0; 
+		}
+		return;
 	}
 private:
 	std::vector<std::vector<std::vector<double > > > grid_density_;
