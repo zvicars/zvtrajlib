@@ -2,8 +2,8 @@
 #include <fstream>
 #include "datatypes.hpp"
 namespace xdr{ //to prevent any potential name clashes with the matrix type
-#include "../libxdr/xdrfile.h"
-#include "../libxdr/xdrfile_xtc.h"
+#include "libxdr/xdrfile.h"
+#include "libxdr/xdrfile_xtc.h"
 }
 class XDRTrajectory{
 public:
@@ -26,3 +26,6 @@ private:
 };
 
 void readNDX(std::string filename, Box& box);
+inline void readTOP(std::string filename, Box& box){
+  return;
+}

@@ -6,12 +6,13 @@
 
 class AtomGroup{
 public:
+  using KeyType = ParameterPack::KeyType;
   AtomGroup(InputPack&);
   const std::vector<int>& getIndices();
 protected:
-  std::string name;
-  std::string type;
-  std::vector<int> global_indices;
+  std::string name_;
+  std::string type_;
+  std::vector<int> global_indices_;
 };
 namespace AtomGroupRegistry {
 // Manages the creation of Steinhardt objects

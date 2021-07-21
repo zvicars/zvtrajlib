@@ -8,6 +8,7 @@
 #include "../interface/datatypes.hpp"
 #include "InputPack.hpp"
 #include "ProbeVolume.hpp"
+#include "AtomGroup.hpp"
 #include <fstream>
 
 class Calculation{
@@ -17,14 +18,18 @@ public:
   virtual ~Calculation(){
     return;
   }
-  virtual void calculate(const Box& box)=0;
+  virtual void calculate()=0;
   virtual std::string printConsoleReport()=0;
   virtual void printOutput(){return;}
   virtual void finalOutput(){return;}
+  virtual bool doCalculate();
+  virtual bool doOutput();
 protected:
   std::string name_, type_, base_;
   double equilibration_, current_time_;
-  int output_freq_, current_frame_; //number of frames to wait before outputting
+  int output_freq_, calc_freq_, current_frame_; //number of frames to wait before outputting
+  const Box* box = 0; //rather than passing in the box object each time, the input pack provides a pointer to this Calculation's box object
+  AtomGroup* atom_group_; //these are the atoms for which calculations will be performed
 };
 
 namespace CalculationRegistry {

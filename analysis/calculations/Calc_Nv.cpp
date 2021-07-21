@@ -11,12 +11,15 @@ Calc_Nv::Calc_Nv(InputPack& input):Calculation{input}
   pv_ = pv_pointer; 
   return;
 }
-void Calc_Nv::calculate(const Box& box){
+void Calc_Nv::calculate(){
+  if(!doCalculate()) return;
   float sum = 0.0;
-  for(int i = 0; i < box.atoms.size(); i++){
-    sum += pv_->compute(box.atoms[i].x);
+  for(int i = 0; i < atom_group_->getIndices().size(); i++){
+    int idx = atom_group_->getIndices()[i];
+    sum += pv_->compute(box->atoms[idx].x);
   }
   value_ = sum;
+  if(doOutput()) printOutput();
   return;
 }
 std::string Calc_Nv::printConsoleReport(){

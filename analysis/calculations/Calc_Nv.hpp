@@ -3,7 +3,7 @@
 class Calc_Nv : public Calculation{
 public:
   Calc_Nv(InputPack& input);
-  virtual void calculate(const Box& box);
+  virtual void calculate();
   virtual std::string printConsoleReport();
 private:
   Vec<double> time;

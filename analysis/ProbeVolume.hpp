@@ -12,6 +12,8 @@ public:
     return; 
   }
   virtual double compute(Vec3<double> position) = 0;
+protected:
+  const Box* box;
 private:
   std::string name_;
 };

@@ -15,24 +15,22 @@ Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
   }
   input.params().readNumber("sigma", KeyType::Required, sigma_);
   FANCY_ASSERT(sigma_ > 0, "Invalid sigma given for isosurface calculation.");
-
   input.params().readNumber("density", KeyType::Required, density_);
   FANCY_ASSERT(density_ > 0, "Invalid density given for isosurface calculation.");
-
   input.params().readNumber("isovalue", KeyType::Required, isovalue_);
-  FANCY_ASSERT(isovalue_ > 0, "Invalid isovalue given for isosurface calculation.");  
-
+  FANCY_ASSERT(isovalue_ > 0, "Invalid isovalue given for isosurface calculation.");
+  method_ = "golosio";
+  input.params().readString("method", KeyType::Optional, method_);
+  FANCY_ASSERT(method_ == "golosio" || method_ == "rchandra", "Invalid method chosen for instantaneous interface calculation, valid options are \'golosio\' and \'rchandra\'.");
   return;
 }
-void Calc_Isosurface::calculate(const Box& box){
-  current_time_ = box.time;
-  current_frame_ = box.frame_counter;
-  if(output_freq_ <= 0) return;
-  if(current_time_ < equilibration_) return;
-  if(current_frame_%output_freq_ != 0) return;
+void Calc_Isosurface::calculate(){
+  current_time_ = box->time;
+  current_frame_ = box->frame_counter;
+  if(!doCalculate()) return;
   Vec3<double> box_size;
   for(int i = 0; i < 3; i++){
-    box_size[i] = box.boxvec[i][i];
+    box_size[i] = box->boxvec[i][i];
   }
   if(!initialized_){
     average_.initialize(npoints_, box_size, density_, sigma_, isovalue_);
@@ -43,12 +41,13 @@ void Calc_Isosurface::calculate(const Box& box){
     frame_.setLength(box_size);
     frame_.clear();
   }
-  for(int i = 0; i < box.atoms.size(); i++ ){
-    frame_.add_gaussian(box.atoms[i].x);
+  for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
+    int idx = atom_group_->getIndices()[i];
+    frame_.add_gaussian(box->atoms[idx].x);
   }
-  marchingCubes("golosio", frame_, mesh_);
+  marchingCubes(method_, frame_, mesh_);
   //average_->sumInPlace(frame_);
-  printOutput();
+  if(doOutput()) printOutput();
   frame_counter_++;
   return;
 }

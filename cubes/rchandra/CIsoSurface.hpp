@@ -12,7 +12,7 @@
 
 #include <map>
 #include <vector>
-#include "Vectors.h"
+#include "Vectors.hpp"
 
 struct POINT3DID {
 	unsigned int newID;
@@ -47,12 +47,12 @@ public:
 	// isosurface in enclosed in.  Returns -1 if the surface is not
 	// valid.
 	int GetVolumeLengths(float& fVolLengthX, float& fVolLengthY, float& fVolLengthZ);
-	void GetIsosurface(int& n_verts, int& n_tris, int& n_normals, ID2POINT3DID& vertices_id, TRIANGLEVECTOR& triangles, VECTOR3D*& verticles, VECTOR3D*& normals){
+	void GetIsosurface(int& n_verts, int& n_tris, int& n_normals, ID2POINT3DID& vertices_id, TRIANGLEVECTOR& triangles, POINT3D*& vertices, VECTOR3D*& normals){
 		n_verts = m_nVertices;
 		n_tris = m_nTriangles;
 		n_normals = m_nNormals;
-		vertices = ID2POINT3DID;
-		triangles = m_nTriangles;
+		vertices = m_ppt3dVertices;
+		triangles = m_trivecTriangles;
 		normals = m_pvec3dNormals;
 	}
 
@@ -119,7 +119,7 @@ protected:
 
 	// Lookup tables used in the construction of the isosurface.
 	static const unsigned int m_edgeTable[256];
-	static const unsigned int m_triTable[256][16];
+	static const int m_triTable[256][16];
 };
 #endif // CISOSURFACE_H
 
