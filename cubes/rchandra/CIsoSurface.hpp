@@ -2,7 +2,7 @@
 #define CISOSURFACE_H
 // File Name: CIsoSurface.h
 // Last Modified: 5/8/2000
-// Author: Raghavendra Chandrashekara (basesd on source code
+// Author: Raghavendra Chandrashekara (based on source code
 // provided by Paul Bourke and Cory Gene Bloyd)
 // Email: rc99@doc.ic.ac.uk, rchandrashekara@hotmail.com
 //
@@ -47,6 +47,14 @@ public:
 	// isosurface in enclosed in.  Returns -1 if the surface is not
 	// valid.
 	int GetVolumeLengths(float& fVolLengthX, float& fVolLengthY, float& fVolLengthZ);
+	void GetIsosurface(int& n_verts, int& n_tris, int& n_normals, ID2POINT3DID& vertices_id, TRIANGLEVECTOR& triangles, VECTOR3D*& verticles, VECTOR3D*& normals){
+		n_verts = m_nVertices;
+		n_tris = m_nTriangles;
+		n_normals = m_nNormals;
+		vertices = ID2POINT3DID;
+		triangles = m_nTriangles;
+		normals = m_pvec3dNormals;
+	}
 
 protected:
 	// The number of vertices which make up the isosurface.

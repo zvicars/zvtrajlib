@@ -5,8 +5,7 @@
 //
 // Description: This is the implementation file for POINT3DXYZ class.
 
-#include "stdafx.h"
-#include "Vectors.h"
+#include "Vectors.hpp"
 
 POINT3DXYZ operator+(const POINT3DXYZ& pt3dPoint1, const POINT3DXYZ& pt3dPoint2)
 {

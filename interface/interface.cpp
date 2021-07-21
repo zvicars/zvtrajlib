@@ -1,4 +1,5 @@
 #include "interface.hpp"
+#include "fileparsers/parseNDX.hpp"
 #include <iostream>
 #include <cstring>
 XDRTrajectory::XDRTrajectory(){
@@ -55,5 +56,10 @@ void XDRTrajectory::getFrame(Box& box){
   box.time = time_;
   box.frame = frame_;
   box.frame_counter = nframes_-1;
+  return;
+}
+
+void readNDX(std::string filename, Box& box){
+  box.idxinfo = parseNDX(filename);
   return;
 }

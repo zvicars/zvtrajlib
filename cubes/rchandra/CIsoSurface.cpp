@@ -6,9 +6,8 @@
 //
 // Description: This is the implementation file for the CIsoSurface class.
 
-#include "stdafx.h"
 #include <math.h>
-#include "CIsoSurface.h"
+#include "CIsoSurface.hpp"
 
 template <class T> const unsigned int CIsoSurface<T>::m_edgeTable[256] = {
 	0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,

@@ -2,7 +2,7 @@
 #include <vector>
 #include <array>
 #include <string>
-
+#include <map>
 template <class T>
 using Vec3 = std::array<T, 3>;
 
@@ -72,15 +72,14 @@ struct TopologyInfo{
   Vec<int> counts;
 };
 struct IndexInfo{
-  Vec<std::string> labels;
-  Vec<Vec<int> > indexes;
+  std::map<std::string, Vec<int> > indexes;
 };
 
 class Box{
 public:
   Vec<Atom> atoms;
-  IndexInfo* idxinfo;
-  TopologyInfo* topinfo;
+  IndexInfo idxinfo;
+  TopologyInfo topinfo;
   Vec3<Vec3<double> > boxvec;
   double time;
   int frame, frame_counter;

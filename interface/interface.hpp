@@ -24,3 +24,5 @@ private:
   int nframes_, frame_, natoms_, state_;
   float time_, prec_;
 };
+
+void readNDX(std::string filename, Box& box);
