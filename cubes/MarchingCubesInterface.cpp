@@ -1,7 +1,11 @@
 #include "MarchingCubesInterface.hpp"
 #include <sstream>
+namespace golosio{
 #include "golosio/TriangulateGlobal.hpp"
+}
+namespace rchandra{
 #include "rchandra/CIsoSurface.hpp"
+}
 
 
 void golosio_mc(const VoxelGrid& v, Mesh& output_mesh){
@@ -26,7 +30,7 @@ void golosio_mc(const VoxelGrid& v, Mesh& output_mesh){
 
 	float s[3] = {(float)v.get_gs()[0], (float)v.get_gs()[1], (float)v.get_gs()[2]}; 
 	float thresh = (float)v.getIsovalue(); 
-	TriangulateGlobal g1;
+	golosio::TriangulateGlobal g1;
 	g1.Triangulate(&volume_data[0], vertex_data, triangle_data, n, s, &nvtx, &ntri, thresh, 0);
 	std::vector<Vec3<double> > vertices_(nvtx);
 	std::vector<Vec3<double> > gradients_(nvtx);
@@ -66,9 +70,8 @@ void rchandra_mc(const VoxelGrid& v, Mesh& output_mesh){
 		volume_data[iterator] = v.getGridVal(i, j, k);
 		iterator++;
 	}
-
-	CIsoSurface<double> rchandra;
-	rchandra.GenerateSurface(&volume_data[0], 0.5, nx, ny, nz, box_vec[0], box_vec[1], box_vec[2]);
+	rchandra::CIsoSurface<double> rc_surf;
+	rc_surf.GenerateSurface(&volume_data[0], 0.5, nx, ny, nz, box_vec[0], box_vec[1], box_vec[2]);
 	int n_verts, n_tris, n_normals;
 	ID2POINT3DID vertices_id;
 	TRIANGLEVECTOR triangles;
@@ -76,7 +79,7 @@ void rchandra_mc(const VoxelGrid& v, Mesh& output_mesh){
 	//the destruction of the CIsoSurface object deletes the data that is pointed to, which happens as this pointer is deleted, so there should be no memory leaks
 	VECTOR3D* normals;
 	POINT3D* vertices;
-	rchandra.GetIsosurface(n_verts, n_tris, n_normals, vertices_id, triangles, vertices, normals);
+	rc_surf.GetIsosurface(n_verts, n_tris, n_normals, vertices_id, triangles, vertices, normals);
 
 
 	std::vector<Vec3<double> > vertices_(n_verts);

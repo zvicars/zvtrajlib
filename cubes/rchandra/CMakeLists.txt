@@ -1,4 +1,5 @@
 add_library (RCHANDRA STATIC
+CIsoSurface.hpp
 Vectors.cpp
 CIsoSurface.cpp
 )
