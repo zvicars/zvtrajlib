@@ -6,6 +6,7 @@ atomgroups/AtomGroup_ndx.cpp
 Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Isosurface.cpp
+calculations/Calc_Angle.cpp
 ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 )

@@ -12,4 +12,5 @@ private:
   double value_;
   std::string pv_name_;
   ProbeVolume* pv_;
+  AtomGroup* atom_group_; //these are the atoms for which calculations will be performed
 };

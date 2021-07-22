@@ -11,6 +11,9 @@ public:
   const std::vector<int>& getIndices(){
     return global_indices_;
   }
+  std::string getName(){
+    return name_;
+  }
 protected:
   std::string name_;
   std::string type_;

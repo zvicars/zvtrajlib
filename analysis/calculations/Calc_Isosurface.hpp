@@ -22,4 +22,6 @@ private:
   Mesh mesh_;
   VoxelGrid frame_;
   VoxelGrid average_;
+  AtomGroup* atom_group_; //these are the atoms for which calculations will be performed
+
 };

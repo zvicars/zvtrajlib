@@ -12,17 +12,23 @@ Calculation::Calculation(InputPack& input)
     else calc_freq_ = 1;
     input.params().readNumber("calculation_frequency", KeyType::Optional, calc_freq_);
     equilibration_ = 0;
-    FANCY_ASSERT((calc_freq_%output_freq_==0), "Can only output data on a calculation step! Output frequency should be a multiple of calculation frequency.");
+    FANCY_ASSERT((calc_freq_%output_freq_==0 || output_freq_ < 0), "Can only output data on a calculation step! Output frequency should be a multiple of calculation frequency.");
     //equilibration in ps
     input.params().readNumber("equilibration", KeyType::Optional, equilibration_);
-
-    std::string agname;
-    input.params().readString("atom_group", KeyType::Required, agname);
-    atom_group_ = input.findAtomGroup(agname);
-    FANCY_ASSERT(atom_group_ != 0, "Failed to find specified atom group.");
-    
     input.addCalculation(name_, this);
     box = input.getBox();
+
+    //histogram data is appended to standard output, so no need to specify a filename
+    input.params().readFlag("histogram", KeyType::Optional, doHistogram);
+    input.params().readFlag("timeseries", KeyType::Optional, doTimeseries);
+    bool found_min = input.params().readNumber("min_bin", KeyType::Optional, min_bin_);
+    if(found_min) forceMin = 1;
+    bool found_max = input.params().readNumber("max_bin", KeyType::Optional, max_bin_);
+    if(found_max) forceMax = 1;
+    bool found_bs = input.params().readNumber("bin_size", KeyType::Optional, bin_size_);
+    if(found_bs) forceBS = 1;
+    if(found_min || found_max || found_bs) doHistogram = 1;
+
     return;
 }
 

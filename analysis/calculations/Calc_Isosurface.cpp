@@ -1,7 +1,7 @@
 #include "Calc_Isosurface.hpp"
 namespace CalculationRegistry {
 static const Register<Calc_Isosurface>
-  registerType("Isosurface");
+  registerType("isosurface");
 }
 
 Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
@@ -13,6 +13,12 @@ Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
   for(int i = 0; i < 3; i++){
     npoints_[i] = npoints[i];
   }
+
+  std::string agname;
+  input.params().readString("atom_group", KeyType::Required, agname);
+  atom_group_ = input.findAtomGroup(agname);
+  FANCY_ASSERT(atom_group_ != 0, "Failed to find specified atom group.");
+  
   input.params().readNumber("sigma", KeyType::Required, sigma_);
   FANCY_ASSERT(sigma_ > 0, "Invalid sigma given for isosurface calculation.");
   input.params().readNumber("density", KeyType::Required, density_);

@@ -29,7 +29,11 @@ protected:
   double equilibration_, current_time_;
   int output_freq_, calc_freq_, current_frame_; //number of frames to wait before outputting
   const Box* box = 0; //rather than passing in the box object each time, the input pack provides a pointer to this Calculation's box object
-  AtomGroup* atom_group_; //these are the atoms for which calculations will be performed
+  //options for final output modes, typical behavior is just to spit out means/variances, but time series data and histogram data can be toggled
+  //here if the calculation allows it all of this is handled in the "final output" as it is expected that this data will be sufficiently small
+  //to be stored in memory and outputted at the end
+  double bin_size_, min_bin_, max_bin_; //standard histogram output options, min/max bin can be found dynamically too
+  bool doHistogram=0, doTimeseries=0, forceMin=0, forceMax=0, forceBS;
 };
 
 namespace CalculationRegistry {
