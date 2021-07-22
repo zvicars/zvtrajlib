@@ -6,16 +6,17 @@
 class ProbeVolume;
 class Calculation;
 class AtomGroup;
+
 //input packs contain a parameterpack and pointer to the registries that different calculations might need to functon,
 class InputPack{
 public:
   InputPack(){
     return;
   }
-  InputPack(const ParameterPack* params, const Box* box_in){
+  InputPack(const ParameterPack* params, const Box* box){
     params_ = params;
     initializeRegistries();
-    box = box_in;
+    box_ = box;
     return;
   }
   ~InputPack(){
@@ -35,7 +36,7 @@ public:
     }
   }
   const Box* getBox(){
-    return box;
+    return box_;
   }
   ProbeVolume* findProbeVolume(std::string name){
     auto it = pv_registry_->find(name);
@@ -62,8 +63,8 @@ public:
     if(calc_registry_ != 0) calc_registry_->insert(std::pair<std::string, Calculation*>{name, calc});
     return;
   }
-  void addAtomGroup(std::string name, AtomGroup* calc){
-    if(ag_registry_ != 0) ag_registry_->insert(std::pair<std::string, AtomGroup*>{name, calc});
+  void addAtomGroup(std::string name, AtomGroup* ag){
+    if(ag_registry_ != 0) ag_registry_->insert(std::pair<std::string, AtomGroup*>{name, ag});
     return;
   }
   void initializeRegistries(){ //use this for master pack
@@ -90,6 +91,9 @@ public:
   void setParams(const ParameterPack* param){
     params_ = param;
   }
+  void setBox(const Box* box){
+    box_ = box;
+  }
   const std::map<std::string, ProbeVolume*>& ProbeVolumeMap() const {
     return *pv_registry_; 
   }
@@ -109,6 +113,7 @@ public:
       inputpacks[i].setProbeVolumeRegistry(pv_registry_);
       inputpacks[i].setAtomGroupRegistry(ag_registry_);
       inputpacks[i].setParams(parameterpacks[i]);
+      inputpacks[i].setBox(box_);
     }
     return inputpacks;
   }
@@ -119,6 +124,6 @@ private:
   std::map<std::string, ProbeVolume*>* pv_registry_ = 0; //contains pointer to the true map
   std::map<std::string, Calculation*>* calc_registry_ = 0; //contains pointer to the true map
   std::map<std::string, AtomGroup*>* ag_registry_ = 0; //contains pointer to the true map
-  const Box* box;
+  const Box* box_;
   bool is_master_pack = 0;
 };

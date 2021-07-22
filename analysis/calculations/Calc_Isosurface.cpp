@@ -21,7 +21,7 @@ Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
   FANCY_ASSERT(isovalue_ > 0, "Invalid isovalue given for isosurface calculation.");
   method_ = "golosio";
   input.params().readString("method", KeyType::Optional, method_);
-  FANCY_ASSERT(method_ == "golosio" || method_ == "rchandra", "Invalid method chosen for instantaneous interface calculation, valid options are \'golosio\' and \'rchandra\'.");
+  FANCY_ASSERT(method_ == "golosio", "Invalid method chosen for instantaneous interface calculation, valid options are \'golosio\' and \'rchandra\'.");
   return;
 }
 void Calc_Isosurface::calculate(){

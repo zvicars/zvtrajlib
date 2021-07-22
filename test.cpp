@@ -37,6 +37,7 @@ int main(int argc, char **argv)
   Box b1;
   if(idx_found) readNDX(index_file_, b1);
   if(top_found) readTOP(topology_file_, b1);
+  
   InputPack master_input_pack = InputPack(&master_pack, &b1);
 
   std::vector<InputPack> ag_packs = master_input_pack.buildDerivedInputPacks("AtomGroup");

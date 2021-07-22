@@ -23,7 +23,7 @@ IndexInfo parseNDX(std::string filename){
     if(pos1 == std::string::npos) continue;
     if(pos2 == std::string::npos || pos2 < pos1) continue;
     //if I get this far I found a valid index label
-    std::string label = line.substr(pos1, pos2);
+    std::string label = line.substr(pos1+1, pos2-pos1-1);
     trim(label);
     std::vector<int> indexes;
     //read the label, should be nothing but an array of numbers until another line with brackets
@@ -51,7 +51,7 @@ IndexInfo parseNDX(std::string filename){
   }
   ifile.close();
 
-  std::cout << "Found " << group_counter << " groups. In index file " << filename << ".ndx\n";
+  std::cout << "Found " << group_counter << " groups. In index file " << filename << "\n";
   for(int i = 0; i < groups.size(); i++){
     std::cout << groups[i] << "  " << index_counts[i] << " atoms." << "\n";
   }

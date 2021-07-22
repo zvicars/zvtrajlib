@@ -1,12 +1,6 @@
 #include "MarchingCubesInterface.hpp"
 #include <sstream>
-namespace golosio{
 #include "golosio/TriangulateGlobal.hpp"
-}
-namespace rchandra{
-#include "rchandra/CIsoSurface.hpp"
-}
-
 
 void golosio_mc(const VoxelGrid& v, Mesh& output_mesh){
 	int nx = v.getSize()[0];
@@ -30,7 +24,7 @@ void golosio_mc(const VoxelGrid& v, Mesh& output_mesh){
 
 	float s[3] = {(float)v.get_gs()[0], (float)v.get_gs()[1], (float)v.get_gs()[2]}; 
 	float thresh = (float)v.getIsovalue(); 
-	golosio::TriangulateGlobal g1;
+	TriangulateGlobal g1;
 	g1.Triangulate(&volume_data[0], vertex_data, triangle_data, n, s, &nvtx, &ntri, thresh, 0);
 	std::vector<Vec3<double> > vertices_(nvtx);
 	std::vector<Vec3<double> > gradients_(nvtx);
@@ -56,72 +50,10 @@ void golosio_mc(const VoxelGrid& v, Mesh& output_mesh){
 	return;
 }
 
-void rchandra_mc(const VoxelGrid& v, Mesh& output_mesh){
-	int nx = v.getSize()[0];
-	int ny = v.getSize()[1];
-	int nz = v.getSize()[2];
-	double box_vec[3] = {v.getLength()[0], v.getLength()[1], v.getLength()[2]};
-	std::vector<double> volume_data(nx*ny*nz, 0);
-	int iterator = 0;
-	for(int k = 0; k < nz; k++)
-	for(int j = 0; j < ny; j++)
-	for(int i = 0; i < nx; i++)
-	{
-		volume_data[iterator] = v.getGridVal(i, j, k);
-		iterator++;
-	}
-	rchandra::CIsoSurface<double> rc_surf;
-	rc_surf.GenerateSurface(&volume_data[0], 0.5, nx, ny, nz, box_vec[0], box_vec[1], box_vec[2]);
-	int n_verts, n_tris, n_normals;
-	ID2POINT3DID vertices_id;
-	TRIANGLEVECTOR triangles;
-	//this is passed by reference into the isosurface algorithm and is modified to point to the internal normal data
-	//the destruction of the CIsoSurface object deletes the data that is pointed to, which happens as this pointer is deleted, so there should be no memory leaks
-	VECTOR3D* normals;
-	POINT3D* vertices;
-	rc_surf.GetIsosurface(n_verts, n_tris, n_normals, vertices_id, triangles, vertices, normals);
-
-
-	std::vector<Vec3<double> > vertices_(n_verts);
-	std::vector<Vec3<double> > gradients_(n_normals);
-	std::vector<Triangle> triangles_(n_tris);
-	for(int i = 0; i < n_tris; i++){
-		Vec3<int> triangle_indices_;
-		for(int j = 0; j < 3; j++){
-			//speculative mapping to real index in the vertices pointer
-			triangle_indices_[j] = vertices_id.find(triangles[i].pointID[j])->second.newID;
-		}
-		triangles_[i].indices = triangle_indices_;
-	}
-	for(int i = 0; i < n_verts; i++){
-		Vec3<double> vertex;
-		for(int j = 0; j < 3; j++){
-			vertex[j] = vertices[i][j];
-		}
-		vertices_[i] = vertex;
-	}
-	for(int i = 0; i < n_normals; i++){
-		Vec3<double> normal;
-		for(int j = 0; j < 3; j++){
-			normal[j] = normals[i][j];
-		}
-		gradients_[i] = normal;
-	}
-	output_mesh.normals = gradients_;
-	output_mesh.vertices = vertices_;
-	output_mesh.triangles = triangles_;
-	output_mesh.nvtx = n_verts;
-	output_mesh.ntri = n_tris;
-	return;
-}
-
 void marchingCubes(std::string type, const VoxelGrid& v, Mesh& output_mesh)
 {
 	if(type == "golosio"){
 		golosio_mc(v, output_mesh);
-	}
-	else if(type == "rchandra"){
-		rchandra_mc(v, output_mesh);
 	}
 	else{
 		std::cout << "Invalid marching cubes type selected." << std::endl;
