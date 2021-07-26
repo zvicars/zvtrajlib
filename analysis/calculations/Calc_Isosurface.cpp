@@ -63,8 +63,8 @@ std::string Calc_Isosurface::printConsoleReport(){
 }
 
 void Calc_Isosurface::printOutput(){
-  std::string filepath = base_ + "_frame" + std::to_string(frame_counter_) + ".stl";
-  std::ofstream ofile(filepath);
+  std::string filepath = base_ + "_interface"+ ".stla";
+  std::ofstream ofile(filepath, std::ofstream::app);
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface step calculation.");
   std::string output;
   printSTL(mesh_, output);

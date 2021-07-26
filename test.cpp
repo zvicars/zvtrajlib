@@ -26,17 +26,19 @@ int main(int argc, char **argv)
   checkRegistries();
   FANCY_ASSERT(argc == 2, "Analysis code only accepts a single input that specifies the op input file.");
   std::string op_input_file_ = argv[1];
-  std::string trajectory_file_, index_file_, topology_file_;
+  std::string trajectory_file_, index_file_, topology_file_, gro_file_;
   InputParser input_parser;
   ParameterPack master_pack = input_parser.parseFile(op_input_file_);
   using KeyType = ParameterPack::KeyType;
   bool trajectory_found = master_pack.readString("trajectory", KeyType::Required, trajectory_file_);
   bool idx_found = master_pack.readString("index", KeyType::Optional, index_file_);
   bool top_found = master_pack.readString("top", KeyType::Optional, topology_file_);
+  bool gro_found = master_pack.readString("gro", KeyType::Optional, gro_file_);
   FANCY_ASSERT(trajectory_found, "Failed to find trajectory file.");
   Box b1;
   if(idx_found) readNDX(index_file_, b1);
   if(top_found) readTOP(topology_file_, b1);
+  if(gro_found) readGRO(gro_file_, b1);
   
   InputPack master_input_pack = InputPack(&master_pack, &b1);
 

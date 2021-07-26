@@ -1,5 +1,6 @@
 #include "interface.hpp"
 #include "fileparsers/parseNDX.hpp"
+#include "fileparsers/parseGRO.hpp"
 #include <iostream>
 #include <cstring>
 XDRTrajectory::XDRTrajectory(){
@@ -41,7 +42,11 @@ int XDRTrajectory::nextFrame(){
 }
 
 void XDRTrajectory::getFrame(Box& box){
-  box.atoms.resize(natoms_);
+  if(box.atoms.size() == 0) box.atoms.resize(natoms_); //if data hasn't been loaded in already, ensure that there's enough space allocated
+  if(box.atoms.size() != natoms_){
+    std::cout << "Mismatch between box atoms and xtc atoms, make sure all of your trajectory files are coming from the right simulation!" << std::endl;
+    throw 0;
+  }
   for(int i = 0; i < natoms_; i++)
   {
     box.atoms[i].x[0] = x_[i][0];
@@ -55,11 +60,16 @@ void XDRTrajectory::getFrame(Box& box){
   }
   box.time = time_;
   box.frame = frame_;
-  box.frame_counter = nframes_-1;
+  box.frame_counter++;
   return;
 }
 
 void readNDX(std::string filename, Box& box){
   box.idxinfo = parseNDX(filename);
+  box.hasIndexes = 1;
+  return;
+}
+void readGRO(std::string filename, Box& box){
+  parseGRO(filename, box);
   return;
 }

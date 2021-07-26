@@ -12,7 +12,8 @@ using Vec = std::vector<T>;
 struct Atom{ //many of these properties are optional
   Vec3<double> x, v;
   double mass, charge;
-  std::string name, type;
+  int resnr, index;
+  std::string name, type, resname;
 };
 
 struct AtomType{
@@ -82,5 +83,6 @@ public:
   TopologyInfo topinfo;
   Vec3<Vec3<double> > boxvec;
   double time;
-  int frame, frame_counter;
+  int frame, frame_counter=-1;
+  bool hasNamedAtoms = 0, hasTopologyInfo = 0, hasIndexes = 0;
 };

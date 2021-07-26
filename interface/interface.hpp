@@ -26,6 +26,7 @@ private:
 };
 
 void readNDX(std::string filename, Box& box);
+void readGRO(std::string filename, Box& box);
 inline void readTOP(std::string filename, Box& box){
   return;
 }

@@ -3,6 +3,7 @@ target_sources(ANALYSIS PRIVATE
 bonded_functions.cpp
 AtomGroup.cpp
 atomgroups/AtomGroup_ndx.cpp
+atomgroups/AtomGroup_name.cpp
 Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Isosurface.cpp
