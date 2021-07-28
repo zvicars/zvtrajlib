@@ -1,9 +1,4 @@
 #include "Calc_Isosurface.hpp"
-namespace CalculationRegistry {
-static const Register<Calc_Isosurface>
-  registerType("isosurface");
-}
-
 Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
 {
   frame_counter_ = 0;

@@ -1,5 +1,5 @@
 #pragma once
-#include "../AtomGroup.hpp"
+#include "AtomGroup.hpp"
 
 class AtomGroup_name : public AtomGroup{
 public:

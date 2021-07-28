@@ -1,29 +1,9 @@
 #include "interface/interface.hpp"
 #include "tools/Assert.hpp"
 #include "tools/InputParser.hpp"
-#include "analysis/InputPack.hpp"
-#include "analysis/ProbeVolume.hpp"
-#include "analysis/Calculation.hpp"
-#include "analysis/AtomGroup.hpp"
-void checkRegistries(){
-  const auto& probe_volume_registry = ProbeVolumeRegistry::Factory::factory().get_registry();
-  if ( probe_volume_registry.size() < 1 ) {
-    throw std::runtime_error("Error: ProbeVolume registry is empty");
-  }
-  const auto& calculate_registry = CalculationRegistry::Factory::factory().get_registry();
-  if ( calculate_registry.size() < 1 ) {
-    throw std::runtime_error("Error: Calculation registry is empty");
-  }
-  const auto& atomgroup_registry = AtomGroupRegistry::Factory::factory().get_registry();
-  if ( calculate_registry.size() < 1 ) {
-    throw std::runtime_error("Error: AtomGroup registry is empty");
-  }
-  return;
-}
-
+#include "analysis/factory.hpp"
 int main(int argc, char **argv)
 {
-  checkRegistries();
   FANCY_ASSERT(argc == 2, "Analysis code only accepts a single input that specifies the op input file.");
   std::string op_input_file_ = argv[1];
   std::string trajectory_file_, index_file_, topology_file_, gro_file_;
@@ -48,7 +28,7 @@ int main(int argc, char **argv)
     std::string type, name;
     ag_packs[i].params().readString("type", ParameterPack::KeyType::Required, type);
     ag_packs[i].params().readString("name", ParameterPack::KeyType::Required, name);
-    auto ag_ptr = AtomGroupRegistry::Factory::factory().create(type, ag_packs[i]);
+    auto ag_ptr = AtomGroup_Factory(type, ag_packs[i]);
     master_input_pack.addAtomGroup(name, ag_ptr);
   } 
 
@@ -57,7 +37,7 @@ int main(int argc, char **argv)
     std::string type, name;
     pv_packs[i].params().readString("type", ParameterPack::KeyType::Required, type);
     pv_packs[i].params().readString("name", ParameterPack::KeyType::Required, name);
-    auto pv_ptr = ProbeVolumeRegistry::Factory::factory().create(type, pv_packs[i]);
+    auto pv_ptr = ProbeVolume_Factory(type, pv_packs[i]);
     master_input_pack.addProbeVolume(name, pv_ptr);
   }  
   
@@ -66,7 +46,7 @@ int main(int argc, char **argv)
     std::string type, name;
     calc_packs[i].params().readString("type", ParameterPack::KeyType::Required, type);
     calc_packs[i].params().readString("name", ParameterPack::KeyType::Required, name);
-    auto calc_ptr = CalculationRegistry::Factory::factory().create(type, calc_packs[i]);
+    auto calc_ptr = Calculation_Factory(type, calc_packs[i]);
     master_input_pack.addCalculation(name, calc_ptr);
   }  
 

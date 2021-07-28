@@ -1,5 +1,5 @@
 #pragma once
-#include "../Calculation.hpp"
+#include "Calculation.hpp"
 #include "../../cubes/MarchingCubesInterface.hpp"
 class Calc_Isosurface : public Calculation{
 public:

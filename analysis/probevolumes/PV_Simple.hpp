@@ -1,5 +1,5 @@
 #pragma once
-#include "../ProbeVolume.hpp"
+#include "ProbeVolume.hpp"
 class PV_DiscreteRect : public ProbeVolume{
 public: 
   PV_DiscreteRect(InputPack& input);

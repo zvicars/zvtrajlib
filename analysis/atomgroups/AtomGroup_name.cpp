@@ -1,8 +1,4 @@
 #include "AtomGroup_name.hpp"
-namespace AtomGroupRegistry {
-static const Register<AtomGroup_name>
-  registerType("name");
-}
 AtomGroup_name::AtomGroup_name(InputPack& input):AtomGroup{input}{
   input.params().readString("atom_name", KeyType::Required, atomname_);
   auto box = input.getBox();

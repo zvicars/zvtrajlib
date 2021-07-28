@@ -1,8 +1,4 @@
 #include "Calc_Nv.hpp"
-namespace CalculationRegistry {
-static const Register<Calc_Nv>
-  registerType("nv");
-}
 Calc_Nv::Calc_Nv(InputPack& input):Calculation{input}
 {
   input.params().readString("probe_volume", KeyType::Required, pv_name_);

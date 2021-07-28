@@ -1,8 +1,4 @@
 #include "Calc_Angle.hpp"
-namespace CalculationRegistry {
-static const Register<Calc_Angle>
-  registerType("angle");
-}
 Calc_Angle::Calc_Angle(InputPack& input):Calculation{input}
 {
   Vec3<std::string> agnames;

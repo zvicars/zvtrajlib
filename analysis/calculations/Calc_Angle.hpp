@@ -1,5 +1,5 @@
 #pragma once
-#include "../Calculation.hpp"
+#include "Calculation.hpp"
 #include "../helper/make_histogram.hpp"
 #include <cmath>
 class Calc_Angle : public Calculation{

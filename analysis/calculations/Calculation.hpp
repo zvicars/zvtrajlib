@@ -2,13 +2,12 @@
 //store the data from previous frames and output them at the end, though I may need to put more thought into it to prevent memory issues
 //this is also probably where parallelizaton should be focused
 #pragma once
-#include "../tools/Assert.hpp"
-#include "../tools/GenericFactory.hpp"
-#include "../tools/StringTools.hpp"
-#include "../interface/datatypes.hpp"
-#include "InputPack.hpp"
-#include "ProbeVolume.hpp"
-#include "AtomGroup.hpp"
+#include "../../tools/Assert.hpp"
+#include "../../tools/StringTools.hpp"
+#include "../../interface/datatypes.hpp"
+#include "../InputPack.hpp"
+#include "../probevolumes/ProbeVolume.hpp"
+#include "../atomgroups/AtomGroup.hpp"
 #include <fstream>
 
 class Calculation{
@@ -35,23 +34,3 @@ protected:
   double bin_size_, min_bin_, max_bin_; //standard histogram output options, min/max bin can be found dynamically too
   bool doHistogram=0, doTimeseries=0, forceMin=0, forceMax=0, forceBS;
 };
-
-namespace CalculationRegistry {
-
-// Manages the creation of Steinhardt objects
-using Factory = GenericFactory<
-  Calculation,   // base class
-  std::string,  // key type
-  InputPack&  // input types
->;
-
-// Object that registers the mapping with the factory
-template<typename S>
-using Register = RegisterInFactory<
-  Calculation,   // base class
-  S,            // derived class
-  std::string,  // key type
-  InputPack&
->;
-} 
-

@@ -84,5 +84,5 @@ public:
   Vec3<Vec3<double> > boxvec;
   double time;
   int frame, frame_counter=-1;
-  bool hasNamedAtoms = 0, hasTopologyInfo = 0, hasIndexes = 0;
+  bool hasNamedAtoms = 0, hasTopologyInfo = 0, hasIndexes = 0, hasVelocities = 0;
 };

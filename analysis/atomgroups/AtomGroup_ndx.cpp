@@ -1,8 +1,4 @@
 #include "AtomGroup_ndx.hpp"
-namespace AtomGroupRegistry {
-static const Register<AtomGroup_ndx>
-  registerType("ndx");
-}
 AtomGroup_ndx::AtomGroup_ndx(InputPack& input):AtomGroup{input}{
   input.params().readString("label", KeyType::Required, label_);
   auto box = input.getBox();

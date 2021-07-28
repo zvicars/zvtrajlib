@@ -1,5 +1,5 @@
 #pragma once
-#include "../Calculation.hpp"
+#include "Calculation.hpp"
 class Calc_Nv : public Calculation{
 public:
   Calc_Nv(InputPack& input);
