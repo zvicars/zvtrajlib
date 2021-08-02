@@ -6,6 +6,21 @@ inline double heaviside(double x){
 inline double phi(double x, double sigma, double prefactor){
 	return prefactor*(exp(-x*x/(2*sigma*sigma)))*heaviside(2.0*sigma-fabs(x));
 }
+
+
+inline double h_x(double x, double xmin, double xmax, double sigma, double xc){
+    double eval = 0.0;
+    double k, k1, k2, invk;
+    double sigma2 = sigma*sigma;
+    k = sqrt(2*M_PI)*sigma*erf(xc/(sqrt(2)*sigma)) - 2*xc*exp(-(xc*xc)/(2*sigma2));
+    invk = 1/k;
+    k1 = invk*sqrt(M_PI/2)*sigma;
+    k2 = invk*exp(-(xc*xc)/(2*sigma2));
+    eval = (k1 * erf((xmax-x)/(sqrt(2)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x)) + heaviside(xc+xmax-x);
+    return eval;
+}
+
+
 VoxelGrid::VoxelGrid(Vec3<int> size, Vec3<double> box_size, double density, double sigma, double isovalue) //must be orthorhombic box
 {
   initialize(size, box_size, density, sigma, isovalue);
@@ -44,7 +59,14 @@ void VoxelGrid::add_gaussian(Vec3<double> x_in)
     {
         idx = ix; idy = iy; idz = iz;
         pbcidx(idx, idy, idz);
-        grid_density_[idx][idy][idz] += (1.0/density_) * phi(ix*grid_spacing_[0] - x, sigma_, prefactor_)*phi(iy*grid_spacing_[1] - y, sigma_, prefactor_)*phi(iz*grid_spacing_[2]- z, sigma_, prefactor_);
+        double xmin, xmax, ymin, ymax, zmin, zmax;
+        xmin = ix * grid_spacing_[0]
+        xmax = xmin + grid_spacing_[0];
+        ymin = iy * grid_spacing_[1];
+        ymax = ymin + grid_spacing_[1];
+        zmin = iz * grid_spacing_[2];
+        zmax = zmin + grid_spacing_[2];
+        grid_density_[idx][idy][idz] += (1.0/density_) * h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_)*h_x(z, zmin, zmax, sigma_, 2.0*sigma_);
     }
     return;
 }
