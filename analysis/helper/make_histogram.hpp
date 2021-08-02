@@ -12,8 +12,9 @@ static inline void makeHistogram(const std::vector<double>& data, double min_bin
         if(datum < min) min = datum;
         if(datum > max) max = datum;
     }
-    min_bin_ = min;
-    max_bin_ = max;
+    if(!forceMin) min_bin_ = min;
+    if(!forceMax) max_bin_ = max;
+    if(!forceBS) bin_size_ = (max-min)/49.0; //default to a histogram with 50 points
   }
   int nbins = std::round((max_bin_ - min_bin_) / bin_size_) + 1;
   //prepare ouput vectors
@@ -28,6 +29,7 @@ static inline void makeHistogram(const std::vector<double>& data, double min_bin
   for(std::size_t i = 0; i < data.size(); i++){
       double datum = data[i];
       int index = std::round((datum - min_bin_)/bin_size_);
+      if(index > max_bin_ || index < min_bin_) continue;
       y_vals[index]++;
   }
 
@@ -65,6 +67,7 @@ static inline void makeHistogram2d(const std::vector<std::vector<double> >& data
     for(std::size_t j = 0; j < data[i].size(); j++){
       double datum = data[i][j];
       int index = std::round((datum - min_bin_)/bin_size_);
+      if(index > max_bin_ || index < min_bin_) continue;
       y_vals[index]++;
     }
   }

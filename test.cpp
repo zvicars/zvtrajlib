@@ -56,12 +56,18 @@ int main(int argc, char **argv)
   
   while(traj.nextFrame()){
     traj.getFrame(b1);
+    std::cout << b1.time << "\n";
     auto calc_reg_ = master_input_pack.CalculationMap();
     for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       auto calculation = i->second;
       i->second->calculate();
-      //std::cout << i->second->printConsoleReport();
     }
   }
+  auto calc_reg_ = master_input_pack.CalculationMap();
+  for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
+    auto calculation = i->second;
+    i->second->finalOutput();
+  }
+
   return 0;
 }

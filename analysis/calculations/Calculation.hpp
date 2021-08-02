@@ -32,5 +32,5 @@ protected:
   //here if the calculation allows it all of this is handled in the "final output" as it is expected that this data will be sufficiently small
   //to be stored in memory and outputted at the end
   double bin_size_, min_bin_, max_bin_; //standard histogram output options, min/max bin can be found dynamically too
-  bool doHistogram=0, doTimeseries=0, forceMin=0, forceMax=0, forceBS;
+  bool doHistogram=0, doTimeseries=0, forceMin=0, forceMax=0, forceBS=0;
 };
