@@ -60,7 +60,7 @@ void VoxelGrid::add_gaussian(Vec3<double> x_in)
         idx = ix; idy = iy; idz = iz;
         pbcidx(idx, idy, idz);
         double xmin, xmax, ymin, ymax, zmin, zmax;
-        xmin = ix * grid_spacing_[0]
+        xmin = ix * grid_spacing_[0];
         xmax = xmin + grid_spacing_[0];
         ymin = iy * grid_spacing_[1];
         ymax = ymin + grid_spacing_[1];
