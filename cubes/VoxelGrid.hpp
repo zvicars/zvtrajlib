@@ -49,13 +49,38 @@ public:
 			for(int j = 0; j < sz[1]; j++){
 				for(int k = 0; k < sz[2]; k++)
 				{
-					std::cout << i << j << k << std::endl;
 					grid_density_[i][j][k] += vg->getGridVal(i,j,k);
 				}
 			}
 		}
 		return;
 	}
+	double getTot(){
+		double sum = 0.0;
+		for(int i = 0; i < sz[0]; i++){
+			for(int j = 0; j < sz[1]; j++){
+				for(int k = 0; k < sz[2]; k++)
+				{
+					sum += grid_density_[i][j][k];
+				}
+			}
+		}
+		return sum;
+	}
+	Vec3<double> getWeightedCOM(){
+		Vec3<double> sum = {0.0, 0.0, 0.0};
+		for(int i = 0; i < sz[0]; i++){
+			for(int j = 0; j < sz[1]; j++){
+				for(int k = 0; k < sz[2]; k++)
+				{
+					sum[0] += grid_density_[i][j][k] * (i+0.5)*grid_spacing_[0];
+					sum[1] += grid_density_[i][j][k] * (j+0.5)*grid_spacing_[1];
+					sum[2] += grid_density_[i][j][k] * (k+0.5)*grid_spacing_[2];
+				}
+			}
+		}
+		return sum;
+	}	
 	void scalarMult(double rhs) // compound assignment (does not need to be a member,
 	{                           // but often is, to modify the private members)
 		for(int i = 0; i < sz[0]; i++){
