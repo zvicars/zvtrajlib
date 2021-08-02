@@ -25,13 +25,13 @@ public:
 	Vec3<double> getLength() const{
 		Vec3<double> ret;
 		for(int i = 0; i < 3; i++){
-			ret[i] = (sz[i])*grid_spacing_[i];
+			ret[i] = (sz[i]-1)*grid_spacing_[i];
 		}
 		return ret;
 	}
 	void setLength(Vec3<double> length){
 		for(int i = 0; i < 3; i++){
-			grid_spacing_[i] = length[i]/(double)(sz[i]);
+			grid_spacing_[i] = length[i]/(double)(sz[i]-1);
 		}
 		return;
 	}

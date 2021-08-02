@@ -1,18 +1,19 @@
 #include "../VoxelGrid.hpp"
 //Testing script for the voxelgrid object type to ensure that it is quantitatively accurate. Two things must remain true, the total density must add up to N/density and the 
-//center of mass of identical mass particles must be conserved
+//center of mass of identical mass particles must be conserved so long as the input parameters are reasonable
 //to this end, a single atom will be added to the box in an arbitrary location and these quantities will be computed
-//one caveat is that the com might be split across pbcs, so the added particle will be far away from the boundaries, this isn't ideal as an error in pbc treatment would go unnoticed, but
-//I want to get this test up and running asap and this covers typical cases
+//one caveat is that the com might be split across pbcs, so the added particle will be far away from the boundaries, this isn't ideal as an error in pbc treatment would go unnoticed
+//however, backresolving the right periodic image from the grid would be ugly, so it's better to test the pbc code separately
+//note that com will not be conserved perfectly if any density crosses pbc's or 2*sigma is less than any dimension
 int main(){
     double testing_threshold = 1e-4;
-    std::array<int,3> size = {10, 15, 20};
+    std::array<int,3> size = {50, 40, 45};
     std::array<double, 3> box_size = {20.0, 15.0, 10.0};
     double density = 1;
-    double sigma = 0.5;
+    double sigma = 2.0;
     double isovalue = 0.5;
     VoxelGrid v1(size, box_size, density, sigma, isovalue);
-    std::array<double, 3> x_in = {4.3, 2.3, 5.7};
+    std::array<double, 3> x_in = {10, 7.5, 5.0};
     v1.add_gaussian(x_in);
     double tot_mass = v1.getTot();
     auto tot_com = v1.getWeightedCOM();

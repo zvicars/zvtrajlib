@@ -14,9 +14,11 @@ inline double h_x(double x, double xmin, double xmax, double sigma, double xc){
     double sigma2 = sigma*sigma;
     k = sqrt(2*M_PI)*sigma*erf(xc/(sqrt(2)*sigma)) - 2*xc*exp(-(xc*xc)/(2*sigma2));
     invk = 1/k;
-    k1 = invk*sqrt(M_PI/2)*sigma;
-    k2 = invk*exp(-(xc*xc)/(2*sigma2));
-    eval = (k1 * erf((xmax-x)/(sqrt(2)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x)) + heaviside(xc+xmax-x);
+    k1 = invk*sqrt(0.5*M_PI*sigma2);
+    k2 = invk*exp(-0.5*(xc*xc)/sigma2);
+    eval = (k1 * erf((xmax-x)/(sqrt(2)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x))
+    + (k1 * erf((x-xmin)/(sqrt(2)*sigma)) - k2*(x-xmin) - 0.5)*heaviside(xc - fabs(x-xmin))
+    + heaviside(xc + 0.5*(xmax-xmin) - fabs(x - 0.5*(xmin+xmax)));
     return eval;
 }
 
@@ -32,7 +34,7 @@ void VoxelGrid::initialize(Vec3<int> size, Vec3<double> box_size, double density
   int dz = size[2];
   resize_grid(dx, dy, dz);
   for(int i = 0; i < 3; i++){
-      grid_spacing_[i] = box_size[i] / (double)(size[i]);
+      grid_spacing_[i] = box_size[i] / (double)(size[i]-1);
   }
   sigma_= sigma;
   density_ = density;
