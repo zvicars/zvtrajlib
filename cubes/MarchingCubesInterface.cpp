@@ -11,11 +11,13 @@ void golosio_mc(const VoxelGrid& v, Mesh& output_mesh){
 	std::vector<int> triangle_data;
 	std::vector<float> vertex_data; 
 	int iterator = 0;
+	double cell_volume = v.get_gs()[0] * v.get_gs()[1] * v.get_gs()[2];
+	double density = v.getDensity();
 	for(int k = 0; k < nz; k++)
 	for(int j = 0; j < ny; j++)
 	for(int i = 0; i < nx; i++)
 	{
-		volume_data[iterator] = v.getGridVal(i, j, k);
+		volume_data[iterator] = v.getGridVal(i, j, k)/( cell_volume * density );
 		iterator++;
 	}
 	int nvtx; 
@@ -74,9 +76,9 @@ void printSTL(const Mesh& mesh, std::string& frame)
         //just using the first vertex normal as the face normal, lazy but shouldn't affect much
         ofile << "facet normal " << mesh.normals[vidx1][0] << "  " << mesh.normals[vidx1][1] << "  " << mesh.normals[vidx1][2] << "\n"; 
 		ofile << "    outer loop\n";
-		ofile << "vertex " << mesh.vertices[vidx1][0] << " " << mesh.vertices[vidx1][1] << " " << mesh.vertices[vidx1][2] << "\n";
- 		ofile << "vertex " << mesh.vertices[vidx2][0] << " " << mesh.vertices[vidx2][1] << " " << mesh.vertices[vidx2][2] << "\n";
-		ofile << "vertex " << mesh.vertices[vidx3][0] << " " << mesh.vertices[vidx3][1] << " " << mesh.vertices[vidx3][2] << "\n";       
+		ofile << "vertex " << 10.0*mesh.vertices[vidx1][0] << " " << 10.0*mesh.vertices[vidx1][1] << " " << 10.0*mesh.vertices[vidx1][2] << "\n";
+ 		ofile << "vertex " << 10.0*mesh.vertices[vidx2][0] << " " << 10.0*mesh.vertices[vidx2][1] << " " << 10.0*mesh.vertices[vidx2][2] << "\n";
+		ofile << "vertex " << 10.0*mesh.vertices[vidx3][0] << " " << 10.0*mesh.vertices[vidx3][1] << " " << 10.0*mesh.vertices[vidx3][2] << "\n";       
 		ofile << "    endloop\n";
 		ofile << "endfacet\n";
 	}

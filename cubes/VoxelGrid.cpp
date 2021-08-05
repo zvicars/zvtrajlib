@@ -68,7 +68,7 @@ void VoxelGrid::add_gaussian(Vec3<double> x_in)
         ymax = ymin + grid_spacing_[1];
         zmin = iz * grid_spacing_[2];
         zmax = zmin + grid_spacing_[2];
-        grid_density_[idx][idy][idz] += (1.0/density_) * h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_)*h_x(z, zmin, zmax, sigma_, 2.0*sigma_);
+        grid_density_[idx][idy][idz] += h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_)*h_x(z, zmin, zmax, sigma_, 2.0*sigma_);
     }
     return;
 }

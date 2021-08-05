@@ -105,6 +105,9 @@ public:
 		}
 		return;
 	}
+	double getDensity() const {
+		return density_;
+	}
 private:
 	std::vector<std::vector<std::vector<double > > > grid_density_;
 	Vec3<int> sz; 
