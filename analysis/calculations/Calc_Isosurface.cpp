@@ -47,7 +47,7 @@ void Calc_Isosurface::calculate(){
     frame_.add_gaussian(box->atoms[idx].x);
   }
   marchingCubes(method_, frame_, mesh_);
-  //average_->sumInPlace(frame_);
+  average_.sumInPlace(&frame_);
   if(doOutput()) printOutput();
   frame_counter_++;
   return;
@@ -74,7 +74,8 @@ void Calc_Isosurface::finalOutput(){
   std::ofstream ofile(filepath);
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface average.");
   std::string output;
-  printSTL(mesh_, output);
+  //printSTL(mesh_, output);
+  printPLYWithCurvature(mesh_);
   ofile << output;
   ofile.close(); 
   return;
