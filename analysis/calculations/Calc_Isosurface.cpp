@@ -67,15 +67,15 @@ void Calc_Isosurface::printOutput(){
   ofile.close();
 };
 void Calc_Isosurface::finalOutput(){
-  return;
   if(output_freq_ <= 0) return;
   average_.scalarMult(1.0/(double)frame_counter_);
-  std::string filepath = base_ + "_average.stl";
+  marchingCubes(method_, average_, mesh_);
+  std::string filepath = base_ + "_average.ply";
   std::ofstream ofile(filepath);
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface average.");
   std::string output;
   //printSTL(mesh_, output);
-  printPLYWithCurvature(mesh_);
+  output = printPLYWithCurvature(mesh_);
   ofile << output;
   ofile.close(); 
   return;
