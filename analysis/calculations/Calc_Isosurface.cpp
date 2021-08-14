@@ -75,7 +75,8 @@ void Calc_Isosurface::finalOutput(){
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface average.");
   std::string output;
   //printSTL(mesh_, output);
-  output = printPLYWithCurvature(mesh_);
+  std::vector<std::array<double, 2> > curv;
+  output = printPLYWithCurvature(mesh_, curv, 2);
   ofile << output;
   ofile.close(); 
   return;

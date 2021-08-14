@@ -19,6 +19,14 @@ Eigen::Matrix3d getVertexTransformationMatrix(const Mesh& mesh, int idx){
   double c = normal.dot(unit_z);
   double s = v.norm();
   Eigen::Matrix3d kmat, eye_mat, rotation_matrix;
+  if(fabs(fabs(c) - 1) < 1e-5){
+    rotation_matrix = Eigen::Matrix3d::Identity();
+    if(c < 0){
+      rotation_matrix(1,1) = -1;
+      rotation_matrix(2,2) = -1;
+    }
+    return rotation_matrix;
+  }
   kmat << 0, -v(2), v(1), v(2), 0, -v(0), -v(1), v(0), 0;
   rotation_matrix = Eigen::Matrix3d::Identity() + kmat + kmat*kmat*((1-c)/(s*s));
   return rotation_matrix;
@@ -85,16 +93,18 @@ inline std::vector<int> getNeighborsWithinRange(const Mesh& mesh, int idx, int n
 struct Functor2Form{
   Eigen::MatrixXd data;
   int values_;
-  Functor2Form(const Eigen::MatrixXd& data_in){
+  double invs_;
+  Functor2Form(const Eigen::MatrixXd& data_in, double sens){
     data = data_in;
     values_ = data_in.rows();
+    invs_ = 1.0/sens;
     return;
   }
   int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec){
     assert(b.size() == 3);
     assert(fvec.size() == values_);
     for(int i = 0; i < fvec.size(); i++){
-      fvec(i) = 0.5*b(0)*data(i,0)*data(i,0) + b(1)*data(i,0)*data(i,1) + 0.5*b(2)*data(i,1)*data(i,1) - data(i,2);
+      fvec(i) = invs_*(0.5*b(0)*data(i,0)*data(i,0) + b(1)*data(i,0)*data(i,1) + 0.5*b(2)*data(i,1)*data(i,1) - data(i,2));
     }
     return 0;
   }
@@ -104,7 +114,7 @@ struct Functor2Form{
     assert(fjac.rows() == values_);
     for(int i = 0; i < data.rows(); i++){
       Eigen::Vector3d jac_row;
-      jac_row << 0.5*data(i,0)*data(i,0), data(i,0)*data(i,1), 0.5*data(i,1)*data(i,1);
+      jac_row << invs_*0.5*data(i,0)*data(i,0), invs_*data(i,0)*data(i,1), invs_*0.5*data(i,1)*data(i,1);
       fjac.row(i) = jac_row;
     }
     return 0;
@@ -112,9 +122,9 @@ struct Functor2Form{
   int values(){return values_;}
 };
 
-Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx){
+Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx, int neighbors){
   Eigen::Matrix2d eval;
-  std::vector<int> included_indices = getNeighborsWithinRange(mesh, idx, 2);
+  std::vector<int> included_indices = getNeighborsWithinRange(mesh, idx, neighbors);
   Eigen::Matrix3d tmat = getVertexTransformationMatrix(mesh, idx);
   Eigen::Vector3d origin;
   origin << mesh.vertices[idx][0], mesh.vertices[idx][1], mesh.vertices[idx][2];
@@ -128,16 +138,16 @@ Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx){
     //add shifted, rotated position to data vector
     data.row(i) = tmat*position;
   }
-  Functor2Form minfunc(data);
+  Functor2Form minfunc(data, 1.0);
   Eigen::LevenbergMarquardt<Functor2Form> lm_algo(minfunc);
   Eigen::VectorXd x;
   x.resize(3);
-  x(0) = 1; x(1) = 1; x(2) = 1;
+  x(0) = 0; x(1) = 0; x(2) = 0;
   int info = lm_algo.minimize(x);
-  
-  eval << x(0), x(1), x(1), x(2);
 
-  if(idx == 1 || idx == 2){
+  eval << x(0), x(1), x(1), x(2);
+  /*
+  if(idx%10 == 0){
     std::ofstream ofile("dump" + std::to_string(idx) + ".txt");
     ofile << "origin: " << origin;
     ofile << "vertex list:\n";
@@ -154,16 +164,16 @@ Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx){
 
     ofile.close();
   }
-
+  */
   return eval;
 }
 
 //computes the curvature at each vertex by fitting the second fundamental form
 //returns a vector of pairs containing the principal curvatures of a given vertex
-std::vector<std::array<double,2> > computeMeshCurvature(const Mesh& mesh){
+std::vector<std::array<double,2> > computeMeshCurvature(const Mesh& mesh, int neighbors){
   std::vector<std::array<double,2> > curvatures;
   for(int i = 0; i < mesh.nvtx; i++){
-    Eigen::Matrix2d eval = get2ndFormTensor(mesh, i);
+    Eigen::Matrix2d eval = get2ndFormTensor(mesh, i, neighbors);
     Eigen::EigenSolver<Eigen::Matrix2d> solver(eval);
     std::array<double,2> arr = {solver.eigenvalues().real()[0], solver.eigenvalues().real()[1]};
     curvatures.push_back(arr);
@@ -171,8 +181,8 @@ std::vector<std::array<double,2> > computeMeshCurvature(const Mesh& mesh){
   return curvatures; 
 }
 
-std::string printPLYWithCurvature(const Mesh& mesh){
-  std::vector<std::array<double,2>> curvatures = computeMeshCurvature(mesh);
+std::string printPLYWithCurvature(const Mesh& mesh, std::vector<std::array<double,2>>& curvatures, int neighbors){
+  curvatures = computeMeshCurvature(mesh, neighbors); 
   double max = -1e10;
   double min = 1e10;
   double abs_max;

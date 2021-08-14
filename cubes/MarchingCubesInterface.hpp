@@ -20,4 +20,4 @@ struct Mesh {
 //Main marching cubes function, will be able to switch between different algorithms
 void marchingCubes(std::string type, const VoxelGrid& grid, Mesh& output_mesh);
 void printSTL(const Mesh& mesh, std::string& frame);
-std::string printPLYWithCurvature(const Mesh& mesh);
+std::string printPLYWithCurvature(const Mesh& mesh, std::vector<std::array<double,2>>& curvatures, int neighbors);
