@@ -3,12 +3,11 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <map>
 class ObjFile{
 public:
-  int load(std::string file_text);
-  int save( const Mesh& mesh, std::string& file_text);
-  Mesh getMesh();
+  virtual int load(std::string file_text);
+  virtual int save( const Mesh& mesh, std::string& file_text);
+  virtual Mesh getMesh();
 protected:
   void createPerVertexNormals();
   void readVertex(std::string line);
