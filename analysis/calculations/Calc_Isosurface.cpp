@@ -47,7 +47,7 @@ void Calc_Isosurface::calculate(){
     frame_.add_gaussian(box->atoms[idx].x);
   }
   marchingCubes(method_, frame_, mesh_);
-  average_.sumInPlace(&frame_);
+  average_.sumInPlace(frame_);
   if(doOutput()) printOutput();
   frame_counter_++;
   return;

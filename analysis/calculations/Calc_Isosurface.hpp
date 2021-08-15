@@ -11,7 +11,7 @@ public:
 private:
   //number of actual frames computed
   int frame_counter_;
-  bool initialized_;
+  bool initialized_ = 0;
   std::string method_;
   //total surface area of the isosurface
   std::vector<double> areas_;

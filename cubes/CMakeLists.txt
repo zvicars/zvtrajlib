@@ -5,8 +5,13 @@ meshcurvature.cpp
 VoxelGrid.cpp
 meshfiles/objfile.cpp
 )
+
+
 target_include_directories(INSTANT_INT PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)
-target_link_libraries(INSTANT_INT PRIVATE GOLOSIO)
-target_compile_options(INSTANT_INT PRIVATE -O0)
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+target_link_libraries(INSTANT_INT PRIVATE GOLOSIO OpenMP::OpenMP_CXX)
+endif()
+target_compile_options(INSTANT_INT PRIVATE -O3 -fopenmp)
 
 add_subdirectory(test)

@@ -1,4 +1,5 @@
 #include "VoxelGrid.hpp"
+#include <omp.h>
 inline double heaviside(double x){
 	if(x <= 0) return 0;
 	return 1.0; 
@@ -51,14 +52,21 @@ int VoxelGrid::resize_grid(int dim_x, int dim_y, int dim_z)
 }
 void VoxelGrid::add_gaussian(Vec3<double> x_in)
 {
-    int idx, idy, idz;
     double x = x_in[0];
     double y = x_in[1];
     double z = x_in[2];
-    for(int ix = floor((x-2*sigma_)/grid_spacing_[0]); ix <= ceil((x+2*sigma_)/grid_spacing_[0]); ix++)
-    for(int iy = floor((y-2*sigma_)/grid_spacing_[1]); iy <= ceil((y+2*sigma_)/grid_spacing_[1]); iy++)
-    for(int iz = floor((z-2*sigma_)/grid_spacing_[2]); iz <= ceil((z+2*sigma_)/grid_spacing_[2]); iz++)
+    int lxmin = floor((x-2*sigma_)/grid_spacing_[0]);
+    int lxmax = ceil((x+2*sigma_)/grid_spacing_[0]);
+    int lymin = floor((y-2*sigma_)/grid_spacing_[1]);
+    int  lymax = ceil((y+2*sigma_)/grid_spacing_[1]);
+    int lzmin = floor((z-2*sigma_)/grid_spacing_[2]);
+    int lzmax = ceil((z+2*sigma_)/grid_spacing_[2]);    
+    #pragma omp parallel for collapse(3)
+    for(int ix = lxmin; ix <= lxmax; ix++)
+    for(int iy = lymin; iy <= lymax; iy++)
+    for(int iz = lzmin; iz <= lzmax; iz++)
     {
+        int idx, idy, idz;
         idx = ix; idy = iy; idz = iz;
         pbcidx(idx, idy, idz);
         double xmin, xmax, ymin, ymax, zmin, zmax;
@@ -81,4 +89,54 @@ void VoxelGrid::pbcidx(int &x, int& y, int& z)
     if(z >= sz[2]) z = z%sz[2];
     else if(z < 0) z = sz[2] - (-z)%sz[2];
     return;
+}
+
+void VoxelGrid::clear(){
+    #pragma omp for collapse(3)
+    for(int i = 0; i < sz[0]; i++){
+        for(int j = 0; j < sz[1]; j++){
+            for(int k = 0; k < sz[2]; k++){
+                grid_density_[i][j][k] = 0.0; 
+            }
+        }
+    }
+    return;
+}
+
+void VoxelGrid::scalarMult(double rhs) // compound assignment (does not need to be a member,
+{                           // but often is, to modify the private members)
+    #pragma omp parallel for collapse(3)
+    for(int i = 0; i < sz[0]; i++){
+        for(int j = 0; j < sz[1]; j++){
+            for(int k = 0; k < sz[2]; k++){
+                grid_density_[i][j][k] *= rhs;
+            }
+        }
+    }
+    return;
+}
+
+void VoxelGrid::sumInPlace(const VoxelGrid& vg){
+    #pragma omp parallel for collapse(3)
+    for(int i = 0; i < sz[0]; i++){
+        for(int j = 0; j < sz[1]; j++){
+            for(int k = 0; k < sz[2]; k++){
+                grid_density_[i][j][k] += vg.getGridVal(i,j,k);
+            }
+        }
+    }
+    return;
+}
+
+double VoxelGrid::getTot() const{
+    double sum = 0.0;
+    for(int i = 0; i < sz[0]; i++){
+        for(int j = 0; j < sz[1]; j++){
+            for(int k = 0; k < sz[2]; k++)
+            {
+                sum += grid_density_[i][j][k];
+            }
+        }
+    }
+    return sum;
 }

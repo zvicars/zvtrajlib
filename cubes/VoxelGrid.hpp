@@ -44,29 +44,8 @@ public:
 	Vec3<double> get_gs() const{
 		return grid_spacing_;
 	}
-	void sumInPlace(VoxelGrid* vg){
-		for(int i = 0; i < sz[0]; i++){
-			for(int j = 0; j < sz[1]; j++){
-				for(int k = 0; k < sz[2]; k++)
-				{
-					grid_density_[i][j][k] += vg->getGridVal(i,j,k);
-				}
-			}
-		}
-		return;
-	}
-	double getTot(){
-		double sum = 0.0;
-		for(int i = 0; i < sz[0]; i++){
-			for(int j = 0; j < sz[1]; j++){
-				for(int k = 0; k < sz[2]; k++)
-				{
-					sum += grid_density_[i][j][k];
-				}
-			}
-		}
-		return sum;
-	}
+	void sumInPlace(const VoxelGrid& vg);
+	double getTot() const;
 	Vec3<double> getWeightedCOM(){
 		Vec3<double> sum = {0.0, 0.0, 0.0};
 		for(int i = 0; i < sz[0]; i++){
@@ -81,30 +60,10 @@ public:
 		}
 		return sum;
 	}	
-	void scalarMult(double rhs) // compound assignment (does not need to be a member,
-	{                           // but often is, to modify the private members)
-		for(int i = 0; i < sz[0]; i++){
-			for(int j = 0; j < sz[1]; j++){
-				for(int k = 0; k < sz[2]; k++){
-					grid_density_[i][j][k] *= rhs;
-				}
-			}
-		}
-		return;
-	}
+	void scalarMult(double rhs); // compound assignment (does not need to be a member,
 	void pbcidx(int &x, int& y, int& z);
 	void add_gaussian(Vec3<double> x_in);
-	void clear(){
-		for(int i = 0; i < sz[0]; i++){
-			for(int j = 0; j < sz[1]; j++){
-				for(int k = 0; k < sz[2]; k++)
-				{
-					grid_density_[i][j][k] = 0.0; 
-				}
-			}
-		}
-		return;
-	}
+	void clear();
 	double getDensity() const {
 		return density_;
 	}

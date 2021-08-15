@@ -16,4 +16,4 @@ target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(ANALYSIS PRIVATE TRAJLIB
                                PRIVATE TOOLS
                                PRIVATE INSTANT_INT)
-target_compile_options(ANALYSIS PRIVATE -O0)
+target_compile_options(ANALYSIS PRIVATE -O3)
