@@ -32,49 +32,51 @@ Eigen::Matrix3d getVertexTransformationMatrix(const Mesh& mesh, int idx){
   return rotation_matrix;
 }
 
-std::vector<int> getNeighboringIndices(const Mesh& mesh, int idx){
-  std::vector<int> indices;
-  for(int i = 0; i < mesh.triangles.size(); i++){
-    for(int j = 0; j < 3; j++){
-      if(mesh.triangles[i].indices[j] == idx){
-        if(j == 0){
-          indices.push_back(mesh.triangles[i].indices[1]);
-          indices.push_back(mesh.triangles[i].indices[2]);
+std::vector<std::vector<int> > buildNeighborList(const Mesh& mesh){
+  std::vector<std::vector<int> > eval(mesh.nvtx);
+  for(int idx = 0; idx < mesh.nvtx; idx++){
+    std::vector<int> indices;
+    for(int i = 0; i < mesh.triangles.size(); i++){
+      for(int j = 0; j < 3; j++){
+        if(mesh.triangles[i].indices[j] == idx){
+          if(j == 0){
+            indices.push_back(mesh.triangles[i].indices[1]);
+            indices.push_back(mesh.triangles[i].indices[2]);
+          }
+          else if(j == 1){
+            indices.push_back(mesh.triangles[i].indices[0]);
+            indices.push_back(mesh.triangles[i].indices[2]);
+          }
+          else{
+            indices.push_back(mesh.triangles[i].indices[0]);
+            indices.push_back(mesh.triangles[i].indices[1]); 
+          }
+          break;
         }
-        else if(j == 1){
-          indices.push_back(mesh.triangles[i].indices[0]);
-          indices.push_back(mesh.triangles[i].indices[2]);
-        }
-        else{
-          indices.push_back(mesh.triangles[i].indices[0]);
-          indices.push_back(mesh.triangles[i].indices[1]); 
-        }
-        break;
       }
     }
-  }
-  for(int i = 0; i < indices.size(); i++){
-    for(int j = i+1; j < indices.size(); j++){
-      if(indices[i] == indices[j]){
-        indices.erase(indices.begin() + j);
-        j--;
+    for(int i = 0; i < indices.size(); i++){
+      for(int j = i+1; j < indices.size(); j++){
+        if(indices[i] == indices[j]){
+          indices.erase(indices.begin() + j);
+          j--;
+        }
       }
     }
+    eval[idx] = indices;
   }
-
-  return indices;
+  return eval;
 }
 
-inline std::vector<int> getNeighborsWithinRange(const Mesh& mesh, int idx, int neighbors){
+inline std::vector<int> getNeighborsWithinRange(const Mesh& mesh, const std::vector<std::vector<int> >& neighbor_list, int idx, int neighbors){
   std::vector<int> indices(1, idx);
   std::vector<int> last_indices(1, idx);
   std::vector<int> new_indices;
   for(int i = 0; i < neighbors; i++){
     for(int j = 0; j < last_indices.size(); j++){
-      std::vector<int> new_index_step = getNeighboringIndices(mesh, last_indices[j]);
+      std::vector<int> new_index_step = neighbor_list[last_indices[j]];
       new_indices.insert(new_indices.end(), new_index_step.begin(), new_index_step.end());
     }
-
     for(int j = new_indices.size()-1; j >= 0; j--){
       for(int k = 0; k < indices.size(); k++){
         if(new_indices[j] == indices[k]){
@@ -122,9 +124,9 @@ struct Functor2Form{
   int values(){return values_;}
 };
 
-Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx, int neighbors){
+Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx, int neighbors, const std::vector<std::vector<int> >& nlist){
   Eigen::Matrix2d eval;
-  std::vector<int> included_indices = getNeighborsWithinRange(mesh, idx, neighbors);
+  std::vector<int> included_indices = getNeighborsWithinRange(mesh, nlist, idx, neighbors);
   Eigen::Matrix3d tmat = getVertexTransformationMatrix(mesh, idx);
   Eigen::Vector3d origin;
   origin << mesh.vertices[idx][0], mesh.vertices[idx][1], mesh.vertices[idx][2];
@@ -172,8 +174,9 @@ Eigen::Matrix2d get2ndFormTensor(const Mesh& mesh, int idx, int neighbors){
 //returns a vector of pairs containing the principal curvatures of a given vertex
 std::vector<std::array<double,2> > computeMeshCurvature(const Mesh& mesh, int neighbors){
   std::vector<std::array<double,2> > curvatures;
+  auto nlist = buildNeighborList(mesh);
   for(int i = 0; i < mesh.nvtx; i++){
-    Eigen::Matrix2d eval = get2ndFormTensor(mesh, i, neighbors);
+    Eigen::Matrix2d eval = get2ndFormTensor(mesh, i, neighbors, nlist);
     Eigen::EigenSolver<Eigen::Matrix2d> solver(eval);
     std::array<double,2> arr = {solver.eigenvalues().real()[0], solver.eigenvalues().real()[1]};
     curvatures.push_back(arr);

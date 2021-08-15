@@ -42,6 +42,8 @@ void Calc_Isosurface::calculate(){
     frame_.setLength(box_size);
     frame_.clear();
   }
+  //it would be very nice to parallize this, but the add_gaussian() function could lead to data races
+  //instead, I placed omp loops inside of add-gaussian function
   for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
     int idx = atom_group_->getIndices()[i];
     frame_.add_gaussian(box->atoms[idx].x);

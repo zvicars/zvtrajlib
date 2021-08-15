@@ -7,7 +7,7 @@
 class ObjFile{
 public:
   int load(std::string file_text);
-  int save(std::string& file_text);
+  int save( const Mesh& mesh, std::string& file_text);
   Mesh getMesh();
 protected:
   void createPerVertexNormals();

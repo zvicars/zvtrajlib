@@ -18,7 +18,6 @@ void ObjFile::readVertexNormal(std::string line){
   std::string tag;
   std::array<double, 3> entry;
   ss >> tag >> entry[0] >> entry[1] >> entry[2];
-  std::cout << tag << " " << entry[0] << " " << entry[1] << " " << entry[2] << std::endl;
   if(ss.fail()){
     std::cout << "Bad data in obj file." << std::endl;
     return;
@@ -62,8 +61,6 @@ void ObjFile::readFace(std::string line){
     face[i] = std::stoi(vs)-1;
     normal[i] = std::stoi(ns)-1;
   }
-  std::cout << face[0] << " " << face[1] << " " << face[2] << "\n";
-  std::cout << normal[0] << " " << normal[1] << " " << normal[2] << "\n";
   faces_.push_back(face);
   face_vtx_norms_.push_back(normal);
   return;
@@ -97,8 +94,31 @@ int ObjFile::load(std::string file_text){
   createPerVertexNormals();
   return 0;
 }
-int ObjFile::save(std::string& file_text){
-  return 1;
+int ObjFile::save( const Mesh& mesh, std::string& file_text){
+  std::stringstream ofile;
+  //file header
+  ofile << "# Created by zvtrajlib\n";
+  ofile << "# Object mesh:\n\n";
+  ofile << "# Begin Group:\n";
+  ofile << "# Shape \"mesh\":\n";
+  ofile << "o mesh\n";
+  for(int i = 0; i < mesh.nvtx; i++){
+    ofile << "v " << mesh.vertices[i][0] << " " << mesh.vertices[i][1] << " "  << mesh.vertices[i][2] << "\n";
+  }
+  for(int i = 0; i < mesh.nvtx; i++){
+    ofile << "vn " << mesh.normals[i][0] << " " << mesh.normals[i][1] << " "  << mesh.normals[i][2] << "\n";
+  }
+  for(int i = 0; i < mesh.ntri; i++){
+    ofile << "f";
+    for(int j = 0; j < 3; j++){
+      ofile << " " << mesh.triangles[i].indices[j]+1 << "//" << mesh.triangles[i].indices[j]+1;
+    }
+    ofile << "\n";
+  }
+  ofile << "# End Group:\n";
+  ofile << "# End of Object \"mesh\"\n";
+  file_text = ofile.str();
+  return 0;
 }
 
 //fills a vector that is the same size as the vertices with the vertex information contained in the faces section
@@ -132,8 +152,6 @@ Mesh ObjFile::getMesh(){
   std::vector<Triangle> triangles;
   for(int i = 0; i < vertex_normals_.size(); i++){
     real_normals[i] = vertex_normals_table_[vertex_normals_[i]];
-    std::cout << "Real normal line" << std::endl;
-    std::cout << real_normals[i][0] << " " << real_normals[i][1] << " " << real_normals[i][2] << "\n";
   }
   for(int i = 0; i < faces_.size(); i++){
     Triangle tri;
