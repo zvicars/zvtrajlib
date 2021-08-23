@@ -25,10 +25,8 @@ Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
   FANCY_ASSERT(method_ == "golosio", "Invalid method chosen for instantaneous interface calculation, valid options are \'golosio\' and \'rchandra\'.");
   return;
 }
-void Calc_Isosurface::calculate(){
-  current_time_ = box->time;
-  current_frame_ = box->frame_counter;
-  if(!doCalculate()) return;
+void Calc_Isosurface::update(){
+  Calculation::update();
   Vec3<double> box_size;
   for(int i = 0; i < 3; i++){
     box_size[i] = box->boxvec[i][i];
@@ -42,17 +40,26 @@ void Calc_Isosurface::calculate(){
     frame_.setLength(box_size);
     frame_.clear();
   }
+  return;
+}
+void Calc_Isosurface::calculate(){
+  if(!doCalculate()) return;
   //it would be very nice to parallize this, but the add_gaussian() function could lead to data races
   //instead, I placed omp loops inside of add-gaussian function
   for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
     int idx = atom_group_->getIndices()[i];
     frame_.add_gaussian(box->atoms[idx].x);
   }
-  marchingCubes(method_, frame_, mesh_);
   average_.sumInPlace(frame_);
-  if(doOutput()) printOutput();
   frame_counter_++;
   return;
+}
+
+void Calc_Isosurface::output(){
+  if(doOutput()){
+    marchingCubes(method_, frame_, mesh_);
+    printOutput();
+  }  
 }
 
 std::string Calc_Isosurface::printConsoleReport(){
@@ -78,8 +85,20 @@ void Calc_Isosurface::finalOutput(){
   std::string output;
   //printSTL(mesh_, output);
   std::vector<std::array<double, 2> > curv;
-  output = printPLYWithCurvature(mesh_, curv, 2);
-  ofile << output;
+  curv = computeMeshCurvature(mesh_, 3);
+  std::vector<double> ac(curv.size()), gc(curv.size());
+  for(int i = 0; i < curv.size(); i++){
+    ac[i] = 0.5*(curv[i][0]+curv[i][1]);
+    gc[i] = curv[i][0]*curv[i][1];
+  }
+  std::string ac_info = printPLYWithCurvature(mesh_, ac); 
+  std::string gc_info = printPLYWithCurvature(mesh_, gc);   
+  ofile << ac_info;
   ofile.close(); 
+  filepath = base_ + "_gaussian.ply";
+  ofile.open(filepath);
+  FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface average.");
+  ofile << gc_info;
+  ofile.close();
   return;
 };
