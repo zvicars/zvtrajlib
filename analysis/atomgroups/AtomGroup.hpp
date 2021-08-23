@@ -13,6 +13,9 @@ public:
   std::string getName(){
     return name_;
   }
+  virtual void update(){
+    return;
+  }
 protected:
   std::string name_;
   std::string type_;

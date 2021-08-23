@@ -53,8 +53,6 @@ void Calc_Angle::calculate(){
     step_vec_.push_back(box->frame_counter);
     time_vec_.push_back(box->time);
   }
-  //this calculation has no per-timestep output, so print output function is blank (defined in Calculations.hpp)
-  if(doOutput()) printOutput();
   return;
 }
 std::string Calc_Angle::printConsoleReport(){

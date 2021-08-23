@@ -11,6 +11,9 @@ public:
     return; 
   }
   virtual double compute(Vec3<double> position) = 0;
+  virtual void update(){
+    return;
+  }
 protected:
   const Box* box;
 private:

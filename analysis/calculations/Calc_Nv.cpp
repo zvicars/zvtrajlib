@@ -14,8 +14,6 @@ Calc_Nv::Calc_Nv(InputPack& input):Calculation{input}
   return;
 }
 void Calc_Nv::calculate(){
-  current_time_ = box->time;
-  current_frame_ = box->frame_counter;
   if(!doCalculate()) return;
   float sum = 0.0;
   for(int i = 0; i < atom_group_->getIndices().size(); i++){
@@ -28,7 +26,6 @@ void Calc_Nv::calculate(){
     step_vec_.push_back(box->frame_counter);
     time_vec_.push_back(box->time);
   }
-  if(doOutput()) printOutput();
   return;
 }
 std::string Calc_Nv::printConsoleReport(){

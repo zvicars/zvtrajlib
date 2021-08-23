@@ -9,8 +9,8 @@ add_subdirectory(interface)
 add_subdirectory(tools)
 add_subdirectory(cubes)
 add_subdirectory(analysis)
-add_executable(main test.cpp)
-target_link_libraries(main PRIVATE TRAJLIB 
+add_executable(zvtrajlib main.cpp)
+target_link_libraries(zvtrajlib PRIVATE TRAJLIB 
                            PRIVATE TOOLS 
                            PRIVATE ANALYSIS)
-target_compile_options(main PRIVATE -O0 -g)
+target_compile_options(zvtrajlib PRIVATE -O0 -g)

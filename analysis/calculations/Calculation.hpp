@@ -19,11 +19,18 @@ public:
   }
   virtual void calculate()=0;
   virtual std::string printConsoleReport()=0;
-  virtual void printOutput(){return;}
   virtual void finalOutput(){return;}
-  virtual bool doCalculate();
-  virtual bool doOutput();
+  virtual void update();
+  virtual void output(){
+    if(!doOutput()) return;
+    printOutput();
+    return;
+  }
 protected:
+  virtual void printOutput(){return;}
+  //check to see if this is a step where you should output
+  virtual bool doOutput();
+  virtual bool doCalculate();
   std::string name_, type_, base_;
   double equilibration_, current_time_;
   int output_freq_, calc_freq_, current_frame_; //number of frames to wait before outputting

@@ -4,6 +4,7 @@ bonded_functions.cpp
 atomgroups/AtomGroup.cpp
 atomgroups/AtomGroup_ndx.cpp
 atomgroups/AtomGroup_name.cpp
+atomgroups/AtomGroup_dynamic.cpp
 calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Isosurface.cpp

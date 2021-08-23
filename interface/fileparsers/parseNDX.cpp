@@ -17,6 +17,7 @@ IndexInfo parseNDX(std::string filename){
   std::vector<int> index_counts;
   std::string line;
   while(std::getline(ifile, line)){
+    if(line.length() == 0) continue;
     if(line.at(0) == ';') continue;
     int pos1 = line.find("[");
     int pos2 = line.find("]");
@@ -28,7 +29,10 @@ IndexInfo parseNDX(std::string filename){
     std::vector<int> indexes;
     //read the label, should be nothing but an array of numbers until another line with brackets
     auto lastpos = ifile.tellg();
+    int counter = 0;
     while(std::getline(ifile, line)){  
+      counter++;
+      if(line.size() == 0) continue;
       if(line.at(0) == ';') continue;
       //leave the loop once a line with a square bracket is found
       int pos1 = line.find("[");

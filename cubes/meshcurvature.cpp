@@ -184,22 +184,11 @@ std::vector<std::array<double,2> > computeMeshCurvature(const Mesh& mesh, int ne
   return curvatures; 
 }
 
-std::string printPLYWithCurvature(const Mesh& mesh, std::vector<std::array<double,2>>& curvatures, int neighbors){
-  curvatures = computeMeshCurvature(mesh, neighbors); 
+std::string printPLYWithCurvature(const Mesh& mesh, const std::vector<double>& cv){
   double max = -1e10;
-  double min = 1e10;
-  double abs_max;
-  for(int i = 0; i < curvatures.size(); i++){
-    for(int j = 0; j < 2; j++){
-      if(curvatures[i][j] > max) max = curvatures[i][j];
-      if(curvatures[i][j] < min) min = curvatures[i][j];
-    }
+  for(int i = 0; i < cv.size(); i++){
+      if(fabs(cv[i]) > max) max = fabs(cv[i]);
   }
-  std::vector<double> average_curvatures(curvatures.size());
-  for(int i = 0; i < curvatures.size(); i++){
-    average_curvatures[i] = 0.5*(curvatures[i][0] + curvatures[i][1]);
-  }
-  abs_max = std::max(fabs(max), fabs(min));
   std::stringstream ss;
   ss << "ply\nformat ascii 1.0\n";
   ss << "element vertex " << mesh.nvtx << "\n";
@@ -214,10 +203,10 @@ std::string printPLYWithCurvature(const Mesh& mesh, std::vector<std::array<doubl
   ss << "end_header\n";
   for(int i = 0; i < mesh.nvtx; i++){
     ss << mesh.vertices[i][0] << " " << mesh.vertices[i][1] << " " << mesh.vertices[i][2] << " ";
-    double red_channel, blue_channel;
-    red_channel = 0.5*(average_curvatures[i]/abs_max) + 0.5;
-    blue_channel = -0.5*(average_curvatures[i]/abs_max) + 0.5;
-    ss << round(255*red_channel) << " 0 " << round(255*blue_channel) << "\n";
+    double red_channel, green_channel;
+    red_channel = 0.5*(cv[i]/max) + 0.5;
+    green_channel = -0.5*(cv[i]/max) + 0.5;
+    ss << round(255*red_channel) << " " << round(255*green_channel) << " 0" << "\n";
   }
   for(int i = 0; i < mesh.ntri; i++){
     ss << "3 " << mesh.triangles[i].indices[0] << " " << mesh.triangles[i].indices[1] << " " << mesh.triangles[i].indices[2] << "\n";

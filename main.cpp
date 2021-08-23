@@ -57,11 +57,30 @@ int main(int argc, char **argv)
   while(traj.nextFrame()){
     traj.getFrame(b1);
     std::cout << b1.time << "\n";
+    auto ag_reg_ = master_input_pack.AtomGroupMap();
+    auto pv_reg_ = master_input_pack.ProbeVolumeMap();
     auto calc_reg_ = master_input_pack.CalculationMap();
+    //update all objects
+    for(auto i = ag_reg_.begin(); i != ag_reg_.end(); i++){
+      i->second->update();
+    }
+    for(auto i = pv_reg_.begin(); i != pv_reg_.end(); i++){
+      i->second->update();
+    }
     for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-      auto calculation = i->second;
+      i->second->update();
+    }
+    //run all calculations
+    for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       i->second->calculate();
     }
+    //perform all outputs
+     for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
+      i->second->printConsoleReport();
+      i->second->output();
+    }  
+
+
   }
   auto calc_reg_ = master_input_pack.CalculationMap();
   for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){

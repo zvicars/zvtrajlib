@@ -6,9 +6,11 @@ public:
   Calc_Isosurface(InputPack& input);
   virtual void calculate();
   virtual std::string printConsoleReport();
-  virtual void printOutput();
   virtual void finalOutput();
-private:
+  virtual void output();
+  virtual void update();
+protected:
+  virtual void printOutput();
   //number of actual frames computed
   int frame_counter_;
   bool initialized_ = 0;

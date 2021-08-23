@@ -8,6 +8,10 @@ public:
   virtual void calculate();
   virtual std::string printConsoleReport();
   virtual void finalOutput();
+  virtual void update(){
+    Calculation::update();
+    return;
+  }
 private:
   Vec<double> time_vec_;
   Vec<int> step_vec_;

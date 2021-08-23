@@ -42,3 +42,9 @@ bool Calculation::doOutput(){
     if(current_frame_%output_freq_ != 0) return 0;
     return 1;
 }
+
+void Calculation::update(){
+    current_time_ = box->time;
+    current_frame_ = box->frame_counter; 
+    return;
+}
