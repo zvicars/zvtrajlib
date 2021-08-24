@@ -17,8 +17,8 @@ public:
   virtual ~Calculation(){
     return;
   }
-  virtual void calculate()=0;
-  virtual std::string printConsoleReport()=0;
+  virtual void calculate(){return;}
+  virtual std::string printConsoleReport(){return "";}
   virtual void finalOutput(){return;}
   virtual void update();
   virtual void output(){

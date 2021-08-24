@@ -9,6 +9,7 @@ calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Isosurface.cpp
 calculations/Calc_Angle.cpp
+calculations/Calc_2D_Density.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 factory.cpp
@@ -17,4 +18,4 @@ target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(ANALYSIS PRIVATE TRAJLIB
                                PRIVATE TOOLS
                                PRIVATE INSTANT_INT)
-target_compile_options(ANALYSIS PRIVATE -O3)
+target_compile_options(ANALYSIS PRIVATE -O0)
