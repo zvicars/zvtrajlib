@@ -10,11 +10,14 @@ calculations/Calc_Nv.cpp
 calculations/Calc_Isosurface.cpp
 calculations/Calc_Angle.cpp
 calculations/Calc_2D_Density.cpp
+calculations/Calc_SWIPES_CircleFit.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
+probevolumes/PV_Cylinder.cpp
+probevolumes/PV_Boolean.cpp
 factory.cpp
 )
-target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)
 target_link_libraries(ANALYSIS PRIVATE TRAJLIB
                                PRIVATE TOOLS
                                PRIVATE INSTANT_INT)

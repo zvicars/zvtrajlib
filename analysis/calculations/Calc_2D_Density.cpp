@@ -97,10 +97,12 @@ GridDataExportPack Calc_2D_Density::getGridSubsection(std::array<int, 2> xmin, s
   g1.grid_offset = xmin;
   g1.real_offset = {xmin[0]*grid_spacing_[0], xmin[1]*grid_spacing_[1]};
   g1.grid_data.resize(xmax[0] - xmin[0] + 1, std::vector<double>(xmax[1] - xmin[1] + 1, 0.0));
+  g1.grid_spacing = grid_spacing_;
+  g1.integration_direction = aligned_axis_;
   for(int i = xmin[0]; i <= xmax[0]; i++){
     for(int j = xmin[1]; j <= xmax[1]; j++){
-      int di = xmax[0] - xmin[0];
-      int dj = xmax[1] - xmin[1];
+      int di = i - xmin[0];
+      int dj = j - xmin[1];
       g1.grid_data[di][dj] = grid_density_[gridIndex(i,j)];
     }
   }

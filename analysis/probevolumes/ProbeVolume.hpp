@@ -16,6 +16,5 @@ public:
   }
 protected:
   const Box* box;
-private:
   std::string name_;
 };

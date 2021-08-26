@@ -2,10 +2,10 @@
 #include "Calculation.hpp"
 #include <cmath>
 struct GridDataExportPack{
+  int integration_direction;
   std::vector<std::vector<double> > grid_data;
-  std::array<int,2> grid_size, original_grid_size;
-  std::array<int, 2> grid_offset;
-  std::array<double,2> real_offset;
+  std::array<int,2> grid_size, original_grid_size, grid_offset;
+  std::array<double,2> real_offset, grid_spacing;
 };
 
 class Calc_2D_Density : public Calculation{

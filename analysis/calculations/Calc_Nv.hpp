@@ -20,4 +20,5 @@ private:
   std::string pv_name_;
   ProbeVolume* pv_;
   AtomGroup* atom_group_; //these are the atoms for which calculations will be performed
+  int dump_frame_ = -1;
 };

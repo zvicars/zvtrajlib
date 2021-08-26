@@ -1,6 +1,8 @@
 #include "factory.hpp"
 #include "../tools/Assert.hpp"
 #include "probevolumes/PV_Simple.hpp"
+#include "probevolumes/PV_Cylinder.hpp"
+#include "probevolumes/PV_Boolean.hpp"
 #include "atomgroups/AtomGroup_name.hpp"
 #include "atomgroups/AtomGroup_ndx.hpp"
 #include "atomgroups/AtomGroup_dynamic.hpp"
@@ -11,6 +13,8 @@
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
+  if(key == "cylinder") return new PV_Cylinder(input);
+  if(key == "boolean") return new PV_Boolean(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }
@@ -28,6 +32,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "nv") return new Calc_Nv(input);
   if(key == "angle") return new Calc_Angle(input);
   if(key == "2d_density") return new Calc_2D_Density(input);
+  if(key == "circlefit") return new Calc_SWIPES_CircleFit(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }
