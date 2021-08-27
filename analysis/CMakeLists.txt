@@ -7,9 +7,11 @@ atomgroups/AtomGroup_name.cpp
 atomgroups/AtomGroup_dynamic.cpp
 calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
+calculations/Calc_Nv_wFit.cpp
 calculations/Calc_Isosurface.cpp
 calculations/Calc_Angle.cpp
 calculations/Calc_2D_Density.cpp
+calculations/Calc_1D_Density.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp

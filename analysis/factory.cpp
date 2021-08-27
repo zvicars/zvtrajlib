@@ -9,7 +9,9 @@
 #include "calculations/Calc_Isosurface.hpp"
 #include "calculations/Calc_Angle.hpp"
 #include "calculations/Calc_Nv.hpp"
+#include "calculations/Calc_Nv_wFit.hpp"
 #include "calculations/Calc_2D_Density.hpp"
+#include "calculations/Calc_1D_Density.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
@@ -30,8 +32,10 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
 Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "isosurface") return new Calc_Isosurface(input);
   if(key == "nv") return new Calc_Nv(input);
+  if(key == "nvwfit") return new Calc_Nv_wFit(input);
   if(key == "angle") return new Calc_Angle(input);
   if(key == "2d_density") return new Calc_2D_Density(input);
+  if(key == "1d_density") return new Calc_1D_Density(input);
   if(key == "circlefit") return new Calc_SWIPES_CircleFit(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;

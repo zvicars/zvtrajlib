@@ -22,14 +22,6 @@ void Calc_Nv::calculate(){
     int idx = atom_group_->getIndices()[i];
     sum += pv_->compute(box->atoms[idx].x);
   }
-  if(current_frame_ = dump_frame_){
-    std::stringstream ss;
-    for(int i = 0; i < atom_group_->getIndices().size(); i++){
-      int idx = atom_group_->getIndices()[i];
-      if(pv_->compute(box->atoms[idx].x) == 1.0);
-    }    
-  }
-
   value_ = sum;
   if(doTimeseries || doHistogram){
     count_vec_.push_back(value_);

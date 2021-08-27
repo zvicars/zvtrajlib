@@ -12,7 +12,7 @@ public:
     Calculation::update();
     return;
   }
-private:
+protected:
   Vec<double> time_vec_;
   Vec<int> step_vec_;
   Vec<double> count_vec_;

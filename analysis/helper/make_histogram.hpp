@@ -29,7 +29,7 @@ static inline void makeHistogram(const std::vector<double>& data, double min_bin
   for(std::size_t i = 0; i < data.size(); i++){
       double datum = data[i];
       int index = std::round((datum - min_bin_)/bin_size_);
-      if(index > max_bin_ || index < min_bin_) continue;
+      if(index >= x_vals.size() || index < 0) continue;
       y_vals[index]++;
   }
 
