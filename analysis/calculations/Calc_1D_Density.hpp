@@ -45,7 +45,7 @@ private:
   //fitting options
   bool fitSigmoidal;
   std::array<int, 2> idx_range_;
-  Vec<double> params_; // calculated per-frame
+  Vec<double> params_, guess_; // calculated per-frame
   Vec<double> tvec_, frame_vec_;
   Vec<Vec<double> > fits_;
 };

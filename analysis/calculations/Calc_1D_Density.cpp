@@ -16,6 +16,9 @@ Calc_1D_Density::Calc_1D_Density(InputPack& input) : Calculation{input} {
   std::vector<int> xrange;
   input.params().readVector("x_range", KeyType::Optional, xrange);
   FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
+  guess_.resize(3, 1.0);
+  input.params().readVector("guess", KeyType::Optional, guess_);
+  FANCY_ASSERT(xrange.size() == 2, "Invalid guess provided");
   idx_range_[0] = xrange[0];
   idx_range_[1] = xrange[1];
   frame_counter_ = 0;  
@@ -79,7 +82,7 @@ void Calc_1D_Density::calculate(){
   FunctorSigmoidalFit f1(data);
   Eigen::LevenbergMarquardt<FunctorSigmoidalFit> lm_algo(f1);
   Eigen::VectorXd b(3);
-  b << 1, 1, 1;
+  b << guess_[0], guess_[1], guess_[2] - idx_range_[0]*grid_spacing_;
   int info = lm_algo.minimize(b);  
   b(2) += grid_spacing_*idx_range_[0];
   params_[0] = b(0);
@@ -120,7 +123,7 @@ void Calc_1D_Density::finalOutput(){
   FunctorSigmoidalFit f1(data);
   Eigen::LevenbergMarquardt<FunctorSigmoidalFit> lm_algo(f1);
   Eigen::VectorXd b(3);
-  b << 1, 1, 1;
+  b << guess_[0], guess_[1], guess_[2] - idx_range_[0]*average_grid_spacing_;
   int info = lm_algo.minimize(b);  
   b(2) += average_grid_spacing_*idx_range_[0];
   params_[0] = b(0);
