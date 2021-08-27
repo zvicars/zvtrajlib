@@ -12,6 +12,6 @@ protected:
   std::vector<std::vector<int> > frames_;
   std::vector<double> times_;
   double dt_, tmin_, tmax_;
-  Box* box_; //this one needs the box pointer
+  const Box* box_; //this one needs the box pointer
   bool allowOB_;
 };

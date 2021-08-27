@@ -28,6 +28,7 @@ AtomGroup_dynamic::AtomGroup_dynamic(InputPack& input) : AtomGroup{input} {
     tmin_ = times_.front();
     tmax_ = times_.back();
   }
+  box_ = input.getBox();
   return;
 }
 void AtomGroup_dynamic::update(){
