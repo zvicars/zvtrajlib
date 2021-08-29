@@ -1,5 +1,5 @@
 #include "Calculation.hpp"
-
+#include <limits>
 Calculation::Calculation(InputPack& input)
 {
     input.params().readString("name", KeyType::Required, name_);
@@ -15,6 +15,8 @@ Calculation::Calculation(InputPack& input)
     FANCY_ASSERT((calc_freq_%output_freq_==0 || output_freq_ < 0), "Can only output data on a calculation step! Output frequency should be a multiple of calculation frequency.");
     //equilibration in ps
     input.params().readNumber("equilibration", KeyType::Optional, equilibration_);
+    end_ = std::numeric_limits<double>::max();
+    input.params().readNumber("end", KeyType::Optional, end_);
     input.addCalculation(name_, this);
     box = input.getBox();
 
@@ -33,12 +35,12 @@ Calculation::Calculation(InputPack& input)
 }
 
 bool Calculation::doCalculate(){
-    if(current_time_ < equilibration_) return 0;
+    if(current_time_ < equilibration_ || current_time_ > end_) return 0;
     if(current_frame_%calc_freq_ != 0) return 0;
     return 1;
 }
 bool Calculation::doOutput(){
-    if(current_time_ < equilibration_) return 0;
+    if(current_time_ < equilibration_ || current_time_ > end_) return 0;
     if(current_frame_%output_freq_ != 0) return 0;
     return 1;
 }

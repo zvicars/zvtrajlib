@@ -32,7 +32,7 @@ protected:
   virtual bool doOutput();
   virtual bool doCalculate();
   std::string name_, type_, base_;
-  double equilibration_, current_time_;
+  double equilibration_, current_time_, end_;
   int output_freq_, calc_freq_, current_frame_; //number of frames to wait before outputting
   const Box* box = 0; //rather than passing in the box object each time, the input pack provides a pointer to this Calculation's box object
   //options for final output modes, typical behavior is just to spit out means/variances, but time series data and histogram data can be toggled
