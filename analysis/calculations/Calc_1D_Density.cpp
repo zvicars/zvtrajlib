@@ -2,6 +2,26 @@
 #include "Eigen/Eigen"
 #include "unsupported/Eigen/NonLinearOptimization"
 
+inline double heaviside(double x){
+	if(x <= 0) return 0;
+	return 1.0; 
+}
+
+inline double h_x(double x, double xmin, double xmax, double sigma, double xc){
+    double eval = 0.0;
+    double k, k1, k2, invk;
+    double sigma2 = sigma*sigma;
+    k = sqrt(2*M_PI)*sigma*erf(xc/(sqrt(2)*sigma)) - 2*xc*exp(-(xc*xc)/(2*sigma2));
+    invk = 1/k;
+    k1 = invk*sqrt(0.5*M_PI*sigma2);
+    k2 = invk*exp(-0.5*(xc*xc)/sigma2);
+    eval = (k1 * erf((xmax-x)/(sqrt(2)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x))
+    + (k1 * erf((x-xmin)/(sqrt(2)*sigma)) - k2*(x-xmin) - 0.5)*heaviside(xc - fabs(x-xmin))
+    + heaviside(xc + 0.5*(xmax-xmin) - fabs(x - 0.5*(xmin+xmax)));
+    return eval;
+}
+
+
 Calc_1D_Density::Calc_1D_Density(InputPack& input) : Calculation{input} {
 
   std::string agname;
@@ -25,6 +45,12 @@ Calc_1D_Density::Calc_1D_Density(InputPack& input) : Calculation{input} {
   grid_density_.resize(npoints_, 0.0);
   average_grid_density_.resize(npoints_, 0.0);
   params_.resize(3, 0.0);
+
+  coarseGrain = 0;
+  input.params().readFlag("smear", KeyType::Optional, coarseGrain);
+  if(coarseGrain){
+    input.params().readNumber("sigma", KeyType::Optional, sigma_);
+  }
   return;
 }
 
@@ -59,13 +85,35 @@ struct FunctorSigmoidalFit{
   int values(){return values_;}
 };
 
+void Calc_1D_Density::add_gaussian(double x_in)
+{
+    double x = x_in;
+    int lxmin = floor((x-2*sigma_)/grid_spacing_);
+    int lxmax = ceil((x+2*sigma_)/grid_spacing_); 
+    #pragma omp parallel for
+    for(int ix = lxmin; ix <= lxmax; ix++)
+    {
+      int idx;
+      idx = ix;
+      if(idx >= grid_density_.size()) idx -= grid_density_.size();
+      else if(idx < 0) idx += grid_density_.size();
+      double xmin, xmax;
+      xmin = ix * grid_spacing_;
+      xmax = xmin + grid_spacing_;
+      grid_density_[idx] += h_x(x, xmin, xmax, sigma_, 2.0*sigma_);
+    }
+    return;
+}
+
 void Calc_1D_Density::calculate(){
   if(!doCalculate()) return;
   for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
     int idx = atom_group_->getIndices()[i];
     auto position = box->atoms[idx].x;
-    putInBin(position);
+    if(coarseGrain) add_gaussian(position[dim_]);
+    else putInBin(position);
   }
+
   for(int i = 0; i < grid_density_.size(); i++){
     average_grid_density_[i] += grid_density_[i];
   }

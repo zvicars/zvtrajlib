@@ -37,7 +37,7 @@ private:
     grid_density_[idx] += 1.0;
     return;
   }
-
+  void add_gaussian(double x_in);
   Vec<double> grid_density_, average_grid_density_;
   int dim_, npoints_, frame_counter_; //the axis that will be kept
   double grid_spacing_, box_size_, average_grid_spacing_;
@@ -48,4 +48,8 @@ private:
   Vec<double> params_, guess_; // calculated per-frame
   Vec<double> tvec_, frame_vec_;
   Vec<Vec<double> > fits_;
+
+  //coarse-graining
+  bool coarseGrain;
+  double sigma_;
 };
