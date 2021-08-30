@@ -17,7 +17,7 @@ AtomGroup_dynamic::AtomGroup_dynamic(InputPack& input) : AtomGroup{input} {
     std::vector<int> indices;
     ss >> time;
     while(ss >> idx1){
-      indices.push_back(idx1);
+      indices.push_back(idx1-1);
     }
     frames_.push_back(indices);
     times_.push_back(time);

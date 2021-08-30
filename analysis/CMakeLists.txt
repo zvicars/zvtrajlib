@@ -13,6 +13,7 @@ calculations/Calc_Angle.cpp
 calculations/Calc_2D_Density.cpp
 calculations/Calc_1D_Density.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
+calculations/Calc_Write_Xtc.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
@@ -22,5 +23,6 @@ factory.cpp
 target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)
 target_link_libraries(ANALYSIS PRIVATE TRAJLIB
                                PRIVATE TOOLS
-                               PRIVATE INSTANT_INT)
+                               PRIVATE INSTANT_INT
+                               PRIVATE XDRFILE)
 target_compile_options(ANALYSIS PRIVATE -O0)
