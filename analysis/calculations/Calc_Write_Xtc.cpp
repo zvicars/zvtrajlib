@@ -37,7 +37,7 @@ void Calc_Write_Xtc::update(){
   for(int i = 0; i < indices.size(); i++){
     int index = indices[i];
     for(int j = 0; j < 3; j++){
-      xdr_x_[i][j] = box->atoms[index].x[j];
+      xdr_x_[index][j] = box->atoms[index].x[j];
     }
   }
 

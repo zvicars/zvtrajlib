@@ -6,6 +6,7 @@
 #include "atomgroups/AtomGroup_name.hpp"
 #include "atomgroups/AtomGroup_ndx.hpp"
 #include "atomgroups/AtomGroup_dynamic.hpp"
+#include "atomgroups/AtomGroup_intersection.hpp"
 #include "calculations/Calc_Isosurface.hpp"
 #include "calculations/Calc_Angle.hpp"
 #include "calculations/Calc_Nv.hpp"
@@ -26,6 +27,7 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
   if(key == "name") return new AtomGroup_name(input);
   if(key == "ndx") return new AtomGroup_ndx(input);
   if(key == "dynamic") return new AtomGroup_dynamic(input);
+  if(key == "intersection") return new AtomGroup_intersection(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }
