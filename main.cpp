@@ -56,9 +56,7 @@ int main(int argc, char **argv)
   
   while(traj.nextFrame()){
     traj.getFrame(b1);
-    if(b1.frame_counter%100 == 0){
-      std::cout << b1.time << "\n";
-    }
+    std::cout << b1.time << "\n";
     auto ag_reg_ = master_input_pack.AtomGroupMap();
     auto pv_reg_ = master_input_pack.ProbeVolumeMap();
     auto calc_reg_ = master_input_pack.CalculationMap();

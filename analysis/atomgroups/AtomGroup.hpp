@@ -10,8 +10,11 @@ public:
   const std::vector<int>& getIndices(){
     return global_indices_;
   }
-  std::string getName(){
+  std::string getName() const {
     return name_;
+  }
+  std::string getType() const {
+    return type_;
   }
   virtual void update(){
     return;
