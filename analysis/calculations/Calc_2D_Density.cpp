@@ -17,6 +17,25 @@ private:
   AtomGroup* atom_group_;
 */
 
+inline double heaviside(double x){
+	if(x <= 0) return 0;
+	return 1.0; 
+}
+
+inline double h_x(double x, double xmin, double xmax, double sigma, double xc){
+    double eval = 0.0;
+    double k, k1, k2, invk;
+    double sigma2 = sigma*sigma;
+    k = sqrt(2*M_PI)*sigma*erf(xc/(sqrt(2)*sigma)) - 2*xc*exp(-(xc*xc)/(2*sigma2));
+    invk = 1/k;
+    k1 = invk*sqrt(0.5*M_PI*sigma2);
+    k2 = invk*exp(-0.5*(xc*xc)/sigma2);
+    eval = (k1 * erf((xmax-x)/(sqrt(2)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x))
+    + (k1 * erf((x-xmin)/(sqrt(2)*sigma)) - k2*(x-xmin) - 0.5)*heaviside(xc - fabs(x-xmin))
+    + heaviside(xc + 0.5*(xmax-xmin) - fabs(x - 0.5*(xmin+xmax)));
+    return eval;
+}
+
 Calc_2D_Density::Calc_2D_Density(InputPack& input) : Calculation{input} {
   std::string agname;
   input.params().readString("atom_group", KeyType::Required, agname);
@@ -30,6 +49,12 @@ Calc_2D_Density::Calc_2D_Density(InputPack& input) : Calculation{input} {
   }
   input.params().readNumber("axis", KeyType::Required, aligned_axis_);
   FANCY_ASSERT(aligned_axis_ >= 0 && aligned_axis_ <= 3, "Invalid dimension provided in " + name_ + ". Expected 0 for x, 1 for y, or 2 for z.");
+  
+  coarseGrain = 0;
+  input.params().readFlag("smear", KeyType::Optional, coarseGrain);
+  if(coarseGrain){
+    input.params().readNumber("sigma", KeyType::Optional, sigma_);
+  }
 
   axes_ = get_axes();
   frame_counter_ = 0;
@@ -58,12 +83,45 @@ void Calc_2D_Density::calculate(){
   for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
     int idx = atom_group_->getIndices()[i];
     auto position = box->atoms[idx].x;
-    putInBin(position);
+    if(coarseGrain) add_gaussian(position[axes_[0]], position[axes_[1]]);
+    else putInBin(position);
   }
   average_grid_spacing_[0] += grid_spacing_[0];
   average_grid_spacing_[1] += grid_spacing_[1];
   frame_counter_++;
-};
+}
+
+void Calc_2D_Density::add_gaussian(double x_in, double y_in)
+{
+    double x = x_in;
+    double y = y_in;
+    int lxmin = floor((x-2*sigma_)/grid_spacing_[0]);
+    int lxmax = ceil((x+2*sigma_)/grid_spacing_[0]); 
+    int lymin = floor((y-2*sigma_)/grid_spacing_[1]);
+    int lymax = ceil((y+2*sigma_)/grid_spacing_[1]);    
+
+    #pragma omp parallel for collapse(2)
+    for(int ix = lxmin; ix <= lxmax; ix++)
+    {
+      for(int iy = lymin; iy <= lymax; iy++)
+      {
+        int idx, idy;
+        idx = ix; idy = iy;
+        if(idx >= grid_density_.size()) idx -= npoints_[0];
+        else if(idx < 0) idx += npoints_[0];
+        if(idy >= grid_density_.size()) idy -= npoints_[1];
+        else if(idy < 0) idy += npoints_[1];       
+        double xmin, xmax, ymin, ymax;
+        xmin = ix * grid_spacing_[0];
+        xmax = xmin + grid_spacing_[0];
+        ymin = iy * grid_spacing_[1];
+        ymax = ymin + grid_spacing_[1];        
+        grid_density_[gridIndex(x, y)] += h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_);
+      }
+    }
+    return;
+}
+
 std::string Calc_2D_Density::printConsoleReport(){
   return "";
 }

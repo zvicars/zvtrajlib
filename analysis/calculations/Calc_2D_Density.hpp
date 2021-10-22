@@ -17,6 +17,7 @@ public:
   virtual void finalOutput();
   GridDataExportPack getGridSubsection(std::array<int, 2> xmin, std::array<int,2> xmax);
 private:
+  void add_gaussian(double x_in, double y_in);
   std::array<int, 2> get_axes(){
     if(aligned_axis_ == 0){
       return {1, 2};
@@ -52,5 +53,6 @@ private:
   int aligned_axis_, frame_counter_; //x, y, or z as 0, 1, or 2, determines which dimension will be averaged out
   //this one depends on 3 atomgroups of equal size
   AtomGroup* atom_group_;
-  bool initialized_;
+  bool initialized_, coarseGrain;
+  double sigma_;
 };
