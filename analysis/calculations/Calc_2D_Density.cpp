@@ -48,7 +48,7 @@ Calc_2D_Density::Calc_2D_Density(InputPack& input) : Calculation{input} {
     npoints_[i] = points[i];
   }
   input.params().readNumber("axis", KeyType::Required, aligned_axis_);
-  FANCY_ASSERT(aligned_axis_ >= 0 && aligned_axis_ <= 3, "Invalid dimension provided in " + name_ + ". Expected 0 for x, 1 for y, or 2 for z.");
+  FANCY_ASSERT(aligned_axis_ >= 0 && aligned_axis_ < 3, "Invalid dimension provided in " + name_ + ". Expected 0 for x, 1 for y, or 2 for z.");
   
   coarseGrain = 0;
   input.params().readFlag("smear", KeyType::Optional, coarseGrain);
@@ -116,7 +116,7 @@ void Calc_2D_Density::add_gaussian(double x_in, double y_in)
         xmax = xmin + grid_spacing_[0];
         ymin = iy * grid_spacing_[1];
         ymax = ymin + grid_spacing_[1];        
-        grid_density_[gridIndex(x, y)] += h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_);
+        grid_density_[gridIndex(getBin(x,0), getBin(x,1))] += h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_);
       }
     }
     return;
