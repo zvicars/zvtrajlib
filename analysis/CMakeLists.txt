@@ -4,6 +4,7 @@ bonded_functions.cpp
 atomgroups/AtomGroup.cpp
 atomgroups/AtomGroup_ndx.cpp
 atomgroups/AtomGroup_name.cpp
+atomgroups/AtomGroup_resname.cpp
 atomgroups/AtomGroup_dynamic.cpp
 atomgroups/AtomGroup_intersection.cpp
 calculations/Calculation.cpp
@@ -15,6 +16,7 @@ calculations/Calc_2D_Density.cpp
 calculations/Calc_1D_Density.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
 calculations/Calc_Write_Xtc.cpp
+calculations/Calc_Dipole.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
