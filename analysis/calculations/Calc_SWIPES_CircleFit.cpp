@@ -33,7 +33,7 @@ struct FunctorCircleFit{
     assert(b.size() == 3);
     assert(fvec.size() == values_);
     for(int i = 0; i < fvec.size(); i++){
-      fvec(i) = sqrt( std::pow(data(i,0) - b(0), 2) + std::pow(data(i,1) - b(1),2) ) - b(2);
+      fvec(i) =  std::pow(data(i,0) - b(0), 2) + std::pow(data(i,1) - b(1),2)  - b(2);
     }
     return 0;
   }
@@ -42,12 +42,11 @@ struct FunctorCircleFit{
     assert(b.size() == 3);
     assert(fjac.rows() == values_);
     for(int i = 0; i < data.rows(); i++){
-      double denom = sqrt( std::pow(data(i,0) - b(0), 2) + std::pow(data(i,1) - b(1),2) );
       double dx = data(i,0) - b(0);
       double dy = data(i,1) - b(1);
-      double j1 = fix_params_[0]?0.0:(-2.0*b(0)*dx/denom);
-      double j2 = fix_params_[1]?0.0:(-2.0*b(1)*dy/denom);
-      double j3 = fix_params_[2]?0.0:-1.0;
+      double j1 = -2.0*b(0)*dx;
+      double j2 = -2.0*b(1)*dy;
+      double j3 = -1.0;
       Eigen::Vector3d jac_row;
       jac_row << j1, j2, j3;
       fjac.row(i) = jac_row;
