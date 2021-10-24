@@ -59,22 +59,23 @@ Calc_2D_Density::Calc_2D_Density(InputPack& input) : Calculation{input} {
   axes_ = get_axes();
   frame_counter_ = 0;
   initialized_ = 0;
+  isFinalized_ = 0;
 
 }
 void Calc_2D_Density::update(){
   Calculation::update();
-  Vec3<double> box_size;
   for(int i = 0; i < 3; i++){
-    box_size[i] = box->boxvec[i][i];
+    cur_box_size_[i] = box->boxvec[i][i];
   }
   if(!initialized_){
     grid_density_.resize(npoints_[0]*npoints_[1], 0.0);
     average_grid_spacing_ = {0};
+    avg_box_size3_ = {0};
     initialized_ = 1;
   }
   for(int i = 0; i < 2; i++){
-    grid_spacing_[i] = box_size[axes_[i]] / (double)(npoints_[i]);
-    box_size_[i] = box_size[axes_[i]];
+    grid_spacing_[i] = cur_box_size_[axes_[i]] / (double)(npoints_[i]);
+    box_size_[i] = cur_box_size_[axes_[i]];
   }
   return;
 }
@@ -88,6 +89,10 @@ void Calc_2D_Density::calculate(){
   }
   average_grid_spacing_[0] += grid_spacing_[0];
   average_grid_spacing_[1] += grid_spacing_[1];
+
+  for(int i = 0; i < 3; i++){
+    avg_box_size3_[i] += cur_box_size_[i];
+  }
   frame_counter_++;
 }
 
@@ -99,26 +104,28 @@ void Calc_2D_Density::add_gaussian(double x_in, double y_in)
     int lxmax = ceil((x+2*sigma_)/grid_spacing_[0]); 
     int lymin = floor((y-2*sigma_)/grid_spacing_[1]);
     int lymax = ceil((y+2*sigma_)/grid_spacing_[1]);    
-
+    double gd_sum = 0.0;
     #pragma omp parallel for collapse(2)
     for(int ix = lxmin; ix <= lxmax; ix++)
     {
       for(int iy = lymin; iy <= lymax; iy++)
       {
+        double gd_term = 0.0;
         int idx, idy;
         idx = ix; idy = iy;
-        if(idx >= grid_density_.size()) idx -= npoints_[0];
+        if(idx >= npoints_[0]) idx -= npoints_[0];
         else if(idx < 0) idx += npoints_[0];
-        if(idy >= grid_density_.size()) idy -= npoints_[1];
+        if(idy >= npoints_[1]) idy -= npoints_[1];
         else if(idy < 0) idy += npoints_[1];       
         double xmin, xmax, ymin, ymax;
         xmin = ix * grid_spacing_[0];
         xmax = xmin + grid_spacing_[0];
         ymin = iy * grid_spacing_[1];
-        ymax = ymin + grid_spacing_[1];        
+        ymax = ymin + grid_spacing_[1];
         grid_density_[gridIndex(idx, idy)] += h_x(x, xmin, xmax, sigma_, 2.0*sigma_)*h_x(y, ymin, ymax, sigma_, 2.0*sigma_);
       }
     }
+
     return;
 }
 
@@ -126,20 +133,25 @@ std::string Calc_2D_Density::printConsoleReport(){
   return "";
 }
 void Calc_2D_Density::finalOutput(){
+  if(isFinalized_) return;
   average_grid_spacing_[0] *= 1.0/(double)frame_counter_;
   average_grid_spacing_[1] *= 1.0/(double)frame_counter_;
-  double invterm =  1.0 / ((double)frame_counter_ * average_grid_spacing_[0] * average_grid_spacing_[1] * box->boxvec[aligned_axis_][aligned_axis_]);
+  for(int i = 0; i < 3; i++){
+    avg_box_size3_[i] *= 1.0/(double)frame_counter_;
+  }
+  double invterm =  1.0 / ((double)frame_counter_ * average_grid_spacing_[0] * average_grid_spacing_[1] * avg_box_size3_[aligned_axis_]);
   for(int i = 0; i < grid_density_.size(); i++){
     grid_density_[i] *= invterm;
   }
   std::ofstream ofile(base_ + "_2D_Density.txt");
-  FANCY_ASSERT(ofile.is_open(), "Failed to open output file for " + name_)
+  FANCY_ASSERT(ofile.is_open(), "Failed to open output file for " + name_);
   
   for(int i = 0; i < npoints_[0]; i++){
     for(int j = 0; j < npoints_[1]; j++){
       ofile << i*grid_spacing_[0] << "     " << j*grid_spacing_[1] << "     " << grid_density_[gridIndex(i, j)] << "\n";
     }
   }
+  isFinalized_ = 1;
   return;
 }
 

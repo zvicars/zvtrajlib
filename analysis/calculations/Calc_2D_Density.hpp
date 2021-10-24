@@ -16,7 +16,14 @@ public:
   virtual std::string printConsoleReport();
   virtual void finalOutput();
   GridDataExportPack getGridSubsection(std::array<int, 2> xmin, std::array<int,2> xmax);
+  bool isFinalized(){
+    return isFinalized_;
+  }
+  void forceFinalize(){
+    finalOutput();
+  }
 private:
+  bool isFinalized_;
   void add_gaussian(double x_in, double y_in);
   std::array<int, 2> get_axes(){
     if(aligned_axis_ == 0){
@@ -50,6 +57,7 @@ private:
   Vec<double> grid_density_;
   std::array<int,2> npoints_, axes_;
   std::array<double,2> grid_spacing_, box_size_, average_grid_spacing_;
+  std::array<double,3> avg_box_size3_, cur_box_size_;
   int aligned_axis_, frame_counter_; //x, y, or z as 0, 1, or 2, determines which dimension will be averaged out
   //this one depends on 3 atomgroups of equal size
   AtomGroup* atom_group_;

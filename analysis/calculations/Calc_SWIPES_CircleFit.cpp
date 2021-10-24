@@ -103,8 +103,27 @@ Calc_SWIPES_CircleFit::Calc_SWIPES_CircleFit(InputPack& input) : Calculation{inp
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
+void Calc_SWIPES_CircleFit::dumpGridSubsection(const GridDataExportPack& gd, std::string filename){
+  std::ofstream ofile(filename);
+  if(!ofile.is_open()) throw 1;
+  for(int i = 0; i < gd.grid_size[0]; i++)
+  for(int j = 0; j < gd.grid_size[1]; j++)
+  {
+    std::cout << i << "     " << j << "     " << gd.grid_data[i][j] << "\n";
+  }
+  ofile.close();
+  return;
+}
+
 void Calc_SWIPES_CircleFit::finalOutput(){
+  if(!calc_->isFinalized()){
+    std::cout << "Final output has not yet been calculated for 2D density..." << std::endl;
+    std::cout << "Forcing finalization...";
+    calc_->forceFinalize();
+  }
   auto g = calc_->getGridSubsection(xmin_, xmax_);
+  //dumpGridSubsection(g, "dumpgs.txt");
   //simple linear interpolation
   vertex_positions_.resize(g.grid_size[parallel_direction_], {0.0,0.0});
   if(normal_direction_ == 0){

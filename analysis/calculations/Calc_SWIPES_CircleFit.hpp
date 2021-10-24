@@ -9,6 +9,7 @@ public:
   Calc_SWIPES_CircleFit(InputPack& input);
   virtual void finalOutput();
 protected:
+  void dumpGridSubsection(const GridDataExportPack& gd, std::string filename);
   Calc_2D_Density* calc_;
   ProbeVolume* pv_; //will only consider atoms within the bounded region
   //atomgroup to be considered
