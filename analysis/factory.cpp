@@ -8,6 +8,7 @@
 #include "atomgroups/AtomGroup_ndx.hpp"
 #include "atomgroups/AtomGroup_dynamic.hpp"
 #include "atomgroups/AtomGroup_intersection.hpp"
+#include "atomgroups/AtomGroup_union.hpp"
 #include "calculations/Calc_Isosurface.hpp"
 #include "calculations/Calc_Angle.hpp"
 #include "calculations/Calc_Nv.hpp"
@@ -15,6 +16,7 @@
 #include "calculations/Calc_Dipole.hpp"
 #include "calculations/Calc_2D_Density.hpp"
 #include "calculations/Calc_1D_Density.hpp"
+#include "calculations/Calc_1D_Density_IP.hpp"
 #include "calculations/Calc_Write_Xtc.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
@@ -31,6 +33,7 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
   if(key == "ndx") return new AtomGroup_ndx(input);
   if(key == "dynamic") return new AtomGroup_dynamic(input);
   if(key == "intersection") return new AtomGroup_intersection(input);
+  if(key == "union") return new AtomGroup_union(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }

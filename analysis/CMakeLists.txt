@@ -7,6 +7,7 @@ atomgroups/AtomGroup_name.cpp
 atomgroups/AtomGroup_resname.cpp
 atomgroups/AtomGroup_dynamic.cpp
 atomgroups/AtomGroup_intersection.cpp
+atomgroups/AtomGroup_union.cpp
 calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
@@ -14,6 +15,7 @@ calculations/Calc_Isosurface.cpp
 calculations/Calc_Angle.cpp
 calculations/Calc_2D_Density.cpp
 calculations/Calc_1D_Density.cpp
+calculations/Calc_1D_Density_IP.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
 calculations/Calc_Write_Xtc.cpp
 calculations/Calc_Dipole.cpp
