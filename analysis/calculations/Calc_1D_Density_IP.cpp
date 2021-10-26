@@ -36,7 +36,6 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   std::vector<int> xrange;
   input.params().readVector("x_range", KeyType::Optional, xrange);
   FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
-  guess_.resize(4, 1.0);
   input.params().readVector("guess", KeyType::Optional, guess_);
   FANCY_ASSERT(guess_.size() == 4, "Invalid guess provided");
   idx_range_[0] = xrange[0];
@@ -199,7 +198,7 @@ void Calc_1D_Density_IP::finalOutput(){
     FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
     for(int i = 0; i < tvec_.size(); i++){
       ofile << tvec_[i] << "   " << frame_vec_[i] << "   ";
-      for(int j = 0; j < 3; j++){
+      for(int j = 0; j < 4; j++){
         ofile << fits_[i][j] << "   ";
       }
       ofile << "\n";

@@ -19,7 +19,7 @@ void Calc_Nv_wFit_IP::calculate(){
   float sum = 0.0;
   for(int i = 0; i < atom_group_->getIndices().size(); i++){
     int idx = atom_group_->getIndices()[i];
-    if((box->atoms[idx].x[dim] <= x1 && box->atoms[idx].x[dim] >= x2) != dir_) sum += pv_->compute(box->atoms[idx].x);
+    if((box->atoms[idx].x[dim] >= x1 && box->atoms[idx].x[dim] <= x2) != dir_) sum += pv_->compute(box->atoms[idx].x);
   }
   value_ = sum;
   if(doTimeseries || doHistogram){
