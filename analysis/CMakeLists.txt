@@ -11,6 +11,7 @@ atomgroups/AtomGroup_union.cpp
 calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
+calculations/Calc_Nv_wFit_IP.cpp
 calculations/Calc_Isosurface.cpp
 calculations/Calc_Angle.cpp
 calculations/Calc_2D_Density.cpp
