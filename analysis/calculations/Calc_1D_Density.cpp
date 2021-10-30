@@ -1,6 +1,5 @@
 #include "Calc_1D_Density.hpp"
-#include "Eigen/Eigen"
-#include "unsupported/Eigen/NonLinearOptimization"
+#include "../helper/functors.hpp"
 
 inline double heaviside(double x){
 	if(x <= 0) return 0;
@@ -54,37 +53,6 @@ Calc_1D_Density::Calc_1D_Density(InputPack& input) : Calculation{input} {
   return;
 }
 
-struct FunctorSigmoidalFit{
-  Eigen::MatrixXd data;
-  int values_;
-  FunctorSigmoidalFit(const Eigen::MatrixXd& data_in){
-    data = data_in;
-    values_ = data_in.rows();
-    return;
-  }
-  int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec){
-    assert(b.size() == 3);
-    assert(fvec.size() == values_);
-    for(int i = 0; i < fvec.size(); i++){
-      fvec(i) = b(0)/(1+exp(b(1)*(data(i,0) - b(2)))) - data(i,1);
-    }
-    return 0;
-  }
-  int df(const Eigen::VectorXd &b, Eigen::MatrixXd &fjac)
-  {
-    assert(b.size() == 3);
-    assert(fjac.rows() == values_);
-    for(int i = 0; i < data.rows(); i++){
-      Eigen::Vector3d jac_row;
-      double dx = data(i,0) - b(2);
-      jac_row << 1/(1+exp(b(1)*dx)),  -b(0)*(dx)*exp(b(1)*dx)/std::pow( 1 + exp(b(1)*dx), 2), b(0)*b(1)*exp(b(1)*dx)/std::pow( 1 + exp(b(1)*dx), 2);
-      fjac.row(i) = jac_row;
-    }
-    return 0;
-  }
-  int values(){return values_;}
-};
-
 void Calc_1D_Density::add_gaussian(double x_in)
 {
     double x = x_in;
@@ -123,16 +91,15 @@ void Calc_1D_Density::calculate(){
   int iterator = 0;
   for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
     data(iterator, 1) = grid_density_[i];
-    data(iterator, 0) = (iterator+0.5)*grid_spacing_;
+    data(iterator, 0) = (iterator + idx_range_[0] + 0.5)*grid_spacing_;
     iterator++;
   }
   
-  FunctorSigmoidalFit f1(data);
-  Eigen::LevenbergMarquardt<FunctorSigmoidalFit> lm_algo(f1);
+  logisticFunctor f1(data);
+  Eigen::LevenbergMarquardt<logisticFunctor> lm_algo(f1);
   Eigen::VectorXd b(3);
-  b << guess_[0], guess_[1], guess_[2] - idx_range_[0]*grid_spacing_;
+  b << guess_[0], guess_[1], guess_[2];
   int info = lm_algo.minimize(b);  
-  b(2) += grid_spacing_*idx_range_[0];
   params_[0] = b(0);
   params_[1] = b(1);
   params_[2] = b(2);
@@ -164,16 +131,15 @@ void Calc_1D_Density::finalOutput(){
   int iterator = 0;
   for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
     data(iterator, 1) = average_grid_density_[i];
-    data(iterator, 0) = (iterator+0.5)*average_grid_spacing_;
+    data(iterator, 0) = (iterator+idx_range_[0]+0.5)*average_grid_spacing_;
     iterator++;
   }
   
-  FunctorSigmoidalFit f1(data);
-  Eigen::LevenbergMarquardt<FunctorSigmoidalFit> lm_algo(f1);
+  logisticFunctor f1(data);
+  Eigen::LevenbergMarquardt<logisticFunctor> lm_algo(f1);
   Eigen::VectorXd b(3);
-  b << guess_[0], guess_[1], guess_[2] - idx_range_[0]*average_grid_spacing_;
+  b << guess_[0], guess_[1], guess_[2];
   int info = lm_algo.minimize(b);  
-  b(2) += average_grid_spacing_*idx_range_[0];
   params_[0] = b(0);
   params_[1] = b(1);
   params_[2] = b(2);

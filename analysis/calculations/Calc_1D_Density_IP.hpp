@@ -18,10 +18,10 @@ public:
     return params_;
   }
   double get_x(){
-    return std::min(params_[2], params_[3]);
+    return params_[3];
   }
   double get_x2(){
-    return std::max(params_[2], params_[3]);
+    return params_[2];
   }
   int get_dim(){
     return dim_;
