@@ -65,7 +65,7 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
     double x = x_in;
     int lxmin = floor((x-2*sigma_)/grid_spacing_);
     int lxmax = ceil((x+2*sigma_)/grid_spacing_); 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for(int ix = lxmin; ix <= lxmax; ix++)
     {
       int idx = ix;
