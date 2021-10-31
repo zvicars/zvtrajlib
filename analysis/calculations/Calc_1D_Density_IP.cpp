@@ -28,14 +28,16 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   input.params().readString("atom_group", KeyType::Required, agname);
   atom_group_ = input.findAtomGroup(agname);
   FANCY_ASSERT(atom_group_ != 0, "Failed to find specified atom group.");
+  
   input.params().readNumber("npoints", KeyType::Required, npoints_);
   input.params().readNumber("axis", KeyType::Required, dim_);
   fitSigmoidal = 0;
   input.params().readFlag("fit", KeyType::Optional, fitSigmoidal);
-  frame_counter_ = 0;
+
   std::vector<int> xrange;
   input.params().readVector("x_range", KeyType::Optional, xrange);
   FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
+
   input.params().readVector("guess", KeyType::Optional, guess_);
   FANCY_ASSERT(guess_.size() == 4, "Invalid guess provided");
   idx_range_[0] = xrange[0];
@@ -52,7 +54,7 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   coarseGrain = 0;
   input.params().readFlag("smear", KeyType::Optional, coarseGrain);
   if(coarseGrain){
-    input.params().readNumber("sigma", KeyType::Optional, sigma_);
+    input.params().readNumber("sigma", KeyType::Required, sigma_);
   }
   return;
 }
@@ -66,8 +68,7 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
     #pragma omp parallel for
     for(int ix = lxmin; ix <= lxmax; ix++)
     {
-      int idx;
-      idx = ix;
+      int idx = ix;
       if(idx >= grid_density_.size()) idx -= grid_density_.size();
       else if(idx < 0) idx += grid_density_.size();
       double xmin, xmax;

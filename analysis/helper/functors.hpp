@@ -1,8 +1,7 @@
 #pragma once
 #include "Eigen/Eigen"
 #include "unsupported/Eigen/NonLinearOptimization"
-using namespace Eigen;
-template<typename _Scalar, int NX=Dynamic, int NY=Dynamic>
+template<typename _Scalar, int NX=Eigen::Dynamic, int NY=Eigen::Dynamic>
 struct Functor
 {
   typedef _Scalar Scalar;
@@ -10,9 +9,9 @@ struct Functor
     InputsAtCompileTime = NX,
     ValuesAtCompileTime = NY
   };
-  typedef Matrix<Scalar,InputsAtCompileTime,1> InputType;
-  typedef Matrix<Scalar,ValuesAtCompileTime,1> ValueType;
-  typedef Matrix<Scalar,ValuesAtCompileTime,InputsAtCompileTime> JacobianType;
+  typedef Eigen::Matrix<Scalar,InputsAtCompileTime,1> InputType;
+  typedef Eigen::Matrix<Scalar,ValuesAtCompileTime,1> ValueType;
+  typedef Eigen::Matrix<Scalar,ValuesAtCompileTime,InputsAtCompileTime> JacobianType;
 
   int m_inputs, m_values;
 
@@ -29,12 +28,12 @@ struct Functor
 struct logisticFunctor : Functor<double>
 {
     Eigen::VectorXd x, y;
-    logisticFunctor(Eigen::MatrixXd data): Functor<double>(3,Dynamic) {
+    logisticFunctor(Eigen::MatrixXd data): Functor<double>(3,Eigen::Dynamic) {
       x = data.col(0);
       y = data.col(1);
       m_values = data.rows();
     };
-    int operator()(const VectorXd &b, VectorXd &fvec)
+    int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec)
     {
         assert(b.size()==3);
         for(int i=0; i < m_values; i++) {
@@ -43,7 +42,7 @@ struct logisticFunctor : Functor<double>
         return 0;
     }
 
-    int df(const VectorXd &b, MatrixXd &fjac) const
+    int df(const Eigen::VectorXd &b, Eigen::MatrixXd &fjac) const
     {
       assert(b.size() == 3);
       assert(fjac.rows() == values());
@@ -60,12 +59,12 @@ struct logisticFunctor : Functor<double>
 struct logisticStepFunctor : Functor<double>
 {
     Eigen::VectorXd x, y;
-    logisticStepFunctor(Eigen::MatrixXd data): Functor<double>(4,Dynamic) {
+    logisticStepFunctor(Eigen::MatrixXd data): Functor<double>(4,Eigen::Dynamic) {
       x = data.col(0);
       y = data.col(1);
       m_values = data.rows();
     };
-    int operator()(const VectorXd &b, VectorXd &fvec)
+    int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec)
     {
         assert(b.size()==4);
         for(int i=0; i<m_values; i++) {
@@ -74,7 +73,7 @@ struct logisticStepFunctor : Functor<double>
         return 0;
     }
 
-    int df(const VectorXd &b, MatrixXd &fjac) const
+    int df(const Eigen::VectorXd &b, Eigen::MatrixXd &fjac) const
     {
       assert(b.size() == 4);
       assert(fjac.rows() == values());
