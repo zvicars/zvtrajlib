@@ -83,7 +83,10 @@ void Calc_1D_Density_IP::calculate(){
   auto indices  = atom_group_->getIndices();
   for(int i = 0; i < indices.size(); i++ ){
     int idx = indices[i];
-    FANCY_ASSERT(idx >= 0 && idx < box->atoms.size(), "AtomGroup provided index " + std::to_string(idx) + "which is not compatible with the number of atoms in the box.");
+    FANCY_ASSERT(idx >= 0 && idx < box->atoms.size(), "AtomGroup provided index "
+     + std::to_string(idx)
+     + " which is not compatible with the number of atoms in the box. This was done on iteration " + std::to_string(i) + " at time "
+     + std::to_string(box->time));
     auto position = box->atoms[idx].x;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
