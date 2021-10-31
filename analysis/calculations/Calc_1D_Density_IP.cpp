@@ -80,9 +80,10 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
 
 void Calc_1D_Density_IP::calculate(){
   if(!doCalculate()) return;
-  
-  for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
-    int idx = atom_group_->getIndices()[i];
+  auto indices  = atom_group_->getIndices();
+  for(int i = 0; i < indices.size(); i++ ){
+    int idx = indices[i];
+    FANCY_ASSERT(idx >= 0 && idx < box->atoms.size(), "AtomGroup provided index " + std::to_string(idx) + "which is not compatible with the number of atoms in the box.");
     auto position = box->atoms[idx].x;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
@@ -160,7 +161,7 @@ void Calc_1D_Density_IP::finalOutput(){
     ofile << (i+0.5)*average_grid_spacing_ << "     " << average_grid_density_[i] << std::endl;
   }
   ofile.close();
-  
+
   if(fitSigmoidal){
     ofile.open(base_ + "_ts_sigmoidal.txt");
     FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");

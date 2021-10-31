@@ -53,10 +53,10 @@ int main(int argc, char **argv)
   std::cout << "Starting test..." << std::endl;
   XDRTrajectory traj(trajectory_file_);
   std::cout << "Trajectory loaded..." << std::endl;
-  
+  int step_iterator = 0;
   while(traj.nextFrame()){
     traj.getFrame(b1);
-    std::cout << b1.time << "\n";
+    if(step_iterator%100 == 0) std::cout << b1.time << "\n";
     auto ag_reg_ = master_input_pack.AtomGroupMap();
     auto pv_reg_ = master_input_pack.ProbeVolumeMap();
     auto calc_reg_ = master_input_pack.CalculationMap();
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
       i->second->output();
     }  
 
-
+    step_iterator++;
   }
   auto calc_reg_ = master_input_pack.CalculationMap();
   for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
