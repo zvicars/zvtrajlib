@@ -17,6 +17,7 @@ AtomGroup_dynamic::AtomGroup_dynamic(InputPack& input) : AtomGroup{input} {
     std::vector<int> indices;
     ss >> time;
     while(ss >> idx1){
+      FANCY_ASSERT(idx1 > 0 && idx1 < 1e6, "Weird index read for dynamic atom group " + std::to_string(idx1) + " something is amiss.");
       indices.push_back(idx1-1);
     }
     frames_.push_back(indices);
