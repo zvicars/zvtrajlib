@@ -157,9 +157,9 @@ void Calc_1D_Density_IP::finalOutput(){
   if(fitSigmoidal){
     ofile.open(base_ + "_ts_sigmoidal.txt");
     FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
-    for(int i = 0; i < tvec_.size(); i++){
+    for(int i = 0; i < fits_.size(); i++){
       ofile << tvec_[i] << "   " << frame_vec_[i] << "   ";
-      for(int j = 0; j < fits_[i].size(); j++){
+      for(int j = 0; j < 4; j++){
         ofile << fits_[i][j] << "   ";
       }
       ofile << "\n";
