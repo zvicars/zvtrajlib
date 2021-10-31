@@ -7,6 +7,9 @@ class AtomGroup_dynamic : public AtomGroup{
 public:
   AtomGroup_dynamic(InputPack&);
   virtual void update();
+  virtual const std::vector<int>& getIndices(){
+    return frames_[index_];
+  }
 protected:
   std::string filename_;
   std::vector<std::vector<int> > frames_;
@@ -14,4 +17,5 @@ protected:
   double dt_, tmin_, tmax_;
   const Box* box_; //this one needs the box pointer
   bool allowOB_;
+  int index_;
 };

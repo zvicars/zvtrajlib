@@ -36,10 +36,13 @@ void AtomGroup_dynamic::update(){
   double time = box_->time;
   //if only one index is provided to avoid calling anything relying on dt, tmin, or tmax
   if(frames_.size() == 1){
-    global_indices_ = frames_[0];
+    //global_indices_ = frames_[0];
+    index_ = 0;
     return;
   }
-  int index = round((time - tmin_) / dt_);
+  index_ = round((time - tmin_) / dt_);
+
+  /*
   if(index >= frames_.size()){
     if(!allowOB_){
       std::cout << "Asking for frames out of bounds of provided indices, \
@@ -59,5 +62,6 @@ void AtomGroup_dynamic::update(){
   else{
     global_indices_ = frames_[index];
   }
+  */
   return;
 }
