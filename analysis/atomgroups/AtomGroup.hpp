@@ -10,6 +10,12 @@ public:
   virtual const std::vector<int>& getIndices(){
     return global_indices_;
   }
+  virtual int getIndexCount(){
+    return global_indices_.size();
+  }
+  virtual int getIndex(int i){
+    return global_indices_[i];
+  }
   std::string getName() const {
     return name_;
   }

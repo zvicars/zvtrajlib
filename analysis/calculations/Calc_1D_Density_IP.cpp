@@ -80,9 +80,8 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
 
 void Calc_1D_Density_IP::calculate(){
   if(!doCalculate()) return;
-  auto indices  = atom_group_->getIndices();
-  for(int i = 0; i < indices.size(); i++ ){
-    int idx = indices[i];
+  for(int i = 0; i < atom_group_->getIndexCount(); i++ ){
+    int idx = atom_group_->getIndex(i);
     FANCY_ASSERT(idx >= 0 && idx < box->atoms.size(), "AtomGroup provided index "
      + std::to_string(idx)
      + " which is not compatible with the number of atoms in the box. This was done on iteration " + std::to_string(i) + " at time "

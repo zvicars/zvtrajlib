@@ -12,7 +12,7 @@ Calculation::Calculation(InputPack& input)
     else calc_freq_ = 1;
     input.params().readNumber("calculation_frequency", KeyType::Optional, calc_freq_);
     equilibration_ = 0;
-    FANCY_ASSERT((calc_freq_%output_freq_==0 || output_freq_ < 0), "Can only output data on a calculation step! Output frequency should be a multiple of calculation frequency.");
+    FANCY_ASSERT( output_freq_%calc_freq_ == 0 || output_freq_ < 0, "Can only output data on a calculation step! Output frequency should be a multiple of calculation frequency.");
     //equilibration in ps
     input.params().readNumber("equilibration", KeyType::Optional, equilibration_);
     end_ = std::numeric_limits<double>::max();

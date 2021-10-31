@@ -42,26 +42,22 @@ void AtomGroup_dynamic::update(){
   }
   index_ = round((time - tmin_) / dt_);
 
-  /*
-  if(index >= frames_.size()){
+  if(index_ >= frames_.size()){
     if(!allowOB_){
       std::cout << "Asking for frames out of bounds of provided indices, \
       ending program. If you want to avoid this check, use the flag \"permissive = 1\" in the AtomGroup input file." << std::endl;
       exit(1);
     }
-    global_indices_ = frames_.back();
+    index_ = frames_.size()-1;
   }
-  else if(index < 0){
+  else if(index_ < 0){
     if(!allowOB_){
       std::cout << "Asking for frames out of bounds of provided indices, \
       ending program. If you want to avoid this check, use the flag \"permissive = 1\" in the AtomGroup input file." << std::endl;
       exit(1);
     }
-    global_indices_ = frames_.front();
+    index_ = 0;
   }
-  else{
-    global_indices_ = frames_[index];
-  }
-  */
   return;
 }
+
