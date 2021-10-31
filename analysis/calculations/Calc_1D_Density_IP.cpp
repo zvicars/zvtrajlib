@@ -119,6 +119,7 @@ void Calc_1D_Density_IP::calculate(){
   frame_vec_.push_back(current_frame_);
   }
   frame_counter_++;
+  return;
 }
 void Calc_1D_Density_IP::update(){
   Calculation::update();
