@@ -10,7 +10,7 @@ public:
   virtual void update();
   virtual std::string printConsoleReport();
   virtual void finalOutput();
-  Vec<double> getFit(){
+  std::array<double,4> getFit(){
     if(!fitSigmoidal){
       std::cout << "1D density profile is not fitting a sigmoidal." << std::endl;
       throw 0;
@@ -44,13 +44,17 @@ private:
   Vec<double> grid_density_, average_grid_density_;
   int dim_, npoints_, frame_counter_; //the axis that will be kept
   double grid_spacing_, box_size_, average_grid_spacing_;
+
   AtomGroup* atom_group_;
+
   //fitting options
   bool fitSigmoidal;
   std::array<int, 2> idx_range_;
-  Vec<double> params_, guess_; // calculated per-frame
+  Vec<double> guess_; // calculated per-frame
+  
   Vec<double> tvec_, frame_vec_;
-  Vec<Vec<double> > fits_;
+  Vec< std::array<double,4> > fits_;
+  std::array<double,4> params_;
 
   //coarse-graining
   bool coarseGrain;

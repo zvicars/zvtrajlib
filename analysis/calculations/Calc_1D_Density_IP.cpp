@@ -40,10 +40,14 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   FANCY_ASSERT(guess_.size() == 4, "Invalid guess provided");
   idx_range_[0] = xrange[0];
   idx_range_[1] = xrange[1];
-  frame_counter_ = 0;  
+  
+  frame_counter_ = 0;
   grid_density_.resize(npoints_, 0.0);
   average_grid_density_.resize(npoints_, 0.0);
-  params_.resize(4, 0.0);
+
+  for(int i = 0; i < 4; i++){
+    params_[i] = guess_[i];
+  }
 
   coarseGrain = 0;
   input.params().readFlag("smear", KeyType::Optional, coarseGrain);
@@ -76,21 +80,22 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
 
 void Calc_1D_Density_IP::calculate(){
   if(!doCalculate()) return;
+  
   for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
     int idx = atom_group_->getIndices()[i];
     auto position = box->atoms[idx].x;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
   }
-
   for(int i = 0; i < grid_density_.size(); i++){
     average_grid_density_[i] += grid_density_[i];
   }
   average_grid_spacing_ += grid_spacing_;
+  
   if(fitSigmoidal){
   Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
   int iterator = 0;
-  for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
+  for(int i = std::max(idx_range_[0],0); i <= std::min(idx_range_[1], npoints_-1); i++){
     data(iterator, 1) = grid_density_[i];
     data(iterator, 0) = (iterator+idx_range_[0]+0.5)*grid_spacing_;
     iterator++;
@@ -101,10 +106,10 @@ void Calc_1D_Density_IP::calculate(){
   Eigen::VectorXd b(4);
   b << guess_[0], guess_[1], guess_[2], guess_[3];
   int info = lm_algo.minimize(b);  
-  params_[0] = b(0);
-  params_[1] = b(1);
-  params_[2] = b(2);
-  params_[3] = b(3);
+  params_[0] = b[0];
+  params_[1] = b[1];
+  params_[2] = b[2];
+  params_[3] = b[3];
   fits_.push_back(params_);
   tvec_.push_back(current_time_);
   frame_vec_.push_back(current_frame_);
@@ -147,6 +152,7 @@ void Calc_1D_Density_IP::finalOutput(){
   params_[2] = b(2);
   params_[3] = b(3);
   }
+
   std::ofstream ofile(base_ + "_avg_sigmoidal.txt");
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
   if(fitSigmoidal) ofile << "# " << params_[0] << "   " << params_[1] << "   " <<  params_[2] << "   " <<  params_[3] << std::endl;
@@ -154,6 +160,7 @@ void Calc_1D_Density_IP::finalOutput(){
     ofile << (i+0.5)*average_grid_spacing_ << "     " << average_grid_density_[i] << std::endl;
   }
   ofile.close();
+  
   if(fitSigmoidal){
     ofile.open(base_ + "_ts_sigmoidal.txt");
     FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
