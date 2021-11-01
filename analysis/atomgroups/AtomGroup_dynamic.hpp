@@ -7,15 +7,6 @@ class AtomGroup_dynamic : public AtomGroup{
 public:
   AtomGroup_dynamic(InputPack&);
   virtual void update();
-  virtual const std::vector<int>& getIndices(){
-    return frames_[index_];
-  }
-  virtual int getIndexCount(){
-    return frames_[index_].size();
-  }
-  virtual int getIndex(int i){
-    return frames_[index_][i];
-  }
 protected:
   std::string filename_;
   std::vector<std::vector<int> > frames_;

@@ -7,13 +7,13 @@ class AtomGroup{
 public:
   using KeyType = ParameterPack::KeyType;
   AtomGroup(InputPack&);
-  virtual const std::vector<int>& getIndices(){
+  const std::vector<int>& getIndices(){
     return global_indices_;
   }
-  virtual int getIndexCount() const {
+  int getIndexCount() const {
     return global_indices_.size();
   }
-  virtual int getIndex(int i) const {
+  int getIndex(int i) const {
     return global_indices_[i];
   }
   std::string getName() const {

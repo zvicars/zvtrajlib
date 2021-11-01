@@ -58,6 +58,8 @@ void AtomGroup_dynamic::update(){
     }
     index_ = 0;
   }
+
+  global_indices_ = frames_[index_];
   return;
 }
 
