@@ -13,6 +13,7 @@ Calc_Nv_wFit_IP::Calc_Nv_wFit_IP(InputPack& input) : Calc_Nv{input} {
 
 void Calc_Nv_wFit_IP::calculate(){
   if(!doCalculate()) return;
+  if(!(calc_->hasCalculated())) calc_->calculate();
   int dim = calc_->get_dim();
   double x1 = calc_->get_x();
   double x2 = calc_->get_x2();

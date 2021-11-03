@@ -20,6 +20,7 @@ calculations/Calc_1D_Density_IP.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
 calculations/Calc_Write_Xtc.cpp
 calculations/Calc_Dipole.cpp
+calculations/Calc_Lattice_Motion.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp

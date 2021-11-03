@@ -65,8 +65,7 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
     double x = x_in;
     int lxmin = floor((x-2*sigma_)/grid_spacing_);
     int lxmax = ceil((x+2*sigma_)/grid_spacing_); 
-    //#pragma omp parallel for
-    //some kind of data race here? should be impossible for the same index to be repeated...
+    #pragma omp parallel for
     for(int ix = lxmin; ix <= lxmax; ix++)
     {
       int idx = ix;
@@ -81,7 +80,10 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
 }
 
 void Calc_1D_Density_IP::calculate(){
-  if(!doCalculate()) return;
+  if(!doCalculate() || calcStatus){
+    return;
+  }
+  calcStatus = 1;
   for(int i = 0; i < atom_group_->getIndexCount(); i++ ){
     int idx = atom_group_->getIndex(i);
     FANCY_ASSERT(idx >= 0 && idx < box->atoms.size(), "AtomGroup provided index "
@@ -100,7 +102,7 @@ void Calc_1D_Density_IP::calculate(){
   if(fitSigmoidal){
   Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
   int iterator = 0;
-  for(int i = std::max(idx_range_[0],0); i <= std::min(idx_range_[1], npoints_-1); i++){
+  for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
     data(iterator, 1) = grid_density_[i];
     data(iterator, 0) = (iterator+idx_range_[0]+0.5)*grid_spacing_;
     iterator++;
@@ -129,6 +131,7 @@ void Calc_1D_Density_IP::update(){
   }
   box_size_ = box->boxvec[dim_][dim_];
   grid_spacing_ = box_size_ / (double)(npoints_);
+  calcStatus = 0;
   return;
 }
 std::string Calc_1D_Density_IP::printConsoleReport(){

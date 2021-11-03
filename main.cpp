@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   Box b1;
   if(idx_found) readNDX(index_file_, b1);
   if(top_found) readTOP(topology_file_, b1);
-  if(gro_found) readGRO(gro_file_, b1);
+  //if(gro_found) readGRO(gro_file_, b1); disabling this for now
   
   InputPack master_input_pack = InputPack(&master_pack, &b1);
 
@@ -54,12 +54,14 @@ int main(int argc, char **argv)
   XDRTrajectory traj(trajectory_file_);
   std::cout << "Trajectory loaded..." << std::endl;
   int step_iterator = 0;
+  auto ag_reg_ = master_input_pack.AtomGroupMap();
+  auto pv_reg_ = master_input_pack.ProbeVolumeMap();
+  auto calc_reg_ = master_input_pack.CalculationMap();
   while(traj.nextFrame()){
     traj.getFrame(b1);
-    if(step_iterator%100 == 0) std::cout << b1.time << "\n";
-    auto ag_reg_ = master_input_pack.AtomGroupMap();
-    auto pv_reg_ = master_input_pack.ProbeVolumeMap();
-    auto calc_reg_ = master_input_pack.CalculationMap();
+    if(step_iterator%100 == 0){
+      std::cout << "Time: " << b1.time  << " ps " << " Step: " << b1.frame_counter << "\n";
+    }
     //update all objects
     for(auto i = ag_reg_.begin(); i != ag_reg_.end(); i++){
       i->second->update();
@@ -82,9 +84,7 @@ int main(int argc, char **argv)
 
     step_iterator++;
   }
-  auto calc_reg_ = master_input_pack.CalculationMap();
   for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-    auto calculation = i->second;
     i->second->finalOutput();
   }
 
