@@ -1,14 +1,21 @@
 #include "factory.hpp"
 #include "../tools/Assert.hpp"
+
+//PROBE VOLUMES
 #include "probevolumes/PV_Simple.hpp"
 #include "probevolumes/PV_Cylinder.hpp"
 #include "probevolumes/PV_Boolean.hpp"
+
+//ATOM GROUPS
 #include "atomgroups/AtomGroup_name.hpp"
 #include "atomgroups/AtomGroup_resname.hpp"
 #include "atomgroups/AtomGroup_ndx.hpp"
 #include "atomgroups/AtomGroup_dynamic.hpp"
 #include "atomgroups/AtomGroup_intersection.hpp"
 #include "atomgroups/AtomGroup_union.hpp"
+#include "atomgroups/AtomGroup_not.hpp"
+
+//CALCULATIONS
 #include "calculations/Calc_Isosurface.hpp"
 #include "calculations/Calc_Angle.hpp"
 #include "calculations/Calc_Nv.hpp"
@@ -20,6 +27,8 @@
 #include "calculations/Calc_1D_Density_IP.hpp"
 #include "calculations/Calc_Write_Xtc.hpp"
 #include "calculations/Calc_Lattice_Motion.hpp"
+
+
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
   if(key == "cylinder") return new PV_Cylinder(input);
@@ -35,6 +44,7 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
   if(key == "dynamic") return new AtomGroup_dynamic(input);
   if(key == "intersection") return new AtomGroup_intersection(input);
   if(key == "union") return new AtomGroup_union(input);
+  if(key == "not") return new AtomGroup_not(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }
