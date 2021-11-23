@@ -2,7 +2,6 @@
 #include "../../tools/Assert.hpp"
 #include "../../interface/datatypes.hpp"
 #include "../InputPack.hpp"
-
 class ProbeVolume{ //probe volumes allow you to specify a particle position and receive a floating point number corresponding to whether the particle is in the volume or not
 public:
   using KeyType = ParameterPack::KeyType;

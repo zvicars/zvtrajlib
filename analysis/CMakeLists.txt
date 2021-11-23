@@ -8,6 +8,7 @@ atomgroups/AtomGroup_resname.cpp
 atomgroups/AtomGroup_dynamic.cpp
 atomgroups/AtomGroup_intersection.cpp
 atomgroups/AtomGroup_union.cpp
+atomgroups/AtomGroup_not.cpp
 calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
@@ -25,6 +26,7 @@ probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
 probevolumes/PV_Boolean.cpp
+probevolumes/PV_DynamicBox.cpp
 factory.cpp
 )
 target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)

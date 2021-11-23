@@ -5,6 +5,8 @@
 #include "probevolumes/PV_Simple.hpp"
 #include "probevolumes/PV_Cylinder.hpp"
 #include "probevolumes/PV_Boolean.hpp"
+#include "probevolumes/PV_DynamicBox.hpp"
+
 
 //ATOM GROUPS
 #include "atomgroups/AtomGroup_name.hpp"
@@ -31,6 +33,7 @@
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
+  if(key == "dynbox") return new PV_DynBox(input);
   if(key == "cylinder") return new PV_Cylinder(input);
   if(key == "boolean") return new PV_Boolean(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
