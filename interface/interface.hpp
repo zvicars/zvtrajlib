@@ -1,6 +1,7 @@
 #pragma once
 #include <fstream>
 #include "datatypes.hpp"
+#include "boxtools.hpp"
 namespace xdr{ //to prevent any potential name clashes with the matrix type
 #include "libxdr/xdrfile.h"
 #include "libxdr/xdrfile_xtc.h"
@@ -27,6 +28,11 @@ private:
 
 void readNDX(std::string filename, Box& box);
 void readGRO(std::string filename, Box& box);
+void writeGRO_ov(std::string ofilename, const Box* box, std::array<double, 3> box_size, 
+                 std::vector<int> indices, std::vector<std::array<double, 3> > positions);
+void writeGRO(std::string ofilename, const Box* box);                
+void writeXYZ_ov(std::string ofilename, const Box* box, std::array<double, 3> box_size, 
+                 std::vector<int> indices, std::vector<std::array<double, 3> > positions);
 inline void readTOP(std::string filename, Box& box){
   return;
 }

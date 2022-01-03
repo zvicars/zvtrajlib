@@ -9,6 +9,7 @@ atomgroups/AtomGroup_dynamic.cpp
 atomgroups/AtomGroup_intersection.cpp
 atomgroups/AtomGroup_union.cpp
 atomgroups/AtomGroup_not.cpp
+atomgroups/AtomGroup_system.cpp
 calculations/Calculation.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
@@ -22,6 +23,7 @@ calculations/Calc_SWIPES_CircleFit.cpp
 calculations/Calc_Write_Xtc.cpp
 calculations/Calc_Dipole.cpp
 calculations/Calc_Lattice_Motion.cpp
+calculations/Calc_Write_AvgPos.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp

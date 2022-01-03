@@ -6,8 +6,6 @@
 #include "probevolumes/PV_Cylinder.hpp"
 #include "probevolumes/PV_Boolean.hpp"
 #include "probevolumes/PV_DynamicBox.hpp"
-
-
 //ATOM GROUPS
 #include "atomgroups/AtomGroup_name.hpp"
 #include "atomgroups/AtomGroup_resname.hpp"
@@ -16,7 +14,7 @@
 #include "atomgroups/AtomGroup_intersection.hpp"
 #include "atomgroups/AtomGroup_union.hpp"
 #include "atomgroups/AtomGroup_not.hpp"
-
+#include "atomgroups/AtomGroup_system.hpp"
 //CALCULATIONS
 #include "calculations/Calc_Isosurface.hpp"
 #include "calculations/Calc_Angle.hpp"
@@ -29,6 +27,7 @@
 #include "calculations/Calc_1D_Density_IP.hpp"
 #include "calculations/Calc_Write_Xtc.hpp"
 #include "calculations/Calc_Lattice_Motion.hpp"
+#include "calculations/Calc_Write_AvgPos.hpp"
 
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
@@ -48,6 +47,7 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
   if(key == "intersection") return new AtomGroup_intersection(input);
   if(key == "union") return new AtomGroup_union(input);
   if(key == "not") return new AtomGroup_not(input);
+  if(key == "system") return new AtomGroup_system(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }
@@ -65,6 +65,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "circlefit") return new Calc_SWIPES_CircleFit(input);
   if(key == "writextc") return new Calc_Write_Xtc(input);
   if(key == "lattice_motion") return new Calc_Lattice_Motion(input);
+  if(key == "write_avg_pos") return new Calc_Write_AvgPos(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }

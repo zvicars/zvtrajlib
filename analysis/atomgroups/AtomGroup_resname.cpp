@@ -5,7 +5,7 @@ AtomGroup_resname::AtomGroup_resname(InputPack& input):AtomGroup{input}{
   FANCY_ASSERT(box->hasNamedAtoms == 1, "Box atoms are not named, name-type atomgroups cannot be used unless you provide a gro/top file.");
   for(std::size_t i = 0; i < box->atoms.size(); i++){
     if(box->atoms[i].resname == resname_){
-      global_indices_.push_back(i-1);
+      global_indices_.push_back(i);
     }
   }
   if(global_indices_.size() == 0){

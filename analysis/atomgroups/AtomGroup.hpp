@@ -25,6 +25,9 @@ public:
   virtual void update(){
     return;
   }
+  virtual bool isDynamic() const {
+    return 0;
+  }
 protected:
   std::string name_;
   std::string type_;

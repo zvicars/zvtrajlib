@@ -26,6 +26,12 @@ public:
     printOutput();
     return;
   }
+  bool isFinished(){
+    if(box->time > end_){
+      return 1;
+    }
+    return 0;
+  }
 protected:
   virtual void printOutput(){return;}
   //check to see if this is a step where you should output

@@ -18,7 +18,7 @@ int main(int argc, char **argv)
   Box b1;
   if(idx_found) readNDX(index_file_, b1);
   if(top_found) readTOP(topology_file_, b1);
-  //if(gro_found) readGRO(gro_file_, b1); disabling this for now
+  if(gro_found) readGRO(gro_file_, b1); //not adding the frame, but keeping information
   
   InputPack master_input_pack = InputPack(&master_pack, &b1);
 
@@ -73,16 +73,20 @@ int main(int argc, char **argv)
       i->second->update();
     }
     //run all calculations
+    int finished_counter = 0;
     for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       i->second->calculate();
+      finished_counter += (int)i->second->isFinished(); //if every calculation is done break
     }
     //perform all outputs
      for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       i->second->printConsoleReport();
       i->second->output();
     }  
-
     step_iterator++;
+    if(finished_counter >= calc_reg_.size()){
+      break;
+    }
   }
   for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
     i->second->finalOutput();

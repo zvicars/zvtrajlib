@@ -11,8 +11,14 @@ add_subdirectory(interface)
 add_subdirectory(tools)
 add_subdirectory(cubes)
 add_subdirectory(analysis)
-add_executable(zvtrajlib main.cpp)
+add_subdirectory(gromanip)
+add_executable(zvtrajlib zvtrajlib.cpp)
+add_executable(zvmangro zvmangro.cpp)
+
 target_link_libraries(zvtrajlib PRIVATE TRAJLIB 
                            PRIVATE TOOLS 
                            PRIVATE ANALYSIS)
 target_compile_options(zvtrajlib PRIVATE -O0 -g)
+
+target_link_libraries(zvmangro PRIVATE GROMANIP)
+target_compile_options(zvmangro PRIVATE -O0 -g)

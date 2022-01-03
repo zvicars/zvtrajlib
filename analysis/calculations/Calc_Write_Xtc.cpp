@@ -58,5 +58,6 @@ void Calc_Write_Xtc::finalOutput(){
   //maybe this would be better in the destructor?
   xdr::xdrfile_close(output_handle_);
   delete xdr_x_;
+
   return;
 }
