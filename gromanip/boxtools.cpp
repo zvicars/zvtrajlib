@@ -2,6 +2,7 @@
 #include <set>
 #include <algorithm>
 #include <unordered_set>
+#include "../tools/StringTools.hpp"
 #include "Eigen/Eigen"
 bool atom_res_sorter(const Atom& lhs, const Atom& rhs){
   if(lhs.resnr != rhs.resnr) return lhs.resnr < rhs.resnr;
@@ -66,16 +67,23 @@ void boxtools::removeResNumbers(Box& box, std::vector<int> res_list){
   //make sure all resnumbers are unique
   std::unordered_set<int> res_list_set;
   for (const int &i: res_list) {
-    res_list_set.insert(i);
+    res_list_set.emplace(i);
   } 
+  std::vector<Atom> new_atoms;
+  new_atoms.reserve(box.atoms.size());
   //remove all resnumbers from res_list_set
-  auto it = box.atoms.begin();
-  while (it != box.atoms.end()){
-    for(auto & resnr : res_list_set){
-      if (it->resnr == resnr) it = box.atoms.erase(it);
-      else ++it;
+  for(auto& atom : box.atoms){
+    bool remove_atom = 0;
+    for(int resnum : res_list_set){
+      if(resnum == atom.resnr){
+        remove_atom = 1;
+        break;
+      }
     }
+    if(!remove_atom) new_atoms.push_back(atom);
   }
+  box.atoms = new_atoms;
+  renumberBox(box);
   return;
 }
 std::vector<int> boxtools::getResnrWithinVolume(const Box& box, const Volume& volume){
@@ -85,10 +93,17 @@ std::vector<int> boxtools::getResnrWithinVolume(const Box& box, const Volume& vo
   }
   return retVec;
 }
-std::vector<int> boxtools::getResnrWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name){
+std::vector<int> boxtools::getResnrNotWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name){
   std::vector<int> retVec;
   for(auto& atom : box.atoms){
     if(!volume.isInside(atom.x) && atom.name == at_name) retVec.push_back(atom.resnr);
+  }
+  return retVec;
+}
+std::vector<int> boxtools::getResnrWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name){
+  std::vector<int> retVec;
+  for(auto& atom : box.atoms){
+    if(volume.isInside(atom.x) && atom.name == at_name) retVec.push_back(atom.resnr);
   }
   return retVec;
 }
@@ -130,8 +145,9 @@ void boxtools::translateAtoms(Box& box, Vec3<double> offset){
 
 //move corner of bounding box to 0,0,0 and shrink box dimensions to fit atoms
 void boxtools::shrinkWrap(Box& box){
-  Vec3<double> min = {std::numeric_limits<double>::min()};
-  Vec3<double> max = {std::numeric_limits<double>::max()};
+  Vec3<double> min, max;
+  min.fill(std::numeric_limits<double>::max());
+  max.fill(std::numeric_limits<double>::min());
   for(auto& atom : box.atoms){
     for(int i = 0; i < 3; i++){
       if(atom.x[i] < min[i]) min[i] = atom.x[i];
@@ -147,7 +163,6 @@ void boxtools::shrinkWrap(Box& box){
   for(auto& atom : box.atoms){
     for(int i = 0; i < 3; i++){
       atom.x[i] -= min[i];
-      atom.x[i] -= max[i];
     }
   }
   for(int i = 0; i < 3; i++){
@@ -155,3 +170,33 @@ void boxtools::shrinkWrap(Box& box){
   }
   return;
 }
+
+void boxtools::relabelRes(Box& box, std::string original_name, std::string new_name){
+  Vec3<double> min = {std::numeric_limits<double>::max()};
+  Vec3<double> max = {std::numeric_limits<double>::min()};
+  for(auto& atom : box.atoms){
+    if(atom.resname == original_name){
+      atom.resname = new_name;
+    }
+  }
+  return;
+}
+
+void boxtools::relabelAtom(Box& box, std::string original_name, std::string new_name){
+  Vec3<double> min = {std::numeric_limits<double>::max()};
+  Vec3<double> max = {std::numeric_limits<double>::min()};
+  for(auto& atom : box.atoms){
+    if(atom.name == original_name){
+      atom.name = new_name;
+    }
+  }
+  return;
+}
+
+void boxtools::setBoxSize(Box& box, Vec3<double> newsize){
+  for(int i = 0; i < 3; i++){
+    box.boxvec[i][i] = newsize[i];
+  }
+  return;
+}
+

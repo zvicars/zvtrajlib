@@ -1,6 +1,9 @@
 add_library (GROMANIP STATIC
-  actions.cpp
   boxtools.cpp
+  boxtools_files.cpp
+  make_params.cpp  
+  actions.cpp
+  GroManipData.cpp
 )
 
 target_include_directories(GROMANIP PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)

@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include "string_ops.hpp"
-IndexInfo parseNDX(std::string filename){
+IndexInfo parse::parseNDX(std::string filename){
 
   std::map<std::string, Vec<int> > output_map;
 

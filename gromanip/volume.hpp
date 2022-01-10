@@ -28,9 +28,9 @@ class UnionVolume : public Volume{
     }
     virtual bool isInside(const Vec3<double>& x) const{
       for(auto& volume : volumes){
-        if(!volume->isInside(x)) return 0;
+        if(volume->isInside(x)) return 1;
       }
-      return 1;
+      return 0;
     }
     virtual std::vector<double> getBoundingBox(){
       std::vector<double> vec(6, 0.0);

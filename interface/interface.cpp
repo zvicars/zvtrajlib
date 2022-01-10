@@ -1,8 +1,6 @@
 #include "interface.hpp"
-namespace parse{
 #include "fileparsers/parseNDX.hpp"
 #include "fileparsers/parseGRO.hpp"
-}
 #include <iostream>
 #include <cstring>
 XDRTrajectory::XDRTrajectory(){

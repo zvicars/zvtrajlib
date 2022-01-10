@@ -1,7 +1,6 @@
 #pragma once
 #include <fstream>
 #include "datatypes.hpp"
-#include "boxtools.hpp"
 namespace xdr{ //to prevent any potential name clashes with the matrix type
 #include "libxdr/xdrfile.h"
 #include "libxdr/xdrfile_xtc.h"

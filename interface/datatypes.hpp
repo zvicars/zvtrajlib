@@ -17,7 +17,7 @@ struct Atom{ //many of these properties are optional
 };
 
 struct AtomType{
-  std::string type;
+  std::string name, type;
   double mass, charge;
   int nbfunc;
   Vec<double> nonbonded_params;
@@ -50,6 +50,7 @@ struct Angle{
   int function_type;
   double (*calculate)(const Vec3<double>&, const Vec3<double>&, const Vec3<double>&, Vec<double>&) = 0;
 };
+
 
 struct Dihedral{
   int i, j, k, l;
