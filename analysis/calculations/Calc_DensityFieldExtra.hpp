@@ -59,7 +59,6 @@ class Calc_DensityFieldExtra : public Calc_DensityField{
         for(auto idx : cluster){
           sum += avggridvals_[idx];
         }
-        std::cout << sum << std::endl;
         if(fabs(1.0 - sum) > dclust_){
           clusters_.erase(clusters_.begin() + i);
         }
