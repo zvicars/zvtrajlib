@@ -1,8 +1,7 @@
 #pragma once
-#include "Calculation.hpp"
-#include "../helper/make_histogram.hpp"
+#include "Calc_Histogram.hpp"
 #include <cmath>
-class Calc_Lattice_Motion : public Calculation{
+class Calc_Lattice_Motion : public Calculation_Histogram{
 public:
   Calc_Lattice_Motion(InputPack& input);
   virtual void calculate();

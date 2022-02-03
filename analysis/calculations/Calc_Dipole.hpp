@@ -1,8 +1,8 @@
 //calculate end group dipole for looking at dipole-surface interactions
 #pragma once
-#include "Calculation.hpp"
+#include "Calc_Histogram.hpp"
 #include <cmath>
-class Calc_Dipole : public Calculation{
+class Calc_Dipole : public Calculation_Histogram{
 public:
   Calc_Dipole(InputPack& input);
   virtual void calculate();

@@ -24,8 +24,14 @@ namespace boxtools::actions{
   void shrinkwrap(GroManipData&, const std::vector<std::string>&);
   void relabelatom(GroManipData&, const std::vector<std::string>&);
   void relabelres(GroManipData&, const std::vector<std::string>&);
+  void respattern(GroManipData&, const std::vector<std::string>&);
   void setboxsize(GroManipData&, const std::vector<std::string>&);
   void outputmolecule(GroManipData&, const std::vector<std::string>&);
+  void deleteoverlapping(GroManipData&, const std::vector<std::string>&);
+  void pbccorrect(GroManipData&, const std::vector<std::string>&);
+  //crystals
+  void supercell(GroManipData&, const std::vector<std::string>&);
+  void decoratefeldspar(GroManipData& data, const std::vector<std::string>& args);
   //void outputbonds(GroManipData&, const std::vector<std::string>&);
   static inline void registerActions(){
     action_map.emplace("merge", &merge);
@@ -46,7 +52,11 @@ namespace boxtools::actions{
     action_map.emplace("relabelres", &relabelres);
     action_map.emplace("setboxsize", &setboxsize);
     action_map.emplace("outputmolecule", &outputmolecule);
-
+    action_map.emplace("respattern", &respattern);
+    action_map.emplace("deleteoverlapping", &deleteoverlapping);
+    action_map.emplace("pbccorrect", &pbccorrect);
+    action_map.emplace("supercell", &supercell);
+    action_map.emplace("decoratefeldspar", &decoratefeldspar);
     return;
   }
   static inline void performAction(GroManipData& data, std::vector<std::string> args){

@@ -1,5 +1,5 @@
 #include "Calc_Nv.hpp"
-Calc_Nv::Calc_Nv(InputPack& input):Calculation{input}
+Calc_Nv::Calc_Nv(InputPack& input):Calculation_Histogram{input}
 {
   input.params().readString("probe_volume", KeyType::Required, pv_name_);
   auto pv_pointer = input.findProbeVolume(pv_name_);

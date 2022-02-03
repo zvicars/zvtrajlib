@@ -1,5 +1,5 @@
 #include "Calc_Angle.hpp"
-Calc_Angle::Calc_Angle(InputPack& input):Calculation{input}
+Calc_Angle::Calc_Angle(InputPack& input):Calculation_Histogram{input}
 {
   Vec3<std::string> agnames;
   input.params().readString("group1", KeyType::Required, agnames[0]);

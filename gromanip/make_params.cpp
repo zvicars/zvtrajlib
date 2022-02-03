@@ -38,7 +38,6 @@ bool isExclusionInTable(const Atom& i, const Atom& j, const boxtools::ParameterT
 {
   int counter = 0;
   for(auto& exclusion : t.entries){
-    if(exclusion.i != i.name) continue;
     for(auto& name : exclusion.exclusion_names){
       if(exclusion.i == i.name && name == j.name) return 1;
       if(exclusion.i == j.name && name == i.name) return 1;
@@ -155,6 +154,7 @@ std::vector<BondInst> boxtools::makePeriodicBonds(Box& box, const boxtools::Para
           binst.i = box.atoms[i].index;
           binst.j = box.atoms[j].index;
           binst.params =  pbcbond.params;
+          binst.params[0] = std::sqrt(r2);
           binst.function_type = pbcbond.function_type;
           bonds.push_back(binst);
         }
@@ -207,9 +207,12 @@ std::vector<ExclusionInst> boxtools::makeExclusions(Box& box, const boxtools::Pa
     for(int j = i+1; j < natoms; j++){
       if(box.atoms[i].resnr != box.atoms[j].resnr) break;
       if(!isExclusionInTable(box.atoms[i], box.atoms[j], t)) continue;
-      indexes.push_back(j);
+      indexes.push_back(box.atoms[j].index);
     }
-    ExclusionInst newExcl(box.atoms[i].index, indexes);
+    if(indexes.size() > 0){
+      ExclusionInst newExcl(box.atoms[i].index, indexes);
+      bonds.push_back(newExcl);
+    }
   }
   return bonds;  
 }

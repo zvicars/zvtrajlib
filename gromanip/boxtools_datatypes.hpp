@@ -235,7 +235,7 @@ struct ExclusionInst : public SingleInst{
     std::string output = "";
     output = std::to_string(i) + "   ";
     for(auto name : exclusion_names){
-      output += name + "   ";
+      output += std::to_string(name) + "   ";
     }
     return output;
   }

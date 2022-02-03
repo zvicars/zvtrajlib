@@ -86,6 +86,7 @@ void boxtools::removeResNumbers(Box& box, std::vector<int> res_list){
   renumberBox(box);
   return;
 }
+
 std::vector<int> boxtools::getResnrWithinVolume(const Box& box, const Volume& volume){
   std::vector<int> retVec;
   for(auto& atom : box.atoms){
@@ -117,7 +118,7 @@ std::vector<int> boxtools::getResnrAllButResname(const Box& box, const Volume& v
 
 void boxtools::rotateEulerAngles(Box& box, Vec3<double> angles){
   Eigen::Vector3d radangles;
-  radangles << angles[0]*M_PI/180.0, angles[1] * M_PI / 180.0, angles[2] * M_PI / 180.0;
+  radangles << angles[2]*M_PI/180.0, angles[1] * M_PI / 180.0, angles[0] * M_PI / 180.0;
   Eigen::AngleAxisd rollAngle(radangles[0], Eigen::Vector3d::UnitZ());
   Eigen::AngleAxisd yawAngle(radangles[1], Eigen::Vector3d::UnitY());
   Eigen::AngleAxisd pitchAngle(radangles[2], Eigen::Vector3d::UnitX());
@@ -168,6 +169,7 @@ void boxtools::shrinkWrap(Box& box){
   for(int i = 0; i < 3; i++){
     box.boxvec[i][i] = newMax[i];
   }
+  renumberBox(box);
   return;
 }
 

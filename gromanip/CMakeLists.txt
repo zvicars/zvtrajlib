@@ -3,6 +3,7 @@ add_library (GROMANIP STATIC
   boxtools_files.cpp
   make_params.cpp  
   actions.cpp
+  actions_crystals.cpp
   GroManipData.cpp
 )
 

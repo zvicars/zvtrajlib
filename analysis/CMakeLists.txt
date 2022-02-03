@@ -11,11 +11,13 @@ atomgroups/AtomGroup_union.cpp
 atomgroups/AtomGroup_not.cpp
 atomgroups/AtomGroup_system.cpp
 calculations/Calculation.cpp
+calculations/Calc_Histogram.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
 calculations/Calc_Nv_wFit_IP.cpp
 calculations/Calc_Isosurface.cpp
 calculations/Calc_Angle.cpp
+calculations/Calc_DensityField.cpp
 calculations/Calc_2D_Density.cpp
 calculations/Calc_1D_Density.cpp
 calculations/Calc_1D_Density_IP.cpp
@@ -29,6 +31,7 @@ probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
 probevolumes/PV_Boolean.cpp
 probevolumes/PV_DynamicBox.cpp
+InputPack.cpp
 factory.cpp
 )
 target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)

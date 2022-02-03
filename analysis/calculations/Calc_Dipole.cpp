@@ -1,6 +1,6 @@
 #include "Calc_Dipole.hpp"
 #include "../helper/make_histogram.hpp"
-Calc_Dipole::Calc_Dipole(InputPack& input):Calculation{input}
+Calc_Dipole::Calc_Dipole(InputPack& input):Calculation_Histogram{input}
 {
   std::string agname;
   input.params().readString("atomgroup", KeyType::Required, agname);
@@ -74,7 +74,7 @@ void Calc_Dipole::calculate(){
 }
 
 void Calc_Dipole::update(){
-  Calculation::update();
+  Calculation_Histogram::update();
   auto indices = atom_group_->getIndices();
   natoms_ = indices.size();
   nmols_ = natoms_/at_per_mol_;

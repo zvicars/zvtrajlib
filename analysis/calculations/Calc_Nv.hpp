@@ -1,8 +1,7 @@
 #pragma once
-#include "Calculation.hpp"
+#include "Calc_Histogram.hpp"
 #include <cmath>
-#include "../helper/make_histogram.hpp"
-class Calc_Nv : public Calculation{
+class Calc_Nv : public Calculation_Histogram{
 public:
   Calc_Nv(InputPack& input);
   virtual void calculate();

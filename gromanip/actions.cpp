@@ -1,4 +1,5 @@
 #include "actions.hpp"
+#include "../tools/pbcfunctions.hpp"
 void boxtools::actions::merge(GroManipData& data, const std::vector<std::string>& args){
   //takes two box names and an output box name
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::merge(), requires input_box_name, input_box_name, and output_box_name");
@@ -15,6 +16,7 @@ void boxtools::actions::merge(GroManipData& data, const std::vector<std::string>
   data.addBox(args[2], b_out);
   return;
 }
+
 void boxtools::actions::eraseres(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name, a resname, and the output box
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::eraseres(), requires input_box_name, resname, and output_box_name");
@@ -242,7 +244,30 @@ void boxtools::actions::relabelres(GroManipData& data, const std::vector<std::st
   data.addBox(args[3], b_out); 
   return;
 }
-
+void boxtools::actions::respattern(GroManipData& data, const std::vector<std::string>& args){
+  //argument is a list of volume names
+  FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::relabelres(), needs input box, number, and output box name");
+  std::vector<std::string>  new_args = args;
+  new_args.erase(new_args.begin());
+  Box *b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::relabelres()");
+  Box box_out = *b1;
+  Box* b_out = data.findBox(args[2]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  int pattern = std::stoi(args[1]);
+  int counter = 0;
+  int rescounter = 1;
+  for(auto& atom : box_out.atoms){
+    if(counter % pattern == 0) rescounter++;
+    atom.resnr = rescounter;
+    counter++;
+  }
+  *b_out = box_out;
+  data.addBox(args[2], b_out); 
+  return;
+}
 void boxtools::actions::setboxsize(GroManipData& data, const std::vector<std::string>& args){
   //argument is a list of volume names
   FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::setboxsize(), needs input box, x, y, z, output box name");
@@ -305,66 +330,60 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   auto ConstraintTable = generateTable<ConstraintType>(constrainttypes);
   auto VsiteTable = generateTable<Vsite3Type>(vsitetypes);
 
-
-  std::cout << "Making atoms..." << std::endl;
   std::vector<AtomInst> atoms = makeAtoms(*b1, AtomTable);
-  std::cout << "Making restraints..." << std::endl;
   std::vector<PosResInst> restraints = makeRestraints(*b1, PosResTable); 
-  std::cout << "Making bonds..." << std::endl;
   std::vector<BondInst> bonds = makeBonds(*b1, BondTable);
-  std::cout << "Making pbc_bonds..." << std::endl;
   std::vector<BondInst> pbc_bonds = makePeriodicBonds(*b1, PBCBondTable);
   bonds.insert(bonds.end(), pbc_bonds.begin(), pbc_bonds.end());
-  std::cout << "Making angles..." << std::endl;
   std::vector<AngleInst> angles = makeAngles(*b1, AngleTable);
-  std::cout << "Making exclusions..." << std::endl;
   std::vector<ExclusionInst> exclusions = makeExclusions(*b1, ExclusionTable);
-  std::cout << "Making constraints..." << std::endl;
   std::vector<ConstraintInst> constraints = makeConstraints(*b1, ConstraintTable);
-  std::cout << "Making vsites..." << std::endl;
   std::vector<Vsite3Inst> vsites = makeVsites(*b1, VsiteTable);
-  std::cout << "Done making vsites" << std::endl;
   std::ofstream ofile(ofilename);
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for molecule bond data");
   
+  ofile << "[ moleculetype ]" << "\n";
+  ofile << molname << "\n";
+
   int natoms = atoms.size();
   if(natoms > 0){
     ofile << "[ atoms ]" << "\n";
     for(int i = 0; i < natoms; i++){
       ofile << atoms[i].print() << "\n";
     }
+    ofile << std::endl;
   }
-
   int nrest = restraints.size();
   if(nrest > 0){
     ofile << "[ position_restraints ]" << "\n";
     for(int i = 0; i < nrest; i++){
       ofile << restraints[i].print() << "\n";
     }
+    ofile << std::endl;
   }
-
   int nbonds = bonds.size();
   if(nbonds > 0){
     ofile << "[ bonds ]" << "\n";
     for(int i = 0; i < nbonds; i++){
       ofile << bonds[i].print() << "\n";
     }
+  ofile << std::endl;
   }
-
   int nexcl = exclusions.size();
   if(nexcl > 0){
     ofile << "[ exclusions ]" << "\n";
     for(int i = 0; i < nexcl; i++){
       ofile << exclusions[i].print() << "\n";
     }
+    ofile << std::endl;
   }
-
   int nconst = constraints.size();
   if(nconst > 0){
     ofile << "[ constraints ]" << "\n";
     for(int i = 0; i < nconst; i++){
       ofile << constraints[i].print() << "\n";
     }
+    ofile << std::endl;
   }
 
   int nangles = angles.size();
@@ -373,17 +392,69 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
     for(int i = 0; i < nangles; i++){
       ofile << angles[i].print() << "\n";
     }
+    ofile << std::endl;
   }
-
   int nv = vsites.size();
   if(nv > 0){
     ofile << "[ virtual_sites3 ]" << "\n";
     for(int i = 0; i < nv; i++){
       ofile << vsites[i].print() << "\n";
     }
+    ofile << std::endl;
   }
-
   ofile.close();
   return;
 
+}
+
+void boxtools::actions::deleteoverlapping(GroManipData& data, const std::vector<std::string>& args){
+  //takes two box names and an output box name
+  FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::deleteoverlapping(), requires input_box_name, input_box_name, threshold, and output_box_name");
+  Box* b_out = data.findBox(args[3]);
+  double thresh = std::stod(args[2]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1, *b2;
+  b1 = data.findBox(args[0]);
+  b2 = data.findBox(args[1]);
+  FANCY_ASSERT(b1 != 0 && b2 != 0, "Failed to find one of the specified boxes in boxtools::actions::deleteoverlapping()");
+  Box box_out = *b1;
+  std::vector<int> resnums_to_delete;
+  for(auto& atoms : box_out.atoms){
+    for(const auto& atoms2 : b2->atoms){
+      double dist = 0.0;
+      for(int i = 0; i < 3; i++){
+        dist += (atoms.x[i] - atoms2.x[i])*(atoms.x[i] - atoms2.x[i]);
+      }
+      dist = std::sqrt(dist);
+      if( dist < thresh) resnums_to_delete.push_back(atoms.resnr);
+    }
+  }
+  removeResNumbers(box_out, resnums_to_delete);
+  *b_out = box_out;
+  data.addBox(args[3], b_out);
+  return;
+} 
+
+
+void boxtools::actions::pbccorrect(GroManipData& data, const std::vector<std::string>& args){
+  //takes two box names and an output box name
+  FANCY_ASSERT(args.size() == 2, "Invalid call to boxtools::actions::pbccorrect(), requires input_box_name and output_box_name");
+  Box* b_out = data.findBox(args[1]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find specified box in boxtools::actions::pbccorrect()");
+  Box box_out = *b1;
+  std::array<double,3> box_dims;
+  for(int i = 0; i < 3; i++) box_dims[i] = box_out.boxvec[i][i];
+  for(auto& atom : box_out.atoms){
+    placeInsideBox(atom.x, box_dims);
+  }
+  *b_out = box_out;
+  data.addBox(args[1], b_out);
+  return;
 }

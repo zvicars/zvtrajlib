@@ -28,7 +28,8 @@
 #include "calculations/Calc_Write_Xtc.hpp"
 #include "calculations/Calc_Lattice_Motion.hpp"
 #include "calculations/Calc_Write_AvgPos.hpp"
-
+#include "calculations/Calc_DensityField.hpp"
+#include "calculations/Calc_DensityFieldExtra.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
@@ -59,6 +60,8 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "nvwfit_ip") return new Calc_Nv_wFit_IP(input);
   if(key == "dipole") return new Calc_Dipole(input);
   if(key == "angle") return new Calc_Angle(input);
+  if(key == "3d_densityextra") return new Calc_DensityFieldExtra(input);  
+  if(key == "3d_density") return new Calc_DensityField(input);
   if(key == "2d_density") return new Calc_2D_Density(input);
   if(key == "1d_density") return new Calc_1D_Density(input);
   if(key == "1d_density_ip") return new Calc_1D_Density_IP(input);
