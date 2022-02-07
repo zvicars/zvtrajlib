@@ -318,6 +318,7 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   std::string exclusiontypes = getGMXTaggedParams(filetext, "exclusiontypes");
   std::string constrainttypes = getGMXTaggedParams(filetext, "constrainttypes");
   std::string angletypes = getGMXTaggedParams(filetext,"angletypes");
+  std::string angle2types = getGMXTaggedParams(filetext,"angletypes2"); //uses bonded information
   std::string dihedraltypes = getGMXTaggedParams(filetext,"dihedraltypes");
   std::string vsitetypes = getGMXTaggedParams(filetext,"vsite3types");
 
@@ -326,6 +327,7 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   auto BondTable = generateTable<BondType>(bondtypes);
   auto PBCBondTable = generateTable<PBCBondType>(pbcbondtypes);
   auto AngleTable = generateTable<AngleType>(angletypes);
+  auto AngleTable2 = generateTable<AngleType>(angle2types);
   auto ExclusionTable = generateTable<ExclusionType>(exclusiontypes);
   auto ConstraintTable = generateTable<ConstraintType>(constrainttypes);
   auto VsiteTable = generateTable<Vsite3Type>(vsitetypes);
@@ -336,6 +338,8 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   std::vector<BondInst> pbc_bonds = makePeriodicBonds(*b1, PBCBondTable);
   bonds.insert(bonds.end(), pbc_bonds.begin(), pbc_bonds.end());
   std::vector<AngleInst> angles = makeAngles(*b1, AngleTable);
+  std::vector<AngleInst> angles2 = makeAnglesUsingBonds(*b1, AngleTable2, bonds);
+  angles.insert(angles.end(), angles2.begin(), angles2.end());
   std::vector<ExclusionInst> exclusions = makeExclusions(*b1, ExclusionTable);
   std::vector<ConstraintInst> constraints = makeConstraints(*b1, ConstraintTable);
   std::vector<Vsite3Inst> vsites = makeVsites(*b1, VsiteTable);

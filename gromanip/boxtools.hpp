@@ -40,12 +40,14 @@ namespace boxtools{
   std::vector<PosResInst> makeRestraints(const Box& box, const ParameterTable<PosResType>& t);
   std::vector<BondInst> makeBonds(const Box& box, const ParameterTable<BondType>& btable);
   std::vector<AngleInst> makeAngles(const Box& box, const ParameterTable<AngleType>& atable);
+  std::vector<AngleInst> makeAnglesUsingBonds(const Box& box, const ParameterTable<AngleType>& atable, const std::vector<BondInst>& bonds);
   std::vector<BondInst> makePeriodicBonds(Box& b1, const ParameterTable<PBCBondType>& t);
   std::vector<ExclusionInst> makeExclusions(Box& b1, const ParameterTable<ExclusionType>& t);
   std::vector<ConstraintInst> makeConstraints(Box& b1, const ParameterTable<ConstraintType>& t);
   std::vector<Vsite3Inst>  makeVsites(Box& b1, const ParameterTable<Vsite3Type>& t);
 
   bool renumberBox(Box& box);
+  bool renumberBoxSeq(Box& box);
   bool deleteRestype(Box& box, std::string resname);
   Box mergeBox(const Box& b1, const Box& b2);
   void removeResNumbers(Box& box, std::vector<int> res_list);
@@ -55,7 +57,7 @@ namespace boxtools{
   std::vector<int> getResnrAllButResname(const Box& box, const Volume& volume, std::string res_name);
   void rotateEulerAngles(Box& box, Vec3<double> angles);
   void translateAtoms(Box& box, Vec3<double> offset);
-  void shrinkWrap(Box& box);
+  void shrinkWrap(Box& box, double buffer = 0.0);
   void relabelAtom(Box& box, std::string original_name, std::string new_name);
   void relabelRes(Box& box, std::string original_name, std::string new_name);
   void setBoxSize(Box& box, Vec3<double> newsize);

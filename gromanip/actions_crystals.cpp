@@ -4,6 +4,7 @@
 #include "../tools/stlmath.hpp"
 #include "../tools/StringTools.hpp"
 #include "Eigen/Eigen"
+#include <cstdlib>
 #include <set>
 struct UnitCell
 {
@@ -304,4 +305,134 @@ void boxtools::actions::decoratefeldspar(GroManipData& data, const std::vector<s
   *b_out = box_out;
   data.addBox(output_box_name, b_out); 
   return;	
+}
+
+inline double randfrom(double min, double max) 
+{
+    double range = (max - min); 
+    double div = RAND_MAX / range;
+    return min + (rand() / div);
+}
+
+std::vector<std::array<double,3>> placeParticlesTetrahedron(Box& box, int index, double searchRadius, double bondRadius){
+	//approach is to find the rotation matrix that minimizes the distance between tetrahedrally distributed points on a unit sphere
+	auto& atoms = box.atoms;
+	std::array<double,3> center = atoms[index].x;
+	std::vector<std::array<double,3>> neighbor_positions;
+	std::vector<std::array<double,3>> new_positions;
+	int nposcount = 0;
+	for(int i = 0; i < atoms.size(); i++){
+		if(i == index) continue;
+		if(norm2(atoms[i].x - atoms[index].x) < searchRadius){
+			neighbor_positions.push_back(atoms[i].x);
+			nposcount++;
+		}
+	}
+	std::cout << nposcount << "   ";
+	//lazy method: attempt to place 4-N_NEIGHBORS particles making sure they aren't within a certain distance of each other
+	//needs to be R < D < 1.63R, so using 1.3R as a baseline
+	//randomly generate position as a Vec3 with length R
+ 	srand(10);
+	std::array<double,3> newpos;
+	int step_counter = 0;
+	while(nposcount < 4){
+		if(step_counter > 1e5){
+			std::cout << "Failed to generate points" << "   ";
+			break;
+		}
+		for(auto& x : newpos){
+			x =  randfrom(-1, 1);
+		}
+		newpos = newpos * (bondRadius/norm2(newpos)) + center;
+		double mindist = std::numeric_limits<double>::max();
+		for(auto& refPos : neighbor_positions){
+			double distStep = norm2(refPos - newpos);
+			if(distStep < mindist) mindist  = distStep;
+		}
+		if(mindist > 1.0*bondRadius){
+			new_positions.push_back(newpos);
+			neighbor_positions.push_back(newpos);
+			step_counter = 0;
+			nposcount++;
+		}
+		step_counter++;
+	}
+	std::cout << new_positions.size() << std::endl;
+	return new_positions;
+}
+void boxtools::actions::hydrogenatefeldspar(GroManipData& data, const std::vector<std::string>& args){
+  //takes a an input box name and a filename
+  FANCY_ASSERT(args.size() == 2, "Invalid call to boxtools::actions::hydrogenatefeldspar(), requires box_in box_out");
+	std::string box_in = args[0], outbox = args[1];
+  Box* b1 = data.findBox(box_in);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::hydrogenatefeldspar()"); 
+  Box* b_out = data.findBox(outbox);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+	Box box_out = *b1;
+	//compute com of system
+	auto& atoms = box_out.atoms;
+	Vec3<double> com; com.fill(0.0);
+	for(int i = 0; i < atoms.size(); i++){
+		com = com + atoms[i].x;
+	}
+	com = (1.0/(double)atoms.size()) * com;
+
+	//each oxygen is expected to be bonded to two metal atoms
+	//quantify bond-deficiency of atoms
+	std::vector<int> bond_order(atoms.size(), 0);
+	for(int i = 0; i < atoms.size(); i++){
+		for(int j = i+1; j < atoms.size(); j++){
+			if((atoms[i].type == "O" && atoms[j].type == "M") || (atoms[i].type == "M" && atoms[j].type == "O")){
+				if(norm2(atoms[i].x - atoms[j].x) < 0.2){
+					bond_order[i] += 1;
+					bond_order[j] += 1;
+					Pair p; p.i = i; p.j = j;
+				}
+			}
+		}
+	}
+	for(int i = 0; i < atoms.size(); i++){
+		auto& atom = atoms[i];
+		if(atom.type == "M"  && bond_order[i] < 4){
+			auto newPos = placeParticlesTetrahedron(box_out, i, 0.2, 0.16);
+			for(int j = 0; j < newPos.size(); j++){
+				Atom oatom;
+				oatom.name = "O"; oatom.type = "O"; oatom.resname = atoms[i].resname; oatom.resnr = atoms[i].resnr;
+				oatom.x = newPos[j]; oatom.v.fill(0.0);
+				atoms.insert(atoms.begin() + i + j + 1, oatom);
+				bond_order.insert(bond_order.begin() + i + j + 1, 1);
+			}
+		}			
+	}
+	for(int i = 0; i < atoms.size(); i++){
+		auto& atom = atoms[i];
+		if(atom.type == "O"  && bond_order[i] == 1){
+			atom.name = "OH";
+			atom.type = "OH";
+		}		
+	}
+
+	
+	double bond_distance = 0.1;
+	std::vector<Vec3<double> > ref_pos;
+	for(int i = 0; i < atoms.size(); i++){
+		if(atoms[i].type == "OH"){
+			Atom hatom;
+			Vec3<double> dx = atoms[i].x - com;
+			Vec3<double> h_pos = (1.0+(bond_distance/norm2(dx)))*dx + com;
+			hatom.name = "HO"; hatom.type = "HO"; hatom.resname = atoms[i].resname; hatom.resnr = atoms[i].resnr;
+			hatom.x = h_pos;hatom.v.fill(0.0);
+			atoms.insert(atoms.begin() + i + 1, hatom);
+		}
+	}
+	renumberBoxSeq(box_out);
+
+	//need to randomly assign M atoms to be either Al or Si, then compute data types based on selection
+
+  *b_out = box_out;
+  data.addBox(outbox, b_out); 
+
+	return;
 }

@@ -32,6 +32,7 @@ namespace boxtools::actions{
   //crystals
   void supercell(GroManipData&, const std::vector<std::string>&);
   void decoratefeldspar(GroManipData& data, const std::vector<std::string>& args);
+  void hydrogenatefeldspar(GroManipData& data, const std::vector<std::string>& args);
   //void outputbonds(GroManipData&, const std::vector<std::string>&);
   static inline void registerActions(){
     action_map.emplace("merge", &merge);
@@ -57,6 +58,7 @@ namespace boxtools::actions{
     action_map.emplace("pbccorrect", &pbccorrect);
     action_map.emplace("supercell", &supercell);
     action_map.emplace("decoratefeldspar", &decoratefeldspar);
+    action_map.emplace("hydrogenatefeldspar", &hydrogenatefeldspar);
     return;
   }
   static inline void performAction(GroManipData& data, std::vector<std::string> args){

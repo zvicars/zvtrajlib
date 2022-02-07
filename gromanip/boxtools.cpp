@@ -34,6 +34,16 @@ bool offsetRes(Box& box, const Atom& last){
   }
   return 0;
 }
+
+bool boxtools::renumberBoxSeq(Box& box){
+  boxtools::checkBoxValid(box);
+  for(int i = 0; i < box.atoms.size(); i++){
+    auto& atom = box.atoms[i];
+    atom.index = i+1;
+  }
+  return 0;
+}
+
 bool boxtools::deleteRestype(Box& box, std::string resname){
   boxtools::checkBoxValid(box);
   auto it = box.atoms.begin();
@@ -145,7 +155,7 @@ void boxtools::translateAtoms(Box& box, Vec3<double> offset){
 }
 
 //move corner of bounding box to 0,0,0 and shrink box dimensions to fit atoms
-void boxtools::shrinkWrap(Box& box){
+void boxtools::shrinkWrap(Box& box, double buffer){
   Vec3<double> min, max;
   min.fill(std::numeric_limits<double>::max());
   max.fill(std::numeric_limits<double>::min());
@@ -158,12 +168,12 @@ void boxtools::shrinkWrap(Box& box){
   Vec3<double> newMin = {0};
   Vec3<double> newMax;
   for(int i = 0; i < 3; i++){
-    newMax[i] = max[i] - min[i];
+    newMax[i] = max[i] - min[i] + 2.0*buffer;
   }
 
   for(auto& atom : box.atoms){
     for(int i = 0; i < 3; i++){
-      atom.x[i] -= min[i];
+      atom.x[i] -= min[i] + buffer;
     }
   }
   for(int i = 0; i < 3; i++){

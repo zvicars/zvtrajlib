@@ -91,6 +91,7 @@ int isVsiteInTable(std::string a, std::string b, std::string c, std::string d, c
 
 std::vector<AtomInst> boxtools::makeAtoms(const Box& box, const boxtools::ParameterTable<BTAtomType>& t){
   std::vector<AtomInst> output;
+  if( t.entries.size() == 0) return output;
   for(const auto& atom : box.atoms){
     for(auto& atomtype : t.entries){
       if(atom.name != atomtype.name) continue;
@@ -104,6 +105,7 @@ std::vector<AtomInst> boxtools::makeAtoms(const Box& box, const boxtools::Parame
 
 std::vector<PosResInst> boxtools::makeRestraints(const Box& box, const boxtools::ParameterTable<PosResType>& t){
   std::vector<PosResInst> output;
+  if(t.entries.size() == 0) return output;
   for(const auto& atom : box.atoms){
     for(auto& restype : t.entries){
       if(atom.name != restype.name) continue;
@@ -118,6 +120,7 @@ std::vector<PosResInst> boxtools::makeRestraints(const Box& box, const boxtools:
 std::vector<BondInst> boxtools::makeBonds(const Box& box, const boxtools::ParameterTable<BondType>& btable)
 {
   std::vector<BondInst> bonds;
+  if(btable.entries.size() == 0) return bonds;
   int lastRes = -1, natoms = box.atoms.size();
   for(int i = 0; i < natoms; i++){
     for(int j = i+1; j < natoms; j++){
@@ -135,6 +138,7 @@ std::vector<BondInst> boxtools::makeBonds(const Box& box, const boxtools::Parame
 std::vector<BondInst> boxtools::makePeriodicBonds(Box& box, const boxtools::ParameterTable<PBCBondType>& pbc_bonds)
 {
 	std::vector<BondInst> bonds;
+  if(pbc_bonds.entries.size() == 0) return bonds;
   Vec3<double> box_dims = {box.boxvec[0][0], box.boxvec[1][1], box.boxvec[2][2]};
   for(const PBCBondType& pbcbond : pbc_bonds.entries){
     double rmax2 = pbcbond.params[0];
@@ -181,6 +185,7 @@ bool setAtomParams(Box& box, const boxtools::ParameterTable<AtomType>& atable){
 std::vector<AngleInst> boxtools::makeAngles(const Box& box, const boxtools::ParameterTable<AngleType>& atable)
 {
   std::vector<AngleInst> angles;
+  if( atable.entries.size() == 0) return angles;
   int natoms = box.atoms.size();
   for(int i = 0; i < natoms; i++){
     for(int j = i+1; j < natoms; j++){
@@ -199,8 +204,50 @@ std::vector<AngleInst> boxtools::makeAngles(const Box& box, const boxtools::Para
   return angles;
 }
 
+std::vector<AngleInst> boxtools::makeAnglesUsingBonds(const Box& box, const boxtools::ParameterTable<AngleType>& atable, const std::vector<BondInst>& bonds){
+  std::vector<AngleInst> angles;
+  if( atable.entries.size() == 0) return angles;
+  int natoms = box.atoms.size();
+  for(int i = 0; i < bonds.size(); i++){
+    for(int j = i+1; j < bonds.size(); j++){
+      auto& bond1 = bonds[i];
+      auto& bond2 = bonds[j];
+      int a,b,c;
+      if(bond1.i == bond2.i){
+        a = bond1.j;
+        b = bond1.i;
+        c = bond2.j;
+      }
+      else if(bond1.i == bond2.j){
+        a = bond1.j;
+        b = bond1.i;
+        c = bond2.i;
+      }
+      else if(bond1.j == bond2.i){
+        a = bond1.i;
+        b = bond1.j;
+        c = bond2.j;
+      }
+      else if(bond1.j == bond2.j){
+        a = bond1.i;
+        b = bond1.j;
+        c = bond2.i;
+      }
+      else continue; //keep going if there are no shared indices
+      //kludge, need more reliable way to go from gro file index to true index
+      const Atom& a1 = box.atoms[a-1], a2 = box.atoms[b-1], a3 = box.atoms[c-1];
+      int pos;
+      int swap = isAngleInTable(a1, a2, a3, atable, pos);
+      if(pos == -1) continue;
+      if(swap == 0) angles.push_back(AngleInst(a, b, c, atable.entries[pos])); //no index-swapping here since the bonding information is important
+    }
+  }
+  return angles;  
+}
+
 std::vector<ExclusionInst> boxtools::makeExclusions(Box& box, const boxtools::ParameterTable<ExclusionType>& t){
   std::vector<ExclusionInst> bonds;
+  if(t.entries.size() == 0) return bonds;
   int natoms = box.atoms.size();
   for(int i = 0; i < natoms; i++){
     std::vector<int> indexes;
@@ -219,6 +266,7 @@ std::vector<ExclusionInst> boxtools::makeExclusions(Box& box, const boxtools::Pa
 
 std::vector<ConstraintInst> boxtools::makeConstraints(Box& box, const boxtools::ParameterTable<ConstraintType>& t){
   std::vector<ConstraintInst> constraints;
+  if(t.entries.size() == 0) return constraints;
   int natoms = box.atoms.size();
   for(int i = 0; i < natoms; i++){
     for(int j = i+1; j < natoms; j++){
@@ -244,6 +292,7 @@ std::vector<int> getIndexesWithResnr(const Box& box, int resnr, int refIdx){
 
 std::vector<Vsite3Inst>  boxtools::makeVsites(Box& box, const boxtools::ParameterTable<Vsite3Type>& t){
   std::vector<Vsite3Inst> vsites;
+  if(t.entries.size() == 0) return vsites;
   int lastRes = -1, natoms = box.atoms.size();
   std::vector<int> resIdx;
   for(int i = 0; i < natoms; i++){
