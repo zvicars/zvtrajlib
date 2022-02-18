@@ -116,3 +116,23 @@ static inline double norm2(const std::vector<T>& a){
   }
   return std::sqrt(retVal);
 }
+
+template <class T>
+static inline T mean(const std::vector<T>& a){
+  double retVal = 0.0;
+  for(auto val : a){
+    retVal += val;
+  }
+  retVal /= a.size();
+  return retVal;
+}
+
+template <class T>
+static inline T var(const std::vector<T>& a, T mean){
+  double retVal = 0.0;
+  for(auto val : a){
+    retVal += (val - mean)*(val-mean);
+  }
+  retVal /= a.size();
+  return retVal;
+}

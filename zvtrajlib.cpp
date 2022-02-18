@@ -82,8 +82,18 @@ int main(int argc, char **argv)
      for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       i->second->printConsoleReport();
       i->second->output();
-    }  
+    }
     step_iterator++;
+    //clear all update flags
+    for(auto i = ag_reg_.begin(); i != ag_reg_.end(); i++){
+      i->second->finish();
+    }
+    for(auto i = pv_reg_.begin(); i != pv_reg_.end(); i++){
+      i->second->finish();
+    }
+    for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
+      i->second->finish();
+    }
     if(finished_counter >= calc_reg_.size()){
       break;
     }

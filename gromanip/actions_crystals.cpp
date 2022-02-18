@@ -210,7 +210,6 @@ void boxtools::actions::supercell(GroManipData& data, const std::vector<std::str
 	auto ucell = load_crystal(args[0]);
 	std::vector<double> box_dims;
 	std::vector<Atom> atoms = replicate_cells(std::stoi(args[1]), std::stoi(args[2]), std::stoi(args[3]), ucell, box_dims);
-	std::cout << "Atom count: " << atoms.size() << std::endl;
 	b_out->atoms = atoms;
 	b_out->hasNamedAtoms = 1;
 	makeOrthorhombic(*b_out);
@@ -264,7 +263,6 @@ void boxtools::actions::decoratefeldspar(GroManipData& data, const std::vector<s
 				if(dist <= cutoff) nn_count++;
 			}
 			if(nn_count <= threshold) hydroxyl_idx.push_back(index);
-			std::cout << nn_count << std::endl;
 		}
 		index++;
 	}
@@ -328,15 +326,13 @@ std::vector<std::array<double,3>> placeParticlesTetrahedron(Box& box, int index,
 			nposcount++;
 		}
 	}
-	std::cout << nposcount << "   ";
 	//lazy method: attempt to place 4-N_NEIGHBORS particles making sure they aren't within a certain distance of each other
 	//needs to be R < D < 1.63R, so using 1.3R as a baseline
 	//randomly generate position as a Vec3 with length R
- 	srand(10);
 	std::array<double,3> newpos;
 	int step_counter = 0;
 	while(nposcount < 4){
-		if(step_counter > 1e5){
+		if(step_counter > 1e6){
 			std::cout << "Failed to generate points" << "   ";
 			break;
 		}
@@ -349,7 +345,7 @@ std::vector<std::array<double,3>> placeParticlesTetrahedron(Box& box, int index,
 			double distStep = norm2(refPos - newpos);
 			if(distStep < mindist) mindist  = distStep;
 		}
-		if(mindist > 1.0*bondRadius){
+		if(mindist > 1.4*bondRadius){
 			new_positions.push_back(newpos);
 			neighbor_positions.push_back(newpos);
 			step_counter = 0;
@@ -357,10 +353,134 @@ std::vector<std::array<double,3>> placeParticlesTetrahedron(Box& box, int index,
 		}
 		step_counter++;
 	}
-	std::cout << new_positions.size() << std::endl;
 	return new_positions;
 }
+
+
+void assignTypesStep(Box& box, int resNum){
+ std::vector<int> index_list;
+	for(int i = 0; i < box.atoms.size(); i++){
+		if(box.atoms[i].resnr == resNum){
+			index_list.push_back(i);
+		}
+	}
+	std::vector<int> surfaceSite(index_list.size(), 0);
+	for(int i = 0; i < index_list.size(); i++){
+		for(int j = i+1; j < index_list.size(); j++){
+			int idx1 = index_list[i], idx2 = index_list[j];
+			Atom& a1 = box.atoms[idx1];
+			Atom& a2 = box.atoms[idx2];
+			if(a1.type == "M" && a2.type == "OH"){
+				if(norm2(a1.x - a2.x) > 0.2) continue;
+				surfaceSite[i]++;
+			}
+			else if(a1.type == "OH" && a2.type == "M"){
+				if(norm2(a1.x - a2.x) > 0.2) continue;
+				surfaceSite[j]++;
+			}
+		}	
+	}
+	std::vector<int> bs2;
+	for(int i = 0; i < index_list.size(); i++){
+		int idx1 = index_list[i];
+		Atom& a1 = box.atoms[idx1];
+		if(a1.type == "M" && surfaceSite[i] == 0) bs2.push_back(i);
+	}
+
+	int siCounter = 12;
+	//make as many surface sites Si as possible)
+	std::vector<int> ss2;
+	for(int i = 0; i < surfaceSite.size(); i++){
+		if(surfaceSite[i] > 0) ss2.push_back(i);
+	}
+
+	while(ss2.size() > 0 && siCounter > 0){
+		//randomly distribute Si atoms on the surface sites until 
+		int idx = rand()%ss2.size();	
+		box.atoms[index_list[ss2[idx]]].name = "SI";
+		box.atoms[index_list[ss2[idx]]].type = "SI";
+		siCounter--;
+		ss2.erase(ss2.begin() + idx);
+	}
+
+	while(bs2.size() > 0 && siCounter > 0){
+		//randomly distribute Si atoms on the surface sites until 
+		int idx = rand()%bs2.size();	
+		box.atoms[index_list[bs2[idx]]].name = "SI";
+		box.atoms[index_list[bs2[idx]]].type = "SI";
+		siCounter--;
+		bs2.erase(bs2.begin() + idx);
+	}
+
+	int alCounter = 0;
+	for(auto idx : index_list){
+		Atom& atom = box.atoms[idx];
+		if(atom.type == "M"){
+			box.atoms[idx].type = "AL";
+			box.atoms[idx].name = "AL";
+			alCounter++;
+		}
+	}
+	FANCY_ASSERT(alCounter == 4, "Improper number of Al atoms in a feldspar molecule, expected 4 found " + std::to_string(alCounter));
+	return;
+}
+void assignTypes(Box& box){
+	int lastResNum = 0;
+	for(int i = 0; i < box.atoms.size(); i++){
+		int resNum = box.atoms[i].resnr;
+		if(resNum != lastResNum){
+			lastResNum = resNum;
+			assignTypesStep(box, resNum);
+		}
+	}
+
+	std::vector<int> ohSub(box.atoms.size(), 0);	
+	std::vector<int> oSub(box.atoms.size(), 0);	
+	//metal atom names are assigned, now figure out what kind of O atoms are present
+	for(int i = 0; i < box.atoms.size(); i++){
+		Atom& a1 = box.atoms[i];
+		if(a1.type != "O") continue;
+		for(int j = 0; j < box.atoms.size(); j++){
+			Atom& a2 = box.atoms[j];
+			if(a2.type != "AL") continue;
+			if(norm2(a1.x - a2.x) < 0.2){
+				oSub[i]++;
+			}
+		}	
+	}
+
+	for(int i = 0; i < box.atoms.size(); i++){
+		Atom& a1 = box.atoms[i];
+		if(a1.type != "OH") continue;
+		for(int j = 0; j < box.atoms.size(); j++){
+			Atom& a2 = box.atoms[j];
+			if(a2.type != "AL") continue;
+			if(norm2(a1.x - a2.x) < 0.2){
+				ohSub[i]++;
+			}
+		}
+	}
+	//assign oxygen atom types
+	for(int i = 0; i < ohSub.size(); i++){
+		if(ohSub[i] == 1){
+			box.atoms[i].name = "OHS";
+			box.atoms[i].type = "OHS";
+		}
+	}
+	for(int i = 0; i < oSub.size(); i++){
+		if(oSub[i] == 1){
+			box.atoms[i].name = "OS";
+			box.atoms[i].type = "OS";
+		}
+		else if(oSub[i] == 2){
+			box.atoms[i].name = "OSS";
+			box.atoms[i].type = "OSS";
+		}		
+	}
+	return;
+}
 void boxtools::actions::hydrogenatefeldspar(GroManipData& data, const std::vector<std::string>& args){
+ 	srand(10);
   //takes a an input box name and a filename
   FANCY_ASSERT(args.size() == 2, "Invalid call to boxtools::actions::hydrogenatefeldspar(), requires box_in box_out");
 	std::string box_in = args[0], outbox = args[1];
@@ -428,8 +548,9 @@ void boxtools::actions::hydrogenatefeldspar(GroManipData& data, const std::vecto
 		}
 	}
 	renumberBoxSeq(box_out);
-
-	//need to randomly assign M atoms to be either Al or Si, then compute data types based on selection
+	shrinkWrap(box_out);
+	//need to assign M atoms to Si or Al based on OH bonds in each res
+	assignTypes(box_out);
 
   *b_out = box_out;
   data.addBox(outbox, b_out); 

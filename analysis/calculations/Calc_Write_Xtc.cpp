@@ -13,6 +13,7 @@ Calc_Write_Xtc::Calc_Write_Xtc(InputPack& input) : Calculation{input} {
 }
 
 void Calc_Write_Xtc::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   xdr_time_ = current_time_;
   xdr_step_ = current_frame_;

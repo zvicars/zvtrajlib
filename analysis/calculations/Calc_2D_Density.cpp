@@ -63,6 +63,7 @@ Calc_2D_Density::Calc_2D_Density(InputPack& input) : Calculation{input} {
 
 }
 void Calc_2D_Density::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   for(int i = 0; i < 3; i++){
     cur_box_size_[i] = box->boxvec[i][i];

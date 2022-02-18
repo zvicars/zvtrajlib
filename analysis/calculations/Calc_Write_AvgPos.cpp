@@ -14,6 +14,7 @@ Calc_Write_AvgPos::Calc_Write_AvgPos(InputPack& input) : Calculation{input} {
 }
 
 void Calc_Write_AvgPos::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   for(int i = 0; i < 3; i++){
     box_size_[i] = box->boxvec[i][i];
@@ -41,7 +42,7 @@ void Calc_Write_AvgPos::setRefPosArray(){
 
 void Calc_Write_AvgPos::calculate(){
   if(!doCalculate()) return;
-  #pragma omp parallel for collapse(2)
+  #pragma omp parallel for
   for(int i = 0; i < natoms_; i++){
     auto newpos = getNearestPeriodicPosition(box->atoms[RefIdx_[i]].x, RefPos_[i], box_size_);
     for(int j = 0; j < 3; j++){

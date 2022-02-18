@@ -33,6 +33,7 @@ double Calc_Lattice_Motion::getNearestPeriodicImage(Vec3<double>& pos, const Vec
   return std::sqrt(dx[0]*dx[0] + dx[1]*dx[1] + dx[2]*dx[2]);
 }
 void Calc_Lattice_Motion::update(){
+  if(hasUpdated()) return;
   Calculation_Histogram::update();
   for(int i = 0; i < 3; i++){
     box_size_[i] = box->boxvec[i][i];
@@ -92,7 +93,6 @@ void Calc_Lattice_Motion::update(){
       nn_distances_[i] = getNearestPeriodicImage(nn_positions_[i], ref_atom_position_);
     } 
   }
-
   return;
 }
 

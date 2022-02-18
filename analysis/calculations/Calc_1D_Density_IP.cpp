@@ -125,6 +125,7 @@ void Calc_1D_Density_IP::calculate(){
   return;
 }
 void Calc_1D_Density_IP::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   for(int i = 0; i < grid_density_.size(); i++){
     grid_density_[i] = 0.0;

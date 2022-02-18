@@ -74,6 +74,7 @@ void Calc_Dipole::calculate(){
 }
 
 void Calc_Dipole::update(){
+  if(hasUpdated()) return;
   Calculation_Histogram::update();
   auto indices = atom_group_->getIndices();
   natoms_ = indices.size();

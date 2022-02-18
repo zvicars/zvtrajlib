@@ -51,7 +51,7 @@ public:
         for(int k = -1; k <= 1; k++){
           new_coord[2] = coord[2] + k;
           int idx1d = _map31(new_coord);
-          output.insert(output.end(), positions[idx1d].begin(), positions[idx1d].end());
+          if(positions[idx1d].size() > 0) output.insert(output.end(), positions[idx1d].begin(), positions[idx1d].end());
         }
       }
     }

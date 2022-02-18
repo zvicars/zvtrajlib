@@ -126,6 +126,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
   nframes_++;
 }
 void Calc_DensityField::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   for(int i = 0; i < 3; i++){
     box_size_[i] = box->boxvec[i][i];

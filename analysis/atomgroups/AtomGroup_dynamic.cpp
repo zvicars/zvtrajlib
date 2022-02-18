@@ -33,6 +33,8 @@ AtomGroup_dynamic::AtomGroup_dynamic(InputPack& input) : AtomGroup{input} {
   return;
 }
 void AtomGroup_dynamic::update(){
+  if(hasUpdated()) return;
+  AtomGroup::update();
   double time = box_->time;
   //if only one index is provided to avoid calling anything relying on dt, tmin, or tmax
   if(frames_.size() == 1){

@@ -13,10 +13,14 @@ AtomGroup_not::AtomGroup_not(InputPack& input):AtomGroup{input}{
 }
 
 void AtomGroup_not::update(){
+  if(hasUpdated()) return;
+  AtomGroup::update();
   index_set_.clear();
   global_indices_.clear();
   auto gi1 = ag1_->getIndices();
   auto gi2 = ag2_->getIndices();
+  if(!ag1_->hasUpdated()) ag1_->update();
+  if(!ag2_->hasUpdated()) ag2_->update();  
   for(int i = 0; i < gi2.size(); i++){
     index_set_.insert(gi2[i]);
   }

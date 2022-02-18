@@ -8,6 +8,7 @@
 #include "probevolumes/PV_DynamicBox.hpp"
 //ATOM GROUPS
 #include "atomgroups/AtomGroup_name.hpp"
+#include "atomgroups/AtomGroup_range.hpp"
 #include "atomgroups/AtomGroup_resname.hpp"
 #include "atomgroups/AtomGroup_ndx.hpp"
 #include "atomgroups/AtomGroup_dynamic.hpp"
@@ -30,6 +31,7 @@
 #include "calculations/Calc_Write_AvgPos.hpp"
 #include "calculations/Calc_DensityField.hpp"
 #include "calculations/Calc_DensityFieldExtra.hpp"
+#include "calculations/Calc_IceID.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
@@ -42,6 +44,7 @@ ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
 
 AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
   if(key == "name") return new AtomGroup_name(input);
+  if(key == "range") return new AtomGroup_range(input);
   if(key == "resname") return new AtomGroup_resname(input);
   if(key == "ndx") return new AtomGroup_ndx(input);
   if(key == "dynamic") return new AtomGroup_dynamic(input);
@@ -69,6 +72,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "writextc") return new Calc_Write_Xtc(input);
   if(key == "lattice_motion") return new Calc_Lattice_Motion(input);
   if(key == "write_avg_pos") return new Calc_Write_AvgPos(input);
+  if(key == "iceid") return new Calc_IceID(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }

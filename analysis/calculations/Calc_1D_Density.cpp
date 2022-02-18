@@ -110,6 +110,7 @@ void Calc_1D_Density::calculate(){
   frame_counter_++;
 }
 void Calc_1D_Density::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   for(int i = 0; i < grid_density_.size(); i++){
     grid_density_[i] = 0.0;

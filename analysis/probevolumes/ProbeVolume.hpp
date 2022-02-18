@@ -11,9 +11,17 @@ public:
   }
   virtual double compute(Vec3<double> position) = 0;
   virtual void update(){
+    update_flag_ = 1;
     return;
+  }
+  void finish(){
+    update_flag_ = 0;
+  }
+  bool hasUpdated(){
+    return update_flag_;
   }
 protected:
   const Box* box;
   std::string name_;
+  bool update_flag_;
 };

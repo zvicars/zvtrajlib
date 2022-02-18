@@ -37,5 +37,6 @@ void PV_DynBox::update(){
   for(int i = 0; i < 3; i++){
     xcom_[i] *= 1.0/(double)natoms;
   }
+  update_flag_ = 1;
   return;
 }

@@ -63,6 +63,7 @@ void Calc_Quadrupole::calculate(){
 }
 
 void Calc_Quadrupole::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   return; 
 }

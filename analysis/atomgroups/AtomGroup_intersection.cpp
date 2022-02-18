@@ -13,6 +13,10 @@ AtomGroup_intersection::AtomGroup_intersection(InputPack& input):AtomGroup{input
 }
 
 void AtomGroup_intersection::update(){
+  if(hasUpdated()) return;
+  AtomGroup::update();
+  if(!ag1_->hasUpdated()) ag1_->update();
+  if(!ag2_->hasUpdated()) ag2_->update();  
   index_set_.clear();
   global_indices_.clear();
   auto gi1 = ag1_->getIndices();

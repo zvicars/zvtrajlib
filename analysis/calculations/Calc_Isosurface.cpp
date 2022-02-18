@@ -26,6 +26,7 @@ Calc_Isosurface::Calc_Isosurface(InputPack& input):Calculation{input}
   return;
 }
 void Calc_Isosurface::update(){
+  if(hasUpdated()) return;
   Calculation::update();
   Vec3<double> box_size;
   for(int i = 0; i < 3; i++){

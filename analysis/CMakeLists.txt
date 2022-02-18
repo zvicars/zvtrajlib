@@ -4,6 +4,7 @@ bonded_functions.cpp
 atomgroups/AtomGroup.cpp
 atomgroups/AtomGroup_ndx.cpp
 atomgroups/AtomGroup_name.cpp
+atomgroups/AtomGroup_range.cpp
 atomgroups/AtomGroup_resname.cpp
 atomgroups/AtomGroup_dynamic.cpp
 atomgroups/AtomGroup_intersection.cpp
@@ -26,6 +27,7 @@ calculations/Calc_Write_Xtc.cpp
 calculations/Calc_Dipole.cpp
 calculations/Calc_Lattice_Motion.cpp
 calculations/Calc_Write_AvgPos.cpp
+calculations/Calc_IceID.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
@@ -39,4 +41,7 @@ target_link_libraries(ANALYSIS PRIVATE TRAJLIB
                                PRIVATE TOOLS
                                PRIVATE INSTANT_INT
                                PRIVATE XDRFILE)
-target_compile_options(ANALYSIS PRIVATE -O0)
+if(OpenMP_CXX_FOUND)
+target_link_libraries(ANALYSIS PRIVATE GOLOSIO OpenMP::OpenMP_CXX)
+endif()
+target_compile_options(ANALYSIS PRIVATE -O3 -fopenmp)
