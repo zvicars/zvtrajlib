@@ -45,6 +45,8 @@ void Calc_IceID::update(){
     xdr_x_ = new xdr::rvec[xdr_natoms_];
     output_handle_ = xdr::xdrfile_open(filename_.c_str(), "w");
     FANCY_ASSERT(output_handle_!=0, "xtc output file is null");
+
+    index_out_.open(name_ + ".index");
     initialized_ = 1;
   }
   return;
@@ -121,12 +123,20 @@ void Calc_IceID::performIteration(std::vector<int>& ice_indices){
 void Calc_IceID::calculate(){
   if(!doCalculate()) return;
   auto& atoms = box->atoms;
+  auto& water_indices = water_group_->getIndices();
+  std::unordered_set<int> wi(water_indices.begin(), water_indices.end());
   final_ice_indices_ = ice_group_->getIndices();
+  n_original_ = 0.0;
+  for(auto index : final_ice_indices_){
+    if(wi.find(index) != wi.end()) n_original_ += pv_->compute(atoms[index].x); //atom must be a water to count towards the final tally
+  }
+
   if(nrep_ > 0){
     for(int i = 0; i < nrep_; i++){
       performIteration(final_ice_indices_);
     }
   }
+
   else{
     int counter = 0;
     int lastcount = final_ice_indices_.size();
@@ -136,8 +146,7 @@ void Calc_IceID::calculate(){
       counter++;
     }
   }
-  auto& water_indices = water_group_->getIndices();
-  std::unordered_set<int> wi(water_indices.begin(), water_indices.end());
+
   int n_ = 0;
   for(auto index : final_ice_indices_){
     if(wi.find(index) != wi.end()) n_ += pv_->compute(atoms[index].x); //atom must be a water to count towards the final tally
@@ -145,6 +154,7 @@ void Calc_IceID::calculate(){
   t_vec_.push_back(current_time_);
   step_vec_.push_back(current_frame_);
   n_vec_.push_back(n_);
+  no_vec_.push_back(n_original_);
   return;
 }
 
@@ -171,6 +181,13 @@ void Calc_IceID::output(){
   }
 
   xdr::write_xtc(output_handle_, xdr_natoms_, xdr_step_, xdr_time_, xdr_box_, xdr_x_, xdr_prec_);
+
+  index_out_ << current_time_ << "   ";
+  for(auto index : final_ice_indices_){
+    index_out_ << index << "   ";
+  }
+  index_out_ << "\n";
+
   return;
 }
 
@@ -178,13 +195,15 @@ void Calc_IceID::finalOutput(){
   
   double n_avg = mean(n_vec_);
   double n_var = var(n_vec_, n_avg);
+  double no_avg = mean(no_vec_);
+  double no_var = var(no_vec_, no_avg);
   std::string filepath = base_ + "_statistics.txt";
   std::ofstream ofile(filepath);
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for IceID");
   ofile << "#Output file for IceID calculation with name \'" << name_ << "\'\n";
   ofile << "#Atom group: " << water_group_->getName() << "\n";
-  ofile << "#Average: " << n_avg << " count\n";
-  ofile << "#Variance: " << n_var << " count^2\n";
+  ofile << "#Average: " << n_avg << " count, Original Average: " << no_avg << "\n";
+  ofile << "#Variance: " << n_var << " count^2, Original Variance: " << no_var << "\n";
   if(doHistogram){
       std::vector<double> x_vals;
       std::vector<int> y_vals;
@@ -200,7 +219,7 @@ void Calc_IceID::finalOutput(){
     std::ofstream ofile(filepath);
     FANCY_ASSERT(ofile.is_open(), "Failed to open output file for nv timeseries.");
     ofile << "#Output file for IceID calculation with name \'" << name_ << "\'\n";   
-    ofile << "Timeseries: time (ps)     step     nv\n";
+    ofile << "Timeseries: time (ps)     step     nv     original count\n";
     for(std::size_t i = 0; i < n_vec_.size(); i++){
         ofile << t_vec_[i] << "     " << step_vec_[i] << "     " << n_vec_[i] << "\n"; 
     }
@@ -209,5 +228,6 @@ void Calc_IceID::finalOutput(){
 
   xdr::xdrfile_close(output_handle_);
   delete xdr_x_;
+  index_out_.close();
   return;
 }

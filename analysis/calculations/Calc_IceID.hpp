@@ -20,8 +20,8 @@ protected:
   double ice_radius_, surface_radius_;
   int ice_thresh_, surf_thresh_;
   std::vector<int> final_ice_indices_;
-  int n_, nrep_;
-  std::vector<double> n_vec_;
+  int n_, n_original_, nrep_;
+  std::vector<double> n_vec_, no_vec_;
   std::vector<int> step_vec_;
   std::vector<double> t_vec_;
   //xtc output
@@ -33,4 +33,7 @@ protected:
   float xdr_prec_;
   bool initialized_;
   std::string filename_;
+  //index output
+  std::ofstream index_out_;
+  std::string index_filename_;
 };
