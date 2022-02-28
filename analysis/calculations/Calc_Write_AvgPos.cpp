@@ -1,5 +1,6 @@
 #include "Calc_Write_AvgPos.hpp"
 #include "../helper/pbc_functions.hpp"
+#include "../../tools/stlmath.hpp"
 Calc_Write_AvgPos::Calc_Write_AvgPos(InputPack& input) : Calculation{input} {
   std::string agname;
   input.params().readString("atom_group", KeyType::Required, agname);
@@ -42,16 +43,14 @@ void Calc_Write_AvgPos::setRefPosArray(){
 
 void Calc_Write_AvgPos::calculate(){
   if(!doCalculate()) return;
+  std::vector<std::array<double,3> > dx_step(natoms_);
   #pragma omp parallel for
   for(int i = 0; i < natoms_; i++){
     auto newpos = getNearestPeriodicPosition(box->atoms[RefIdx_[i]].x, RefPos_[i], box_size_);
-    for(int j = 0; j < 3; j++){
-      ComPos_[i][j] += newpos[j];
-    }
+    dx_step[i] = newpos - RefPos_[i];
+    ComPos_[i] = ComPos_[i] + newpos;
   }
-  for(int j = 0; j < 3; j++){
-    avg_box_size_[j] += box_size_[j];
-  } 
+  avg_box_size_ = avg_box_size_ + box_size_;
   frame_counter_++;
   return;
 }

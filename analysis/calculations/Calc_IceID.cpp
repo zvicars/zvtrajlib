@@ -184,7 +184,7 @@ void Calc_IceID::output(){
 
   index_out_ << current_time_ << "   ";
   for(auto index : final_ice_indices_){
-    index_out_ << index << "   ";
+    index_out_ << index+1 << "   ";
   }
   index_out_ << "\n";
 

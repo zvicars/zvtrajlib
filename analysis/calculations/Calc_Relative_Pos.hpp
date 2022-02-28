@@ -1,11 +1,11 @@
 //creates and writes to a gro file with the average atom positions and box positions for the specified atom group
 //also reports some statistics about the system
 #pragma once
-#include "Calculation.hpp"
+#include "Calc_Histogram.hpp"
 #include "../interface/interface.hpp" 
-class Calc_Write_AvgPos : public Calculation{
+class Calc_Relative_Pos: public Calculation_Histogram{
 public:
-  Calc_Write_AvgPos(InputPack& input);
+  Calc_Relative_Pos(InputPack& input);
   virtual void update();
   virtual void calculate();
   virtual void output();
@@ -16,8 +16,10 @@ protected:
   AtomGroup* atom_group_;
   int natoms_, frame_counter_;
   bool initialized_;
-  std::vector<Vec3<double> > RefPos_, ComPos_; //contains initial atom position for computing pbcs
-  std::vector<int> RefIdx_;
-  std::string ofilename_;
-  Vec3<double> box_size_, avg_box_size_;
+  std::string refFile_;
+  std::vector<Atom> refAtoms_;
+  Vec3<double> box_size_;
+  std::vector<double> times_;
+  std::vector<double> frames_;
+  std::vector<std::array<double, 3> > means_, vars_, dx_vals_;
 };

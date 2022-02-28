@@ -143,7 +143,7 @@ bool isNumber(const std::string& str);
 
 
 template<typename T>
-std::vector<T> StringTools::split(const std::string& str)
+std::vector<T> split(const std::string& str)
 {
   std::vector<T> tokens;
   std::stringstream ss(str);
@@ -157,7 +157,7 @@ std::vector<T> StringTools::split(const std::string& str)
 
 
 template<typename T>
-std::vector<T> StringTools::split(const std::string& str, const char delim)
+std::vector<T> split(const std::string& str, const char delim)
 {
   std::vector<T> tokens;
   std::stringstream ss(str);
@@ -172,7 +172,7 @@ std::vector<T> StringTools::split(const std::string& str, const char delim)
 
 
 template<typename T> 
-T StringTools::stringToValue(const std::string& str) {
+T stringToValue(const std::string& str) {
   std::stringstream ss( str );
   T value;
   ss >> value;
@@ -184,7 +184,7 @@ T StringTools::stringToValue(const std::string& str) {
 
 
 template<typename T, std::size_t dim>
-std::array<T,dim> StringTools::stringsToArray(const std::vector<std::string>& strings) {
+std::array<T,dim> stringsToArray(const std::vector<std::string>& strings) {
   FANCY_ASSERT( strings.size() == dim, "size mismatch" );
 
   std::array<T,dim> arr;
@@ -195,7 +195,7 @@ std::array<T,dim> StringTools::stringsToArray(const std::vector<std::string>& st
 
 
 template<typename T>
-std::vector<T> StringTools::stringsToVector(const std::vector<std::string>& strings) {
+std::vector<T> stringsToVector(const std::vector<std::string>& strings) {
   std::vector<T> vec( strings.size() );
   std::transform( strings.begin(), strings.end(), vec.begin(),
     [](const std::string& s) { return StringTools::stringToValue<T>(s); } );

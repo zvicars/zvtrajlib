@@ -27,6 +27,7 @@ calculations/Calc_Write_Xtc.cpp
 calculations/Calc_Dipole.cpp
 calculations/Calc_Lattice_Motion.cpp
 calculations/Calc_Write_AvgPos.cpp
+calculations/Calc_Relative_Pos.cpp
 calculations/Calc_IceID.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp

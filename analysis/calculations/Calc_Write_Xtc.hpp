@@ -1,5 +1,6 @@
 //creates and writes to an xtc file with all atoms at -1, -1, -1 except for ones in the atomgroup
 //a slightly easier method of rendering solid-like atoms than using Sean's scripts
+#pragma once
 #include "Calculation.hpp"
 #include "../../interface/interface.hpp"
 class Calc_Write_Xtc : public Calculation{
