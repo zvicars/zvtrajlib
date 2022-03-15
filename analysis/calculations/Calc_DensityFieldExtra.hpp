@@ -59,7 +59,7 @@ class Calc_DensityFieldExtra : public Calc_DensityField{
         for(auto idx : cluster){
           sum += avggridvals_[idx];
         }
-        if(fabs(1.0 - sum) > dclust_){
+        if(sum > dclust_){
           clusters_.erase(clusters_.begin() + i);
         }
       }
