@@ -33,6 +33,24 @@ void boxtools::actions::eraseres(GroManipData& data, const std::vector<std::stri
   data.addBox(args[2], b_out);
   return;
 }
+
+void boxtools::actions::keepres(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, a resname, and the output box
+  FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::keepres(), requires input_box_name, resname, and output_box_name");
+  Box* b_out = data.findBox(args[2]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::eraseres()");
+  Box box_out = *b1;
+  boxtools::deleteNotRestype(box_out, args[1]);
+  *b_out = box_out;
+  data.addBox(args[2], b_out);
+  return;
+}
+
 void boxtools::actions::duplicate(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name and an output name
   FANCY_ASSERT(args.size() == 2, "Invalid call to boxtools::actions::duplicate(), requires input_box_name and output_box_name");
@@ -67,6 +85,27 @@ void boxtools::actions::trimvolumebyresname(GroManipData& data, const std::vecto
   data.addBox(args[2], b_out);
   return; 
 }
+
+void boxtools::actions::trimvolumebyresnameinv(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, a volume name, and an output name
+  FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::trimvolume(), requires input_box_name, volume_name and output_box_name");
+  Box* b_out = data.findBox(args[2]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  Volume *v1;
+  b1 = data.findBox(args[0]);
+  v1 = data.findVolume(args[1]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::trimvolume()");
+  FANCY_ASSERT(v1 != 0,  "Failed to find input volume in boxtools::actions::trimvolume()");
+  Box box_out = *b1;
+  boxtools::removeResNumbers(box_out, boxtools::getResnrNotWithinVolume(box_out, *v1));
+  *b_out = box_out;
+  data.addBox(args[2], b_out);
+  return; 
+}
+
 void boxtools::actions::trimvolumebyatomname(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name, a volume name, and an output name
   FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::trimvolumebyatomname(), \

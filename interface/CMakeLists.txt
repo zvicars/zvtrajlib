@@ -1,6 +1,8 @@
 add_subdirectory(libxdr)
 add_library (TRAJLIB SHARED
 interface.cpp
+xtctrajectory.cpp
+trrtrajectory.cpp
 fileparsers/parseNDX.cpp
 fileparsers/parseGRO.cpp
 )

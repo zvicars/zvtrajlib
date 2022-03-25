@@ -49,9 +49,11 @@ namespace boxtools{
   bool renumberBox(Box& box);
   bool renumberBoxSeq(Box& box);
   bool deleteRestype(Box& box, std::string resname);
+  bool deleteNotRestype(Box& box, std::string resname);
   Box mergeBox(const Box& b1, const Box& b2);
   void removeResNumbers(Box& box, std::vector<int> res_list);
   std::vector<int> getResnrWithinVolume(const Box& box, const Volume& volume);
+  std::vector<int> getResnrNotWithinVolume(const Box& box, const Volume& volume);
   std::vector<int> getResnrWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name);
   std::vector<int> getResnrNotWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name);
   std::vector<int> getResnrAllButResname(const Box& box, const Volume& volume, std::string res_name);

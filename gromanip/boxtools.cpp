@@ -57,6 +57,21 @@ bool boxtools::deleteRestype(Box& box, std::string resname){
   }
   return 0;
 }
+
+bool boxtools::deleteNotRestype(Box& box, std::string resname){
+  boxtools::checkBoxValid(box);
+  auto it = box.atoms.begin();
+  while (it != box.atoms.end()){
+    if (it->resname != resname){
+        it = box.atoms.erase(it);
+    }
+    else {
+        ++it;
+    }    
+  }
+  return 0;
+}
+
 Box boxtools::mergeBox(const Box& b1, const Box& b2){
   boxtools::checkBoxValid(b1);
   boxtools::checkBoxValid(b2);
@@ -101,6 +116,13 @@ std::vector<int> boxtools::getResnrWithinVolume(const Box& box, const Volume& vo
   std::vector<int> retVec;
   for(auto& atom : box.atoms){
     if(!volume.isInside(atom.x)) retVec.push_back(atom.resnr);
+  }
+  return retVec;
+}
+std::vector<int> boxtools::getResnrNotWithinVolume(const Box& box, const Volume& volume){
+  std::vector<int> retVec;
+  for(auto& atom : box.atoms){
+    if(volume.isInside(atom.x)) retVec.push_back(atom.resnr);
   }
   return retVec;
 }

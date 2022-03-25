@@ -10,8 +10,10 @@ namespace boxtools::actions{
   //use to initialize registry
   void merge(GroManipData&, const std::vector<std::string>&);
   void eraseres(GroManipData&, const std::vector<std::string>&);
+  void keepres(GroManipData&, const std::vector<std::string>&);
   void duplicate(GroManipData&, const std::vector<std::string>&);
   void trimvolumebyresname(GroManipData&, const std::vector<std::string>&);
+  void trimvolumebyresnameinv(GroManipData&, const std::vector<std::string>&);
   void trimvolumebyatomname(GroManipData&, const std::vector<std::string>&);
   void trimvolumebyatomnameinv(GroManipData&, const std::vector<std::string>&);
   void rotate(GroManipData&, const std::vector<std::string>&);
@@ -37,8 +39,10 @@ namespace boxtools::actions{
   static inline void registerActions(){
     action_map.emplace("merge", &merge);
     action_map.emplace("eraseres", &eraseres);
+    action_map.emplace("keepres", &keepres);
     action_map.emplace("duplicate", &duplicate);
     action_map.emplace("trimbyresname", &trimvolumebyresname);
+    action_map.emplace("trimbyresnameinv", &trimvolumebyresnameinv);
     action_map.emplace("trimbyatomname", &trimvolumebyatomname);
     action_map.emplace("trimbyatomnameinv", &trimvolumebyatomnameinv);
     action_map.emplace("rotate", &rotate);

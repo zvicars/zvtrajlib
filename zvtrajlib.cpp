@@ -10,7 +10,7 @@ int main(int argc, char **argv)
   InputParser input_parser;
   ParameterPack master_pack = input_parser.parseFile(op_input_file_);
   using KeyType = ParameterPack::KeyType;
-  bool trajectory_found = master_pack.readString("trajectory", KeyType::Required, trajectory_file_);
+  bool trajectory_found = master_pack.readString("trajectory", KeyType::Optional, trajectory_file_);
   bool idx_found = master_pack.readString("index", KeyType::Optional, index_file_);
   bool top_found = master_pack.readString("top", KeyType::Optional, topology_file_);
   bool gro_found = master_pack.readString("gro", KeyType::Optional, gro_file_);
@@ -50,9 +50,8 @@ int main(int argc, char **argv)
     master_input_pack.addCalculation(name, calc_ptr);
   }  
 
-  std::cout << "Starting test..." << std::endl;
-  XDRTrajectory traj(trajectory_file_);
-  std::cout << "Trajectory loaded..." << std::endl;
+  Trajectory* traj_ptr = loadTrajectory(trajectory_file_);
+  auto& traj = *traj_ptr;
   int step_iterator = 0;
   auto ag_reg_ = master_input_pack.AtomGroupMap();
   auto pv_reg_ = master_input_pack.ProbeVolumeMap();
@@ -101,6 +100,6 @@ int main(int argc, char **argv)
   for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
     i->second->finalOutput();
   }
-
+  delete traj_ptr;
   return 0;
 }

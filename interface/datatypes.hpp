@@ -10,7 +10,7 @@ template <class T>
 using Vec = std::vector<T>;
 
 struct Atom{ //many of these properties are optional
-  Vec3<double> x, v;
+  Vec3<double> x, v, f;
   double mass, charge;
   int resnr, index;
   std::string name, type, resname;
@@ -85,7 +85,8 @@ public:
   Vec3<Vec3<double> > boxvec;
   double time;
   int frame, frame_counter = -1;
-  bool hasNamedAtoms = 0, hasTopologyInfo = 0, hasIndexes = 0, hasVelocities = 0;
+  bool hasNamedAtoms = 0, hasTopologyInfo = 0, hasIndexes = 0, 
+  hasVelocities = 0, hasMasses = 0, hasForces = 0;
   Vec3<double> getAtomPosition(int idx) const{
     return atoms[idx].x;
   }
