@@ -18,8 +18,12 @@ struct Mesh {
 
 struct MeshFile{
 public:
-  virtual int load(std::string file_text)=0;
-  virtual int save( const Mesh& mesh, std::string& file_text)=0;
+  virtual int load(std::string file_text){
+    return 1;
+  }
+  virtual int save( const Mesh& mesh, std::string& file_text){
+    return 1;
+  }
   virtual Mesh getMesh(){
       return meshInternal_;
   }
