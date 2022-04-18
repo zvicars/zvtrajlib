@@ -3,7 +3,10 @@
 #include <algorithm>
 #include <unordered_set>
 #include "../tools/StringTools.hpp"
+#include "../tools/pbcfunctions.hpp"
+#include "../tools/stlmath.hpp"
 #include "Eigen/Eigen"
+
 bool atom_res_sorter(const Atom& lhs, const Atom& rhs){
   if(lhs.resnr != rhs.resnr) return lhs.resnr < rhs.resnr;
   return lhs.index < rhs.index;
@@ -167,6 +170,26 @@ void boxtools::rotateEulerAngles(Box& box, Vec3<double> angles){
   return;
 }
 
+void boxtools::invrotateEulerAngles(Box& box, Vec3<double> angles){
+  Eigen::Vector3d radangles;
+  radangles << angles[2]*M_PI/180.0, angles[1] * M_PI / 180.0, angles[0] * M_PI / 180.0;
+  Eigen::AngleAxisd rollAngle(radangles[0], Eigen::Vector3d::UnitZ());
+  Eigen::AngleAxisd yawAngle(radangles[1], Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd pitchAngle(radangles[2], Eigen::Vector3d::UnitX());
+  Eigen::Quaternion<double> q = rollAngle * yawAngle * pitchAngle;
+  Eigen::Matrix3d rotationMatrix = q.matrix();
+  rotationMatrix.transposeInPlace();
+  for(auto& atom : box.atoms){
+    Eigen::Vector3d xi, xi2;
+    xi << atom.x[0], atom.x[1], atom.x[2];
+    xi2 = rotationMatrix*xi;
+    atom.x[0] = xi2[0];
+    atom.x[1] = xi2[1];
+    atom.x[2] = xi2[2];
+  }
+  return;
+}
+
 void boxtools::translateAtoms(Box& box, Vec3<double> offset){
   for(auto& atom : box.atoms){
     atom.x[0] += offset[0];
@@ -175,7 +198,16 @@ void boxtools::translateAtoms(Box& box, Vec3<double> offset){
   }
   return;
 }
-
+void boxtools::wrapPBC(Box& box){
+  std::array<double, 3> box_size;
+  for(int i = 0; i < 3; i++){
+    box_size[i] = box.boxvec[i][i];
+  }
+  for(auto& atom : box.atoms){
+    placeInsideBox(atom.x, box_size);
+  }
+  return;
+}
 //move corner of bounding box to 0,0,0 and shrink box dimensions to fit atoms
 void boxtools::shrinkWrap(Box& box, double buffer){
   Vec3<double> min, max;
@@ -234,3 +266,29 @@ void boxtools::setBoxSize(Box& box, Vec3<double> newsize){
   return;
 }
 
+void boxtools::rotateVectorCOM(Box& box, Vec3<double> v1, Vec3<double> v2){
+  Eigen::Vector3d A, B;
+  A << v1[0], v1[1], v1[2];
+  B << v2[0], v2[1], v2[2];
+  Eigen::Matrix3d R;
+  R = Eigen::Quaterniond().setFromTwoVectors(A,B);
+  //get center of mass for all atoms in box
+  Vec3<double> x_avg;
+  x_avg.fill(0.0);
+  for(const auto& atom : box.atoms){
+    x_avg = x_avg + atom.x;
+  }
+  x_avg = x_avg * (1.0/(double)box.atoms.size());
+
+  translateAtoms(box, x_avg*-1.0);
+  for(auto& atom : box.atoms){
+    Eigen::Vector3d X,Y;
+    X << atom.x[0], atom.x[1], atom.x[2];
+    Y = R*X;
+    for(int i = 0; i < 3; i++){
+      atom.x[i] = Y[i];
+    }
+  }
+  translateAtoms(box, x_avg);
+  return;
+}

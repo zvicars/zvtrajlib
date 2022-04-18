@@ -170,7 +170,6 @@ std::vector<T> split(const std::string& str, const char delim)
   return tokens;
 }
 
-
 template<typename T> 
 T stringToValue(const std::string& str) {
   std::stringstream ss( str );
@@ -193,7 +192,6 @@ std::array<T,dim> stringsToArray(const std::vector<std::string>& strings) {
   return arr;
 }
 
-
 template<typename T>
 std::vector<T> stringsToVector(const std::vector<std::string>& strings) {
   std::vector<T> vec( strings.size() );
@@ -202,7 +200,23 @@ std::vector<T> stringsToVector(const std::vector<std::string>& strings) {
   return vec;
 }
 
-
+//shorter comma-delimited variant, [x,y,z]
+template<typename T>
+std::vector<T> stringToVector(const std::string& str) {
+  int pos1 = str.find('[');
+  int pos2 = str.rfind(']');
+  std::string str_data = str.substr(pos1+1, pos2-pos1-1);
+  std::stringstream ss(str_data);
+  std::vector<T> vec;
+  std::string token;
+  while(std::getline(ss, token, ',')) {
+      std::stringstream ss2(token);
+      T token_cast;
+      ss2 >> token_cast;
+      vec.push_back(token_cast);
+  }
+  return vec;
+}
 
 template<typename T>
 std::ostream& operator<<(
@@ -251,6 +265,7 @@ std::ostream& os, const FixedWidthValue<T> value
   return os;
 };
 
+void swap(std::string& s1, std::string& s2);
 
 } // end namespace StringTools
 

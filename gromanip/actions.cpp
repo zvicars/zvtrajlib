@@ -1,5 +1,8 @@
 #include "actions.hpp"
 #include "../tools/pbcfunctions.hpp"
+#include "../tools/StringTools.hpp"
+#include "../tools/stlmath.hpp"
+#include <set>
 void boxtools::actions::merge(GroManipData& data, const std::vector<std::string>& args){
   //takes two box names and an output box name
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::merge(), requires input_box_name, input_box_name, and output_box_name");
@@ -166,6 +169,51 @@ void boxtools::actions::rotate(GroManipData& data, const std::vector<std::string
   data.addBox(args[4], b_out); 
   return;
 }
+void boxtools::actions::invrotate(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, euler angles (degrees), and an output box name
+  FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::invrotate(), \
+  requires input_box_name, euler phi, euler theta, euler psi, output_box_name");
+  Vec3<double> angles; 
+  for(int i = 0; i < 3; i++){
+    angles[i] = std::stod(args[i+1]);
+  }
+  Box *b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::invrotate()"); 
+  Box* b_out = data.findBox(args[4]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box box_out = *b1;
+  boxtools::invrotateEulerAngles(box_out, angles);
+  *b_out = box_out;
+  data.addBox(args[4], b_out); 
+  return;
+}
+void boxtools::actions::rotate_vector(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, euler angles (degrees), and an output box name
+  FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::rotate_vector(), \
+  requires input_box_name, [v1,v2,v3], [w1,w2,w3], output_box_name");
+  std::string in = args[0], out = args[3];
+  Vec3<double> angles;
+  auto v1 = StringTools::stringToVector<double>(args[1]);
+  auto v2 = StringTools::stringToVector<double>(args[2]);
+  auto a1 = vec2Array<double,3>(v1);
+  auto a2 = vec2Array<double,3>(v2);
+  a1 = a1 * 1.0/norm2(a1);
+  a2 = a2 * 1.0/norm2(a2);
+  Box *b1 = data.findBox(in);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::rotate_vector()"); 
+  Box* b_out = data.findBox(out);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box box_out = *b1;
+  //rotation matrix that rotates v1 to v2 
+  boxtools::rotateVectorCOM(box_out, a1, a2);
+  *b_out = box_out;
+  data.addBox(out, b_out); 
+  return;
+}
 void boxtools::actions::flip(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name an axis, and an output box name
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::flip(), requires input_box_name, axis_name, and output_box_name");
@@ -303,6 +351,7 @@ void boxtools::actions::respattern(GroManipData& data, const std::vector<std::st
     atom.resnr = rescounter;
     counter++;
   }
+  renumberBox(box_out);
   *b_out = box_out;
   data.addBox(args[2], b_out); 
   return;
@@ -499,5 +548,80 @@ void boxtools::actions::pbccorrect(GroManipData& data, const std::vector<std::st
   }
   *b_out = box_out;
   data.addBox(args[1], b_out);
+  return;
+}
+//good for adding a single atom to the dataset to balance the charge
+void boxtools::actions::addatom(GroManipData& data, const std::vector<std::string>& args){
+  //argument is a list of volume names
+  FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::setboxsize(), needs input box, name, resname, position [x,y,z], output box name");
+  std::string in = args[0], out = args[4];
+  auto pos = StringTools::stringToVector<double>(args[3]);
+  std::string atom_name = args[1], resname = args[2];
+  Box *b1 = data.findBox(in);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::setboxsize()");
+  Box box_out = *b1;
+  Box* b_out = data.findBox(out);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Atom new_atom;
+  new_atom.x = vec2Array<double,3>(pos);
+  new_atom.name = atom_name;
+  new_atom.resname = resname;
+  new_atom.index = box_out.atoms.back().index + 1;
+  new_atom.resnr = box_out.atoms.back().resnr + 1;
+  new_atom.type = atom_name;
+  box_out.atoms.push_back(new_atom);
+  *b_out = box_out;
+  data.addBox(out, b_out); 
+  return;
+}
+
+void boxtools::actions::printindicesnear(GroManipData& data, const std::vector<std::string>& args){
+  //argument is a list of volume names
+  FANCY_ASSERT(args.size() == 5, 
+  "Invalid call to boxtools::actions::printindicesnear(), needs in, [n1,n2,n3], [n1,n2,n3], distance, outfile");
+  std::string in = args.front();
+  double distance_thresh = std::stod(args[3]);
+  std::string filename = args[4];
+  std::string n1 = args[1], n2 = args[2];
+  std::vector<std::string> names1, names2;
+  names1 = StringTools::stringToVector<std::string>(n1);
+  names2 = StringTools::stringToVector<std::string>(n2);
+  Box *b1 = data.findBox(in);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::setboxsize()");
+  Box box = *b1;
+  std::set<int> idx_out;
+  std::vector<int> idx1, idx2;
+  for(int i = 0; i < box.atoms.size(); i++){
+    for(auto name : names1){
+      if(box.atoms[i].name == name){
+        idx1.push_back(i);
+        break;
+      }
+    }
+    for(auto name : names2){
+      if(box.atoms[i].name == name){
+        idx2.push_back(i);
+        break;
+      }
+    }
+  }
+  for(auto i : idx1){
+    for(auto j : idx2){
+      auto pos1 = box.atoms[i].x;
+      auto pos2 = box.atoms[j].x;
+      double distance = norm2(pos2-pos1);
+      if(distance < distance_thresh){
+        idx_out.insert(box.atoms[i].index);
+      }
+    }
+  }
+  std::ofstream ofile(filename);
+  FANCY_ASSERT(ofile.is_open(), "Failed to open output file for boxtools::actions::printindicesnear()");
+  for(auto idx : idx_out){
+    ofile << idx << "\n";
+  }
+  ofile.close();
   return;
 }

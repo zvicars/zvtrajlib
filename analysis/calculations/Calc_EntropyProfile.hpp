@@ -18,8 +18,17 @@ class Calc_EntropyProfile : public Calc_DensityField{
     virtual void calculate(){
       if(!doCalculate()) return;
       Calc_DensityField::calculate();
-
-      return;
+      auto indices = atom_group_->getIndices();
+      for(auto index : indices){
+          auto& atom = box->atoms[index];
+          auto position = atom.x;
+          placeInsideBox(position, box_size_);
+          auto idx_ref = getIndex(position);
+          std::array<double,6> temp = {position[0], position[1], position[2],
+          atom.v[0]*atom.mass, atom.v[1]*atom.mass, atom.v[2]*atom.mass};
+          point_data_[_map31(idx_ref)].push_back(temp);
+      }
+        return;
     }
     virtual void finalOutput(){
       Calc_DensityField::finalOutput();

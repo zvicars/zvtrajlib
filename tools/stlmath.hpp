@@ -2,7 +2,7 @@
 #include <array>
 #include <vector>
 #include <cmath>
-//STD ARRAYS
+#include <stdexcept>
 template <class T, std::size_t N>
 static inline std::array<T, N> operator+(const std::array<T, N>& a, const std::array<T, N>& b){
   std::array<T,N> retVal;
@@ -135,4 +135,29 @@ static inline T var(const std::vector<T>& a, T mean){
   }
   retVal /= a.size();
   return retVal;
+}
+
+template <class T> 
+static inline std::array<T,3> cross(const std::array<T,3>& a, const std::array<T,3>& b){
+  std::array<T,3> out;
+  out[0] = a[1]*b[2] - a[2]*b[1];
+  out[1] = a[2]*b[0] - a[0]*b[2];
+  out[2] = a[0]*b[1] - a[1]*b[0];
+  return out;
+}
+template <class T> 
+static inline T dot(const std::array<T,3>& a, const std::array<T,3>& b){
+  return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
+
+template <class T, std::size_t N>
+static inline std::array<T, N> vec2Array(std::vector<T> v){
+  if(v.size() != N){
+    throw std::bad_cast();
+  }
+  std::array<T,N> ret;
+  for(int i = 0; i < N; i++){
+    ret[i] = v[i]; 
+  }
+  return ret;
 }

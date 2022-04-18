@@ -17,6 +17,8 @@ namespace boxtools::actions{
   void trimvolumebyatomname(GroManipData&, const std::vector<std::string>&);
   void trimvolumebyatomnameinv(GroManipData&, const std::vector<std::string>&);
   void rotate(GroManipData&, const std::vector<std::string>&);
+  void invrotate(GroManipData&, const std::vector<std::string>&);
+  void rotate_vector(GroManipData&, const std::vector<std::string>&);
   void flip(GroManipData&, const std::vector<std::string>&);
   void translate(GroManipData&, const std::vector<std::string>&);
   void loadgro(GroManipData&, const std::vector<std::string>&);
@@ -35,6 +37,12 @@ namespace boxtools::actions{
   void supercell(GroManipData&, const std::vector<std::string>&);
   void decoratefeldspar(GroManipData& data, const std::vector<std::string>& args);
   void hydrogenatefeldspar(GroManipData& data, const std::vector<std::string>& args);
+  //use a mesh to trim the atoms
+  void trimbymesh(GroManipData& data, const std::vector<std::string>& args);
+  //for adding a single atom to the box, charge equalization
+  void addatom(GroManipData& data, const std::vector<std::string>& args);
+  //for getting atoms for union of spheres volume
+  void printindicesnear(GroManipData& data, const std::vector<std::string>& args);
   //void outputbonds(GroManipData&, const std::vector<std::string>&);
   static inline void registerActions(){
     action_map.emplace("merge", &merge);
@@ -45,7 +53,10 @@ namespace boxtools::actions{
     action_map.emplace("trimbyresnameinv", &trimvolumebyresnameinv);
     action_map.emplace("trimbyatomname", &trimvolumebyatomname);
     action_map.emplace("trimbyatomnameinv", &trimvolumebyatomnameinv);
+    action_map.emplace("trimbymesh", &trimbymesh);
     action_map.emplace("rotate", &rotate);
+    action_map.emplace("invrotate", &invrotate);
+    action_map.emplace("rotate_vector", &rotate_vector);
     action_map.emplace("flip", &flip);
     action_map.emplace("translate", &translate);
     action_map.emplace("loadgro", &loadgro);
@@ -63,6 +74,8 @@ namespace boxtools::actions{
     action_map.emplace("supercell", &supercell);
     action_map.emplace("decoratefeldspar", &decoratefeldspar);
     action_map.emplace("hydrogenatefeldspar", &hydrogenatefeldspar);
+    action_map.emplace("printindicesnear", &printindicesnear);
+    action_map.emplace("addatom", &addatom);
     return;
   }
   static inline void performAction(GroManipData& data, std::vector<std::string> args){

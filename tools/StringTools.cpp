@@ -1,7 +1,5 @@
 // AUTHOR: Sean M. Marks (https://github.com/seanmarks)
-
 #include "StringTools.hpp"
-
 namespace StringTools {
 
 bool stringToBool(const std::string& str)
@@ -101,5 +99,11 @@ bool stringToValue<bool>(const std::string& str) {
   return stringToBool(str);
 }
 
+void swap(std::string& s1, std::string& s2){
+  std::string temp = s1;
+  s1 = s2;
+  s2 = temp;
+  return;
+}
 
 }  // end namespace StringTools

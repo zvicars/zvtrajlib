@@ -58,12 +58,14 @@ namespace boxtools{
   std::vector<int> getResnrNotWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name);
   std::vector<int> getResnrAllButResname(const Box& box, const Volume& volume, std::string res_name);
   void rotateEulerAngles(Box& box, Vec3<double> angles);
+  void invrotateEulerAngles(Box& box, Vec3<double> angles);
   void translateAtoms(Box& box, Vec3<double> offset);
+  void wrapPBC(Box& box);
   void shrinkWrap(Box& box, double buffer = 0.0);
   void relabelAtom(Box& box, std::string original_name, std::string new_name);
   void relabelRes(Box& box, std::string original_name, std::string new_name);
   void setBoxSize(Box& box, Vec3<double> newsize);
-
+  void rotateVectorCOM(Box& box, Vec3<double> v1, Vec3<double> v2);
   bool setAtomParams(Box& box, const ParameterTable<AtomType>& atable);
   static inline bool checkBoxValid(const Box& box){
     if(box.atoms.size() > 0 && box.hasNamedAtoms) return 1;
