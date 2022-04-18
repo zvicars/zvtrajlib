@@ -1,9 +1,9 @@
 #pragma once
-#include "meshfiles.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
 #include <array>
+#include "meshfiles.hpp"
 class ObjFile : public MeshFile{
 public:
   int load(std::string file_text);

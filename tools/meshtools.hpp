@@ -1,5 +1,4 @@
 #pragma once
-#include "meshtools_files/meshfiles.hpp"
 #include "meshtools_files/obj.hpp"
 #include "StringTools.hpp"
 static inline Mesh getMesh(std::string filename){
