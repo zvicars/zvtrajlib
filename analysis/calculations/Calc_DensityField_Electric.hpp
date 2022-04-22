@@ -48,6 +48,7 @@ class Calc_DensityFieldElectric : public Calc_DensityField{
         }
         gridvals_[i] = Usr_test_sum(realpos_);
       }
+      nframes_++;
       avggridvals_ = avggridvals_ + gridvals_;
       avggridspacing_ = avggridspacing_ + gridspacing_;
       return;
