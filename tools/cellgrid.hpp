@@ -8,6 +8,9 @@
 //partitions the simulation cell into different regions where neigbors within cutoff can only be in neigboring grid cells
 class CellGrid{
 public:
+  CellGrid(){
+    return;
+  }
   CellGrid(double cutoff, std::array<double, 3> box_size){
     for(int i = 0; i < 3; i++){
       nx[i] = ceil(box_size[i]/cutoff);
@@ -15,6 +18,15 @@ public:
     }
     positions.resize(nx[0]*nx[1]*nx[2]);
     return;
+  }
+  void reset(double cutoff, std::array<double, 3> box_size){
+    positions.clear();
+    for(int i = 0; i < 3; i++){
+      nx[i] = ceil(box_size[i]/cutoff);
+      sxi[i] = (double)nx[i]/box_size[i];
+    }
+    positions.resize(nx[0]*nx[1]*nx[2]);
+    return;    
   }
   std::vector<int> getNearbyIndices(const std::array<double, 3>& position) const{
     //searches 27 nearest cells and returns a list of indices stored within those cells

@@ -2,6 +2,7 @@
 #include "tools/Assert.hpp"
 #include "tools/InputParser.hpp"
 #include "analysis/factory.hpp"
+
 int main(int argc, char **argv)
 {
   FANCY_ASSERT(argc == 2, "Analysis code only accepts a single input that specifies the op input file.");
