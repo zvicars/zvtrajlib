@@ -60,6 +60,7 @@ class Calc_DensityFieldElectric : public Calc_DensityField{
   protected:
     //usr between nearby atom of charge q and test charge
     inline double Usr_test(double  r,  double q){
+      if(r < 0.1*norm2(gridspacing_)) r = 0.1*norm2(gridspacing_);
       return (q/r)*erfc(beta_*r);
     }
     inline void resetCellGrid(){
