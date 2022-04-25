@@ -19,6 +19,7 @@ class Calc_DensityFieldAngle : public Calc_DensityField{
       FANCY_ASSERT(normal_vector.size() == 3, "Improper size for normal vector in Calc_DensityFieldAngle()");
       normal_vector_ = vec2Array<double,3>(normal_vector);
       normal_vector_ = normal_vector_ * (1.0/norm2(normal_vector_));
+      gridcounts_.resize(npoints_[0]*npoints_[1]*npoints_[2], 0.0);
       return;
     }
     virtual void calculate(){
@@ -39,17 +40,36 @@ class Calc_DensityFieldAngle : public Calc_DensityField{
         double angle = dot(x21, normal_vector_);
         auto idx_ref = getIndex(x1);
         gridvals_[_map31(idx_ref)] += angle;
+        gridcounts_[_map31(idx_ref)] += 1; 
       }
       nframes_++;
       avggridvals_ = avggridvals_ + gridvals_;
       avggridspacing_ = avggridspacing_ + gridspacing_;
       return;
     }
+
     virtual void finalOutput(){
-      Calc_DensityField::finalOutput();
+      for(int i = 0; i < avggridvals_.size(); i++){
+        avggridvals_[i] *= 1.0/gridcounts_[i];
+      }
+      avggridspacing_ = (1.0/(double)nframes_)  * avggridspacing_;
+      std::ofstream ofile(base_ + "_DensityField.txt");
+      FANCY_ASSERT(ofile.is_open(), "Failed to open output file for " + name_);
+      for(int i = 0; i < npoints_[0]; i++){
+        for(int j = 0; j < npoints_[1]; j++){
+          for(int k = 0; k < npoints_[2]; k++)
+          {
+            Vec3<int> pos = {i,j,k};
+            int idx = _map31(pos);
+            ofile << i << "   " << j << "   " << k << "   " << avggridvals_[idx] << "\n";
+          }
+        }
+      }
+      ofile.close();
       return;
     }
   protected:
     AtomGroup* atom_group2_;
+    std::vector<double> gridcounts_;
     std::array<double,3> normal_vector_;
 };
