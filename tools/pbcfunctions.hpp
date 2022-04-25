@@ -55,3 +55,10 @@ static inline double getNearestImage1D(double x, double xref, double box_size){
   return x; 
 }
 
+static inline void getNearestImage3D(std::array<double,3>& x, const std::array<double,3>& xref, const std::array<double,3>& box_size){
+  for(int i = 0; i < 3; i++){
+    x[i] = getNearestImage1D(x[i], xref[i], box_size[i]);
+  }
+  return; 
+}
+
