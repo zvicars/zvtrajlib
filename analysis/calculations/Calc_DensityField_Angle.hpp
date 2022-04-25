@@ -38,7 +38,7 @@ class Calc_DensityFieldAngle : public Calc_DensityField{
         auto x21 = (x2-x1) * (1.0/norm2(x2-x1));
         double angle = dot(x21, normal_vector_);
         auto idx_ref = getIndex(x1);
-        gridvals_[_map31(idx_ref)] += 1.0;
+        gridvals_[_map31(idx_ref)] += angle;
       }
       nframes_++;
       avggridvals_ = avggridvals_ + gridvals_;
