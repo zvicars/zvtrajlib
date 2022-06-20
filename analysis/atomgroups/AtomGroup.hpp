@@ -35,6 +35,9 @@ public:
   bool hasUpdated() const {
     return update_flag_;
   }
+  virtual std::string getDumpString(){
+    return "";
+  }
 protected:
   std::string name_;
   std::string type_;

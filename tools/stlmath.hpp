@@ -161,3 +161,48 @@ static inline std::array<T, N> vec2Array(std::vector<T> v){
   }
   return ret;
 }
+//naive matrix multiplication
+template <class T, std::size_t L, std::size_t M, std::size_t N>
+std::array< std::array<T, L>, N > matrix_mult( std::array< std::array<T, M>, N> left, std::array< std::array<T, L>, M> right){
+  std::array< std::array<T, L>, N > output;
+  for(int n = 0; n < N; n++){
+    for(int l = 0; l < L; l++){
+      T sum = 0;
+      for(int m = 0; m < M; m++){
+        sum += left[n][m] * right[m][l];
+      }
+      output[n][l] = sum; 
+    }
+  }
+  return output;
+}
+
+template <class T, std::size_t N>
+std::array< std::array<T, N>, 1 > arr2Col(std::array<T, N> v){
+  std::array< std::array<T, N>, 1 > output;
+  output[0] = v;
+  return output;
+}
+
+template <class T, std::size_t N>
+std::array< std::array<T, 1>, N > arr2Row(std::array<T, N> v){
+  std::array< std::array<T, 1>, N > output;
+  for(int i = 0; i < N; i++){
+    output[i][0] = v[i];
+  }
+  return output;
+}
+
+template <class T, std::size_t N>
+std::array<T, N> col2Arr(std::array< std::array<T, N>, 1 > v){
+  return v[0];
+}
+
+template <class T, std::size_t N>
+std::array<T, N> row2Arr(std::array< std::array<T, 1>, N > v){
+  std::array<T, N> output;
+  for(int i = 0; i < N; i++){
+    output[i] = v[i][0];
+  }
+  return output;
+}

@@ -21,6 +21,7 @@ namespace boxtools::actions{
   void rotate_vector(GroManipData&, const std::vector<std::string>&);
   void flip(GroManipData&, const std::vector<std::string>&);
   void translate(GroManipData&, const std::vector<std::string>&);
+  void scale(GroManipData&, const std::vector<std::string>&);
   void loadgro(GroManipData&, const std::vector<std::string>&);
   void writegro(GroManipData&, const std::vector<std::string>&);
   void createprimitivevolume(GroManipData&, const std::vector<std::string>&);
@@ -59,6 +60,7 @@ namespace boxtools::actions{
     action_map.emplace("rotate_vector", &rotate_vector);
     action_map.emplace("flip", &flip);
     action_map.emplace("translate", &translate);
+    action_map.emplace("scale", &scale);
     action_map.emplace("loadgro", &loadgro);
     action_map.emplace("writegro", &writegro);
     action_map.emplace("volume", &createprimitivevolume);

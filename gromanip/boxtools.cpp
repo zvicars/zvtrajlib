@@ -198,6 +198,16 @@ void boxtools::translateAtoms(Box& box, Vec3<double> offset){
   }
   return;
 }
+
+void boxtools::scaleAtoms(Box& box, Vec3<double> offset){
+  for(auto& atom : box.atoms){
+    atom.x[0] *= offset[0];
+    atom.x[1] *= offset[1];
+    atom.x[2] *= offset[2];
+  }
+  return;
+}
+
 void boxtools::wrapPBC(Box& box){
   std::array<double, 3> box_size;
   for(int i = 0; i < 3; i++){

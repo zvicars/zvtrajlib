@@ -23,6 +23,7 @@ AtomGroup_dynamic::AtomGroup_dynamic(InputPack& input) : AtomGroup{input} {
     frames_.push_back(indices);
     times_.push_back(time);
   }
+  ifile.close();
   FANCY_ASSERT(times_.size() != 0, "No indices provided to dynamic atomgroup " + name_ + ".");
   if(frames_.size() > 1){
     dt_ = times_[1] - times_[0];
@@ -63,3 +64,16 @@ void AtomGroup_dynamic::update(){
   return;
 }
 
+std::string AtomGroup_dynamic::getDumpString(){
+  std::stringstream ss; 
+  for(int i = 0; i < times_.size(); i++){
+    double time = times_[i];
+    ss << time << "   ";
+    auto idx_list = frames_[i];
+    for(auto idx : idx_list){
+      ss << idx << "   ";
+    }
+    ss << "\n";
+  }
+  return ss.str();
+}

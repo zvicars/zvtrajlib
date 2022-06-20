@@ -61,4 +61,3 @@ static inline void getNearestImage3D(std::array<double,3>& x, const std::array<d
   }
   return; 
 }
-

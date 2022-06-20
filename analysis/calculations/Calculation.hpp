@@ -35,6 +35,7 @@ public:
   virtual void printOutput(){return;}
   virtual bool doOutput();
   virtual bool doCalculate();
+  virtual bool doCalculateChild();
   bool hasUpdated(){
     return update_flag_;
   }

@@ -118,6 +118,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
       }
     }
     else{
+      if(!isInBox(position)) continue; 
       gridvals_[_map31(idx_ref)] += 1.0;
     }
   }

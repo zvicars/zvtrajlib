@@ -26,6 +26,10 @@ protected:
     eval[0] = idx % npoints_[0];
     return eval;
   }  
+  bool isInBox(const Vec3<double>& x) const{
+    if(x[0] < minx_[0] || x[0] > maxx_[0] || x[1] < minx_[1] || x[1] > maxx_[1] || x[2] < minx_[2] || x[2] > maxx_[2]) return 0;
+    return 1;
+  }
   double getGaussian(const Vec3<double>& position, const Vec3<int>& index);
   AtomGroup* atom_group_;
   std::vector<double> gridvals_, avggridvals_;

@@ -10,6 +10,7 @@ public:
   virtual bool isDynamic(){
     return 1;
   }
+  virtual std::string getDumpString();
 protected:
   std::string filename_;
   std::vector<std::vector<int> > frames_;

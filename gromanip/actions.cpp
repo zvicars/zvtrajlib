@@ -239,6 +239,28 @@ void boxtools::actions::translate(GroManipData& data, const std::vector<std::str
   data.addBox(args[4], b_out); 
   return;
 }
+
+void boxtools::actions::scale(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, a translation vector, and an output box name
+  FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::scale(), requires input_box_name, \
+  x factor, y factor, z factor, and output_box_name");
+  Vec3<double> pos;
+  for(int i = 0; i < 3; i++){
+    pos[i] = std::stod(args[i+1]);
+  }
+  Box *b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::scale()"); 
+  Box* b_out = data.findBox(args[4]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box box_out = *b1;
+  boxtools::scaleAtoms(box_out, pos);
+  *b_out = box_out;
+  data.addBox(args[4], b_out); 
+  return;
+}
+
 void boxtools::actions::loadgro(GroManipData& data, const std::vector<std::string>& args){
   //takes a filename and an output box name
   FANCY_ASSERT(args.size() == 2, "Invalid call to boxtools::actions::loadgro(), requires filename and output_box_name");

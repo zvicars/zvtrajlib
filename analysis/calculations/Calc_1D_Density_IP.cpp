@@ -1,7 +1,6 @@
 #include "Calc_1D_Density_IP.hpp"
 #include "../helper/functors.hpp"
 
-
 inline double heaviside(double x){
 	if(x <= 0) return 0;
 	return 1.0; 
@@ -84,12 +83,25 @@ void Calc_1D_Density_IP::calculate(){
     return;
   }
   calcStatus = 1;
-  for(int i = 0; i < atom_group_->getIndexCount(); i++ ){
-    int idx = atom_group_->getIndex(i);
-    FANCY_ASSERT(idx >= 0 && idx < box->atoms.size(), "AtomGroup provided index "
+  auto indices = atom_group_->getIndices();
+  int counter = 0;
+  for(auto idx : indices){
+    counter++;
+    bool out_of_range_flag = 1;
+    if(idx >= 0 && idx < box->atoms.size()) out_of_range_flag = 0;
+    if(out_of_range_flag == 1){
+      std::ofstream ofile("dump_atomgroup_info.txt");
+      ofile << atom_group_ << std::endl;
+      std::string ag_dump = atom_group_->getDumpString();
+      for(auto idx2 : indices) ofile << idx2 << "   " << "\n";
+      ofile << ag_dump;
+      ofile.close();
+    }
+    FANCY_ASSERT(!out_of_range_flag, "AtomGroup provided index "
      + std::to_string(idx)
-     + " which is not compatible with the number of atoms in the box. This was done on iteration " + std::to_string(i) + " at time "
+     + " which is not compatible with the number of atoms in the box. This was done on iteration " + std::to_string(counter) + " at time "
      + std::to_string(box->time));
+
     auto position = box->atoms[idx].x;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
@@ -127,8 +139,8 @@ void Calc_1D_Density_IP::calculate(){
 void Calc_1D_Density_IP::update(){
   if(hasUpdated()) return;
   Calculation::update();
-  for(int i = 0; i < grid_density_.size(); i++){
-    grid_density_[i] = 0.0;
+  for(auto& entry : grid_density_){
+    entry = 0.0;
   }
   box_size_ = box->boxvec[dim_][dim_];
   grid_spacing_ = box_size_ / (double)(npoints_);

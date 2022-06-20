@@ -31,6 +31,15 @@ bool Calculation::doCalculate(){
     calculate_flag_ = 1;
     return 1;
 }
+
+//another version that doesn't check to see if a calculation has already been called, prevents child class from calculating
+//when parent class hasn't calculated
+bool Calculation::doCalculateChild(){
+    if(current_time_ < equilibration_ || current_time_ > end_) return 0;
+    if(current_frame_%calc_freq_ != 0) return 0;
+    return 1;
+}
+
 bool Calculation::doOutput(){
     if(current_time_ < equilibration_ || current_time_ > end_) return 0;
     if(current_frame_%output_freq_ != 0) return 0;
