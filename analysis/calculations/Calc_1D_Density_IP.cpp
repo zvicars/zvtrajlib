@@ -68,8 +68,8 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
     for(int ix = lxmin; ix <= lxmax; ix++)
     {
       int idx = ix;
-      if(idx >= grid_density_.size()) idx -= grid_density_.size();
-      else if(idx < 0) idx += grid_density_.size();
+      if(idx >= npoints_) idx -= npoints_;
+      else if(idx < 0) idx += npoints_;
       double xmin, xmax;
       xmin = ix * grid_spacing_;
       xmax = xmin + grid_spacing_;
@@ -79,10 +79,9 @@ void Calc_1D_Density_IP::add_gaussian(double x_in)
 }
 
 void Calc_1D_Density_IP::calculate(){
-  if(!doCalculate() || calcStatus){
+  if(!doCalculate()){
     return;
   }
-  calcStatus = 1;
   auto indices = atom_group_->getIndices();
   int counter = 0;
   for(auto idx : indices){
@@ -144,15 +143,14 @@ void Calc_1D_Density_IP::update(){
   }
   box_size_ = box->boxvec[dim_][dim_];
   grid_spacing_ = box_size_ / (double)(npoints_);
-  calcStatus = 0;
   return;
 }
 std::string Calc_1D_Density_IP::printConsoleReport(){
   return "";
 }
 void Calc_1D_Density_IP::finalOutput(){
-  for(int i = 0; i < average_grid_density_.size(); i++){
-    average_grid_density_[i] *= 1.0/(double)frame_counter_;
+  for(auto& gridval : average_grid_density_){
+    gridval *= 1.0/(double)frame_counter_;
   }
   average_grid_spacing_*= 1.0/frame_counter_;
   if(fitSigmoidal){

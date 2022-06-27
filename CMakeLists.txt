@@ -17,7 +17,7 @@ add_executable(zvmangro zvmangro.cpp)
 target_link_libraries(zvtrajlib PRIVATE TRAJLIB 
                            PRIVATE TOOLS 
                            PRIVATE ANALYSIS)
-target_compile_options(zvtrajlib PRIVATE -O3 -g)
+target_compile_options(zvtrajlib PRIVATE -O0)
 
 target_link_libraries(zvmangro PRIVATE GROMANIP)
 target_compile_options(zvmangro PRIVATE -O3 -g)

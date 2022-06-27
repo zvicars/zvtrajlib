@@ -31,6 +31,7 @@ AtomGroup_dynamic::AtomGroup_dynamic(InputPack& input) : AtomGroup{input} {
     tmax_ = times_.back();
   }
   box_ = input.getBox();
+  originalChecksum = computeChecksum();
   return;
 }
 void AtomGroup_dynamic::update(){
@@ -59,7 +60,7 @@ void AtomGroup_dynamic::update(){
     }
     index_ = 0;
   }
-
+  //checksumCheck();
   global_indices_ = frames_[index_];
   return;
 }

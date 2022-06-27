@@ -57,6 +57,14 @@ void parse::parseGRO(std::string filename, Box& box){
     box.atoms[i].index = atomnumber;
   }
   box.hasNamedAtoms = 1;
+  std::getline(ifile, line);
+  std::stringstream ss(line);
+  box.boxvec = {0};
+  for(int i = 0; i < 3; i++){
+    double box_dim;
+    ss >> box_dim;
+    box.boxvec[i][i] = box_dim;
+  }
   return;
 }
 

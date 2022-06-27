@@ -2,7 +2,6 @@
 #include "tools/Assert.hpp"
 #include "tools/InputParser.hpp"
 #include "analysis/factory.hpp"
-
 int main(int argc, char **argv)
 {
   FANCY_ASSERT(argc == 2, "Analysis code only accepts a single input that specifies the op input file.");
@@ -20,7 +19,7 @@ int main(int argc, char **argv)
   if(idx_found) readNDX(index_file_, b1);
   if(top_found) readTOP(topology_file_, b1);
   if(gro_found) readGRO(gro_file_, b1); //not adding the frame, but keeping information
-  
+
   InputPack master_input_pack = InputPack(&master_pack, &b1);
 
   std::vector<InputPack> ag_packs = master_input_pack.buildDerivedInputPacks("AtomGroup");
@@ -31,8 +30,8 @@ int main(int argc, char **argv)
     ag_packs[i].params().readString("name", ParameterPack::KeyType::Required, name);
     auto ag_ptr = AtomGroup_Factory(type, ag_packs[i]);
     master_input_pack.addAtomGroup(name, ag_ptr);
-  } 
-
+  }
+  auto ag_reg_ = master_input_pack.AtomGroupMap();
   std::vector<InputPack> pv_packs = master_input_pack.buildDerivedInputPacks("ProbeVolume");
   for(std::size_t i = 0; i < pv_packs.size(); i++){
     std::string type, name;
@@ -40,8 +39,7 @@ int main(int argc, char **argv)
     pv_packs[i].params().readString("name", ParameterPack::KeyType::Required, name);
     auto pv_ptr = ProbeVolume_Factory(type, pv_packs[i]);
     master_input_pack.addProbeVolume(name, pv_ptr);
-  }  
-  
+  } 
   std::vector<InputPack> calc_packs = master_input_pack.buildDerivedInputPacks("Calculation");
   for(std::size_t i = 0; i < calc_packs.size(); i++){
     std::string type, name;
@@ -49,12 +47,11 @@ int main(int argc, char **argv)
     calc_packs[i].params().readString("name", ParameterPack::KeyType::Required, name);
     auto calc_ptr = Calculation_Factory(type, calc_packs[i]);
     master_input_pack.addCalculation(name, calc_ptr);
-  }  
-
+  } 
   Trajectory* traj_ptr = loadTrajectory(trajectory_file_);
   auto& traj = *traj_ptr;
   int step_iterator = 0;
-  auto ag_reg_ = master_input_pack.AtomGroupMap();
+  
   auto pv_reg_ = master_input_pack.ProbeVolumeMap();
   auto calc_reg_ = master_input_pack.CalculationMap();
   while(traj.nextFrame()){
@@ -76,13 +73,13 @@ int main(int argc, char **argv)
     int finished_counter = 0;
     for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       i->second->calculate();
-      finished_counter += (int)i->second->isFinished(); //if every calculation is done break
+      finished_counter += (int)i->second->isFinished(); //count the number of calculations that are completely finished
     }
     //perform all outputs
      for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
       i->second->printConsoleReport();
       i->second->output();
-    }
+    } 
     step_iterator++;
     //clear all update flags
     for(auto i = ag_reg_.begin(); i != ag_reg_.end(); i++){

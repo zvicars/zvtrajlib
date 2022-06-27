@@ -38,9 +38,13 @@ public:
   virtual std::string getDumpString(){
     return "";
   }
+  virtual bool checkSumCheck(){
+    return 1;
+  }
 protected:
   std::string name_;
   std::string type_;
   std::vector<int> global_indices_;
   bool update_flag_;
+  int checkSum;
 };

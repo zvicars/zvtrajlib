@@ -19,6 +19,7 @@ protected:
   float time_;
 };
 
+
 class XDRTrajectory : public Trajectory{
 public:
   virtual void getFrame(Box& box) = 0;
@@ -69,6 +70,31 @@ void writeGRO(std::string ofilename, const Box* box);
 void writeXYZ_ov(std::string ofilename, const Box* box, std::array<double, 3> box_size, 
                  std::vector<int> indices, std::vector<std::array<double, 3> > positions);
 inline void readTOP(std::string filename, Box& box){ return; }
+
+
+class GROTrajectory : public Trajectory{
+public:
+  GROTrajectory(std::string grofile){
+    grofile_ = grofile;
+    return;
+  }
+  virtual void getFrame(Box& box){
+    box.time = 0.0;
+    box.frame = 1;
+    readGRO(grofile_, box);
+  }
+  int nextFrame(){
+    if(firstFrame){
+      firstFrame = 0;
+      return 1;
+    }
+    return 0;
+  };
+private:
+  bool firstFrame = 1;
+  std::string grofile_;
+};
+
 static inline Trajectory* loadTrajectory(std::string trajectory_file){
   std::string filetype = trajectory_file.substr(trajectory_file.rfind('.')+1);
   if(filetype == "xtc"){
@@ -79,6 +105,9 @@ static inline Trajectory* loadTrajectory(std::string trajectory_file){
     throw 1;
     return 0;
   }
+  if (filetype == "gro"){
+    return new GROTrajectory(trajectory_file);
+  } 
   std::cout << "Unrecognized trajectory filetype, " << filetype << ".";
   throw 1;
   return 0;

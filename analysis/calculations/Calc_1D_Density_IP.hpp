@@ -26,9 +26,6 @@ public:
   int get_dim(){
     return dim_;
   }
-  bool hasCalculated(){
-    return calcStatus;
-  }
 private:
   int getBin(double x){
     int bin;
@@ -62,7 +59,4 @@ private:
   //coarse-graining
   bool coarseGrain;
   double sigma_;
-
-  //updating
-  bool calcStatus;
 };

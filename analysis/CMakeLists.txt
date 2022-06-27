@@ -45,4 +45,4 @@ target_link_libraries(ANALYSIS PRIVATE TRAJLIB
 if(OpenMP_CXX_FOUND)
 target_link_libraries(ANALYSIS PRIVATE GOLOSIO OpenMP::OpenMP_CXX)
 endif()
-target_compile_options(ANALYSIS PRIVATE -O3 -fopenmp)
+target_compile_options(ANALYSIS PRIVATE -O0 -fopenmp)

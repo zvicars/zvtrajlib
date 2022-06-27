@@ -46,6 +46,9 @@ public:
     update_flag_ = 0;
     calculate_flag_ = 0;
   }
+  std::string getName(){
+    return name_;
+  }
 protected:
   std::string name_, type_, base_;
   double equilibration_, current_time_, end_;

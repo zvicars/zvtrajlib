@@ -33,6 +33,7 @@
 #include "calculations/Calc_DensityField.hpp"
 #include "calculations/Calc_DensityFieldExtra.hpp"
 #include "calculations/Calc_DensityField_Electric.hpp"
+#include "calculations/Calc_DensityField_LJ.hpp"
 #include "calculations/Calc_DensityField_Angle.hpp"
 #include "calculations/Calc_DensityField_Water.hpp"
 #include "calculations/Calc_IceID.hpp"
@@ -68,6 +69,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "dipole") return new Calc_Dipole(input);
   if(key == "angle") return new Calc_Angle(input);
   if(key == "3d_densityelectric") return new Calc_DensityFieldElectric(input);
+  if(key == "3d_densitylj") return new Calc_DensityFieldLJ(input);
   if(key == "3d_densityangle") return new Calc_DensityFieldAngle(input);
   if(key == "3d_densitywater") return new Calc_DensityFieldWater(input);
   if(key == "3d_densityextra") return new Calc_DensityFieldExtra(input);  
