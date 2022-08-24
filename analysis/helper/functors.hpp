@@ -1,6 +1,7 @@
 #pragma once
 #include "Eigen/Eigen"
 #include "unsupported/Eigen/NonLinearOptimization"
+
 template<typename _Scalar, int NX=Eigen::Dynamic, int NY=Eigen::Dynamic>
 struct Functor
 {
@@ -90,3 +91,14 @@ struct logisticStepFunctor : Functor<double>
       return 0;
     }
 };
+
+ /* 
+  Eigen::Vector3d radangles;
+  radangles << angles[2]*M_PI/180.0, angles[1] * M_PI / 180.0, angles[0] * M_PI / 180.0;
+  Eigen::AngleAxisd rollAngle(radangles[0], Eigen::Vector3d::UnitZ());
+  Eigen::AngleAxisd yawAngle(radangles[1], Eigen::Vector3d::UnitY());
+  Eigen::AngleAxisd pitchAngle(radangles[2], Eigen::Vector3d::UnitX());
+  Eigen::Quaternion<double> q = rollAngle * yawAngle * pitchAngle;
+  Eigen::Matrix3d rotationMatrix = q.matrix();
+  rotationMatrix.transposeInPlace();
+  */

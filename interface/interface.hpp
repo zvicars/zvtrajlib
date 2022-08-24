@@ -69,6 +69,8 @@ void writeGRO_ov(std::string ofilename, const Box* box, std::array<double, 3> bo
 void writeGRO(std::string ofilename, const Box* box);                
 void writeXYZ_ov(std::string ofilename, const Box* box, std::array<double, 3> box_size, 
                  std::vector<int> indices, std::vector<std::array<double, 3> > positions);
+void writeXYZ_ov_append(std::string ofilename, std::array<double, 3> box_size, 
+                 std::vector<std::string> names, std::vector<std::array<double, 3> > positions);
 inline void readTOP(std::string filename, Box& box){ return; }
 
 

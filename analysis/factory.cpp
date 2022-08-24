@@ -36,7 +36,13 @@
 #include "calculations/Calc_DensityField_LJ.hpp"
 #include "calculations/Calc_DensityField_Angle.hpp"
 #include "calculations/Calc_DensityField_Water.hpp"
+#include "calculations/Calc_DensityField_Union.hpp"
+#include "calculations/Calc_DensityField_H2Omin.hpp"
 #include "calculations/Calc_IceID.hpp"
+#include "calculations/Calc_SR_LJAtt.hpp"
+#include "calculations/Calc_1D_HBond.hpp"
+#include "calculations/Calc_HBonds.hpp"
+//#include "calculations/Calc_SR_LJTest.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "rectilinear") return new PV_DiscreteRect(input);
@@ -70,8 +76,10 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "angle") return new Calc_Angle(input);
   if(key == "3d_densityelectric") return new Calc_DensityFieldElectric(input);
   if(key == "3d_densitylj") return new Calc_DensityFieldLJ(input);
+  if(key == "3d_union") return new Calc_DensityField_Union(input);
   if(key == "3d_densityangle") return new Calc_DensityFieldAngle(input);
   if(key == "3d_densitywater") return new Calc_DensityFieldWater(input);
+  if(key == "3d_densityh2omin") return new Calc_DensityFieldH2OMin(input);  
   if(key == "3d_densityextra") return new Calc_DensityFieldExtra(input);  
   if(key == "3d_density") return new Calc_DensityField(input);
   if(key == "2d_density") return new Calc_2D_Density(input);
@@ -83,6 +91,9 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "write_avg_pos") return new Calc_Write_AvgPos(input);
   if(key == "rel_pos") return new Calc_Relative_Pos(input);
   if(key == "iceid") return new Calc_IceID(input);
+  if(key == "ljatt") return new Calc_SR_LJAtt(input);
+  if(key == "1dhbond") return new Calc_1D_HBond(input);
+  if(key == "hbond") return new Calc_HBonds(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }

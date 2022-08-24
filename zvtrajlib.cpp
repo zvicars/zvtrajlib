@@ -60,43 +60,43 @@ int main(int argc, char **argv)
       std::cout << "Time: " << b1.time  << " ps " << " Step: " << b1.frame_counter << "\n";
     }
     //update all objects
-    for(auto i = ag_reg_.begin(); i != ag_reg_.end(); i++){
-      i->second->update();
+    for(auto& i : ag_reg_){
+      i.second->update();
     }
-    for(auto i = pv_reg_.begin(); i != pv_reg_.end(); i++){
-      i->second->update();
+    for(auto& i : pv_reg_){
+      i.second->update();
     }
-    for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-      i->second->update();
+    for(auto& i : calc_reg_){
+      i.second->update();
     }
     //run all calculations
     int finished_counter = 0;
-    for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-      i->second->calculate();
-      finished_counter += (int)i->second->isFinished(); //count the number of calculations that are completely finished
+    for(auto& i : calc_reg_){
+      i.second->calculate();
+      finished_counter += (int)i.second->isFinished(); //count the number of calculations that are completely finished
     }
     //perform all outputs
-     for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-      i->second->printConsoleReport();
-      i->second->output();
+     for(auto& i : calc_reg_){
+      i.second->printConsoleReport();
+      i.second->output();
     } 
     step_iterator++;
     //clear all update flags
-    for(auto i = ag_reg_.begin(); i != ag_reg_.end(); i++){
-      i->second->finish();
+    for(auto& i : ag_reg_){
+      i.second->finish();
     }
-    for(auto i = pv_reg_.begin(); i != pv_reg_.end(); i++){
-      i->second->finish();
+    for(auto& i : pv_reg_){
+      i.second->finish();
     }
-    for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-      i->second->finish();
+    for(auto& i : calc_reg_){
+      i.second->finish();
     }
     if(finished_counter >= calc_reg_.size()){
       break;
     }
   }
-  for(auto i = calc_reg_.begin(); i != calc_reg_.end(); i++){
-    i->second->finalOutput();
+  for(auto& i : calc_reg_){
+    i.second->finalOutput();
   }
   delete traj_ptr;
   return 0;

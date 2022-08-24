@@ -11,6 +11,7 @@ add_subdirectory(tools)
 add_subdirectory(cubes)
 add_subdirectory(analysis)
 add_subdirectory(gromanip)
+add_subdirectory(misc)
 add_executable(zvtrajlib zvtrajlib.cpp)
 add_executable(zvmangro zvmangro.cpp)
 

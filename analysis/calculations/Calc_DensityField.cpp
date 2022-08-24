@@ -6,6 +6,9 @@ Calc_DensityField::Calc_DensityField(InputPack& input):Calculation{input}{
   span_.fill(0);
   sigma_ = 0.0;
   input.params().readString("atom_group", KeyType::Required, agname);
+  omode_ = "xyzw";
+  input.params().readString("output_mode", KeyType::Optional, omode_);
+  FANCY_ASSERT(omode_ == "matlab" || omode_ == "xyzw", "Unknown output mode specified for 3d density field calculation.");
   atom_group_ = input.findAtomGroup(agname);
   FANCY_ASSERT(atom_group_ != 0, "Failed to find atom group.");
   coarseGrain_ = 0;
@@ -59,11 +62,12 @@ bool Calc_DensityField::getIndexNoWrap1D(double& pos, int dim, int& ret){
 double Calc_DensityField::Calc_DensityField::getGaussian(const Vec3<double>& x, const Vec3<int>& index){
   Vec3<double> xmin, xmax;
   double eval = 1.0;
+  Vec3<double> x_pbc;
   for(int i = 0; i < 3; i++){
-    double x_pbc = getNearestImage1D(x[i], index[i]*gridspacing_[i] + minx_[i], box_size_[i]);
+    x_pbc[i] = getNearestImage1D(x[i], index[i]*gridspacing_[i] + minx_[i], box_size_[i]);
     xmin[i] = minx_[i] + index[i]*gridspacing_[i];
     xmax[i] = xmin[i] + gridspacing_[i];
-    eval *= h_x(x_pbc, xmin[i], xmax[i], sigma_, 2.0*sigma_);
+    eval *= h_x(x_pbc[i], xmin[i], xmax[i], sigma_, 2.0*sigma_);
   }
   return eval;
 }
@@ -111,6 +115,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
             idx_temp[1] = wrapIndex(idx_ref[1] + j, npoints_[1]);
             for(int k = -span_[2]; k <= span_[2]; k++){
               idx_temp[2] = wrapIndex(idx_ref[2], npoints_[2]);
+
               gridvals_[_map31(idx_temp)] += getGaussian(position, idx_temp);
             }
           }
@@ -148,19 +153,50 @@ std::string Calc_DensityField::printConsoleReport(){
   return "";
 }
 void Calc_DensityField::finalOutput(){
-  avggridvals_ = (1.0/(double)nframes_) * avggridvals_;
-  avggridspacing_ = (1.0/(double)nframes_)  * avggridspacing_;
+  std::vector<double> avggridvals2_;
+  Vec3<double> avggridspacing2_;
+  avggridvals2_ = (1.0/(double)nframes_) * avggridvals_;
+  avggridspacing2_ = (1.0/(double)nframes_)  * avggridspacing_;
   std::ofstream ofile(base_ + "_DensityField.txt");
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for " + name_);
-  for(int i = 0; i < npoints_[0]; i++){
+  if(omode_ == "xyzw"){
+    for(int i = 0; i < npoints_[0]; i++){
     for(int j = 0; j < npoints_[1]; j++){
-      for(int k = 0; k < npoints_[2]; k++)
-      {
-        Vec3<int> pos = {i,j,k};
-        int idx = _map31(pos);
-        ofile << i << "   " << j << "   " << k << "   " << avggridvals_[idx] << "\n";
+    for(int k = 0; k < npoints_[2]; k++){
+          Vec3<int> pos = {i,j,k};
+          int idx = _map31(pos);
+          if(omode_ == "xyzw")
+          ofile << i << "   " << j << "   " << k << "   " << avggridvals2_[idx] << "\n";
+          else if(omode_ == "matlab"){
+            ofile << avggridvals2_[idx] << "   ";
+          }
+        }
       }
     }
   }
+
+  else if(omode_ == "matlab"){
+    ofile << "\%nx = [ " << npoints_[0] << " " << npoints_[1] << " " << npoints_[2] << " ]\n";
+    for(int k = 0; k < npoints_[2]; k++){
+    for(int j = 0; j < npoints_[1]; j++){
+    for(int i = 0; i < npoints_[0]; i++){
+          Vec3<int> pos = {i,j,k};
+          int idx = _map31(pos);
+          ofile << avggridvals2_[idx] << "   ";
+        }
+      }
+    }
+  }
+  else{
+    FANCY_ASSERT(0, "Unknown output mode specified...");
+  }
+  ofile.close();
   return;
 }
+  DensityFieldDataPack Calc_DensityField::getAverageDatapack(){
+    DensityFieldDataPack output;
+    output.gridspacing_ = avggridspacing_ * (1.0/(double)nframes_);
+    output.gridvals_ = avggridvals_ * (1.0/(double)nframes_);
+    output.npoints_ = npoints_;
+    return output;
+  }

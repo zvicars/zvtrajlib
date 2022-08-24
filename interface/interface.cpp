@@ -43,3 +43,21 @@ void writeXYZ_ov(std::string ofilename, const Box* box, std::array<double, 3> bo
   ofile << std::endl;
   return;
 }
+
+void writeXYZ_ov_append(std::string ofilename, std::array<double, 3> box_size, 
+                 std::vector<std::string> names, std::vector<std::array<double, 3> > positions)
+{
+  std::ofstream ofile(ofilename, std::ios_base::app);
+  if(!ofile.is_open()){
+    std::cerr << "Failed to open output file stream when writing xyz file." << std::endl;
+    throw;
+  }
+  ofile << names.size() << "\n\n";
+  for(int i = 0; i < names.size(); i++){
+    auto pos = positions[i];
+    auto name = names[i];
+    ofile << name << "     " << 10.0*pos[0] << "     " << 10.0*pos[1] << "     " << 10.0*pos[2] << "\n";
+  }
+  ofile << std::endl;
+  return;
+}

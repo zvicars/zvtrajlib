@@ -1,6 +1,24 @@
 #pragma once
 #include "Calculation.hpp"
 #include "../../tools/pbcfunctions.hpp"
+//structure that minimally contains a density_field snapshot
+struct DensityFieldDataPack{
+  std::vector<double> gridvals_;
+  Vec3<int> npoints_;
+  Vec3<double> gridspacing_;
+  //need to keep track of particular 3d array scheme as well
+  int _map31(std::array<int,3>& coord) const{
+    return (coord[2]*npoints_[0]*npoints_[1]) + (coord[1]*npoints_[0]) + coord[0];
+  }
+  Vec3<int> _map13(int idx) const{
+    Vec3<int> eval;
+    eval[2] = idx / (npoints_[0] * npoints_[1]);
+    idx -= (eval[2] * npoints_[0] * npoints_[1]);
+    eval[1] = idx / npoints_[0];
+    eval[0] = idx % npoints_[0];
+    return eval;
+  } 
+};
 class Calc_DensityField : public Calculation{
 public:
   Calc_DensityField(InputPack& input);
@@ -8,6 +26,10 @@ public:
   virtual void update();
   virtual std::string printConsoleReport();
   virtual void finalOutput();
+  std::array<std::size_t, 3> size(){
+    return {(std::size_t)npoints_[0], (std::size_t)npoints_[1], (std::size_t)npoints_[2]};
+  }
+  DensityFieldDataPack getAverageDatapack();
 protected:
   Vec3<int> getIndex(const Vec3<double>& pos);
   bool getIndexNoWrap1D(double& pos, int dim, int& ret);
@@ -39,4 +61,5 @@ protected:
   //stuff for coarse-graining
   double sigma_; Vec3<int> span_;
   int nframes_;
+  std::string omode_;
 };

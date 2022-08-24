@@ -199,6 +199,14 @@ void boxtools::translateAtoms(Box& box, Vec3<double> offset){
   return;
 }
 
+void boxtools::flipAtoms(Box& box, int axis){
+  FANCY_ASSERT(axis < 3, "Invalid axis specified in boxtools::flipAtoms()");
+  for(auto& atom : box.atoms){
+    atom.x[axis] = -atom.x[axis];
+  }
+  return;
+}
+
 void boxtools::scaleAtoms(Box& box, Vec3<double> offset){
   for(auto& atom : box.atoms){
     atom.x[0] *= offset[0];

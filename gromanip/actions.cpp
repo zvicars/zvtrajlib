@@ -217,6 +217,17 @@ void boxtools::actions::rotate_vector(GroManipData& data, const std::vector<std:
 void boxtools::actions::flip(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name an axis, and an output box name
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::flip(), requires input_box_name, axis_name, and output_box_name");
+  Box *b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::rotate()"); 
+  Box* b_out = data.findBox(args[2]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box box_out = *b1;
+  int axis = std::stoi(args[1]);
+  boxtools::flipAtoms(box_out, axis);
+  *b_out = box_out;
+  data.addBox(args[2], b_out); 
   return;
 }
 void boxtools::actions::translate(GroManipData& data, const std::vector<std::string>& args){

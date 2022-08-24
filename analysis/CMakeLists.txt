@@ -13,6 +13,7 @@ atomgroups/AtomGroup_not.cpp
 atomgroups/AtomGroup_system.cpp
 calculations/Calculation.cpp
 calculations/Calc_Histogram.cpp
+calculations/Calc_DensityField_Union.cpp
 calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
 calculations/Calc_Nv_wFit_IP.cpp
@@ -29,6 +30,9 @@ calculations/Calc_Lattice_Motion.cpp
 calculations/Calc_Write_AvgPos.cpp
 calculations/Calc_Relative_Pos.cpp
 calculations/Calc_IceID.cpp
+calculations/Calc_SR.cpp
+calculations/Calc_DensityField_H2Omin.cpp
+calculations/Calc_HBonds.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp

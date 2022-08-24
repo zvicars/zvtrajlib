@@ -1,12 +1,12 @@
 #include "Calc_1D_Density.hpp"
 #include "../helper/functors.hpp"
-
-inline double heaviside(double x){
+#include "../../tools/stlmath.hpp"
+inline double Calc_1D_Density::heaviside(double x){
 	if(x <= 0) return 0;
 	return 1.0; 
 }
 
-inline double h_x(double x, double xmin, double xmax, double sigma, double xc){
+double Calc_1D_Density::h_x(double x, double xmin, double xmax, double sigma, double xc){
     double eval = 0.0;
     double k, k1, k2, invk;
     double sigma2 = sigma*sigma;
@@ -61,10 +61,9 @@ void Calc_1D_Density::add_gaussian(double x_in)
     #pragma omp parallel for
     for(int ix = lxmin; ix <= lxmax; ix++)
     {
-      int idx;
-      idx = ix;
-      if(idx >= grid_density_.size()) idx -= grid_density_.size();
-      else if(idx < 0) idx += grid_density_.size();
+      int idx = ix;
+      if(idx >= grid_density_.size()) continue;
+      else if(idx < 0) continue;
       double xmin, xmax;
       xmin = ix * grid_spacing_;
       xmax = xmin + grid_spacing_;
@@ -75,17 +74,15 @@ void Calc_1D_Density::add_gaussian(double x_in)
 
 void Calc_1D_Density::calculate(){
   if(!doCalculate()) return;
-  for(int i = 0; i < atom_group_->getIndices().size(); i++ ){
-    int idx = atom_group_->getIndices()[i];
+  auto& indices = atom_group_->getIndices();
+  for(auto idx : indices){
     auto position = box->atoms[idx].x;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
   }
-
-  for(int i = 0; i < grid_density_.size(); i++){
-    average_grid_density_[i] += grid_density_[i];
-  }
+  average_grid_density_ = average_grid_density_ + grid_density_;
   average_grid_spacing_ += grid_spacing_;
+
   if(fitSigmoidal){
   Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
   int iterator = 0;
@@ -94,7 +91,6 @@ void Calc_1D_Density::calculate(){
     data(iterator, 0) = (iterator + idx_range_[0] + 0.5)*grid_spacing_;
     iterator++;
   }
-  
   logisticFunctor f1(data);
   Eigen::LevenbergMarquardt<logisticFunctor> lm_algo(f1);
   Eigen::VectorXd b(3);
@@ -107,13 +103,14 @@ void Calc_1D_Density::calculate(){
   tvec_.push_back(current_time_);
   frame_vec_.push_back(current_frame_);
   }
+
   frame_counter_++;
 }
 void Calc_1D_Density::update(){
   if(hasUpdated()) return;
   Calculation::update();
-  for(int i = 0; i < grid_density_.size(); i++){
-    grid_density_[i] = 0.0;
+  for(auto& val : grid_density_){
+    val = 0.0;
   }
   box_size_ = box->boxvec[dim_][dim_];
   grid_spacing_ = box_size_ / (double)(npoints_);

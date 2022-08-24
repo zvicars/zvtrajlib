@@ -7,3 +7,5 @@ add_library (TOOLS STATIC
 )
 target_include_directories(TOOLS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(TOOLS PRIVATE -fPIC)
+
+add_subdirectory(test)

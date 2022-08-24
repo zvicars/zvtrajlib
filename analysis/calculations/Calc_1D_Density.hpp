@@ -23,7 +23,7 @@ public:
   int get_dim(){
     return dim_;
   }
-private:
+protected:
   int getBin(double x){
     int bin;
     double dim_size = box_size_;
@@ -38,6 +38,8 @@ private:
     return;
   }
   void add_gaussian(double x_in);
+  double h_x(double x, double xmin, double xmax, double sigma, double xc);
+  double heaviside(double x);
   Vec<double> grid_density_, average_grid_density_;
   int dim_, npoints_, frame_counter_; //the axis that will be kept
   double grid_spacing_, box_size_, average_grid_spacing_;

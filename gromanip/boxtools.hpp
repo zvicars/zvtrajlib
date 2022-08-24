@@ -60,6 +60,7 @@ namespace boxtools{
   void rotateEulerAngles(Box& box, Vec3<double> angles);
   void invrotateEulerAngles(Box& box, Vec3<double> angles);
   void translateAtoms(Box& box, Vec3<double> offset);
+  void flipAtoms(Box& box, int axis);
   void scaleAtoms(Box& box, Vec3<double> offset);
   void wrapPBC(Box& box);
   void shrinkWrap(Box& box, double buffer = 0.0);

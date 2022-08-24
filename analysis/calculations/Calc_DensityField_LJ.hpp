@@ -4,6 +4,12 @@
 #include "../../tools/pbcfunctions.hpp"
 #include "../../tools/cellgrid.hpp"
 #include <unordered_map>
+#include <cstdlib>
+double fRand(double fMin, double fMax)
+{
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
 //scheme clusters, omitting grid densities below thresh
 //each cluster is averaged, with the sum needing t o
 
@@ -38,15 +44,37 @@ class Calc_DensityFieldLJ : public Calc_DensityField{
       for(auto& value : gridvals_){
         value = 0.0;
       }
-      resetCellGrid();
+      for(int i = 0; i < 3; i++){
+        span_[i] = ceil(cutoff_ / gridspacing_[i]);
+      }
+      auto atomIndices = atom_group_->getIndices();
+      //fast but doesn't work across pbc's
+      //pragma omp parallel for
       #pragma omp parallel for
-      for(int i = 0; i < gridvals_.size(); i++){
-        auto idx3d = _map13(i);
-        std::array<double, 3> realpos_;
-        for(int j = 0; j < 3; j++){
-          realpos_[j] = idx3d[j]*gridspacing_[j] + minx_[j];
+      for(auto idx : atomIndices){
+        auto atom = box->atoms[idx];
+        auto pos = atom.x;
+        Vec3<double> min_pos;
+        Vec3<double> max_pos; 
+        for(int i = 0; i < 3; i++){
+          min_pos[i] = std::fmax((pos[i] - minx_[i]) / gridspacing_[i] - span_[i], 0);
+          max_pos[i] = std::fmin((pos[i] - minx_[i]) / gridspacing_[i] + span_[i], npoints_[i]-1);
         }
-        gridvals_[i] = LJ_sum(realpos_);
+        Vec3<double> r1;
+        for(int i = min_pos[0]; i <= max_pos[0]; i++){
+          for(int j = min_pos[1]; j <= max_pos[1]; j++){
+            for(int k = min_pos[2]; k <= max_pos[2]; k++){
+              r1[0] = i*gridspacing_[0] + minx_[0];
+              r1[1] = j*gridspacing_[1] + minx_[1];
+              r1[2] = k*gridspacing_[2] + minx_[2];
+              Vec3<int> idx3d = {i,j,k};
+              auto r = getDistance(r1, pos, box_size_);
+              if(r > cutoff_) continue;
+              auto idx1d = _map31(idx3d);
+              gridvals_[idx1d] += LJ_single(r, sigma_map_.find(atom.name)->second, eps_map_.find(atom.name)->second);
+            }
+          }
+        }
       }
       nframes_++;
       avggridvals_ = avggridvals_ + gridvals_;
@@ -65,25 +93,7 @@ class Calc_DensityFieldLJ : public Calc_DensityField{
       double r12 = r6*r6;
       return -4.0*epsilon*(r6 - r12);
     }
-    inline void resetCellGrid(){
-      cell_grid_.reset(cutoff_, box_size_);
-      auto& indices = atom_group_->getIndices();
-      for(auto index : indices){
-        cell_grid_.addIndexToGrid(index, box->atoms[index].x);
-      }
-    }
-    //usr summed over all atoms for a given position with a test charge of 1
-    inline double LJ_sum(std::array<double,3> r1){
-      double sum = 0;
-      auto nearbyAtomIndices = cell_grid_.getNearbyIndices(r1);
-      for(auto idx : nearbyAtomIndices){
-        auto& atom = box->atoms[idx];
-        auto r = getDistance(r1, atom.x, box_size_);
-        sum += LJ_single(r, sigma_map_.find(atom.name)->second, eps_map_.find(atom.name)->second);
-      }
-      return sum; 
-    }
     std::map<std::string, double> eps_map_, sigma_map_;
     double cutoff_, sigma_, alpha_, beta_;
-    CellGrid cell_grid_;
+    double max_spacing_;
 };
