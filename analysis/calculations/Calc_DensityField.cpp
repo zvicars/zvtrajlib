@@ -101,7 +101,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
             if(idx_temp[1] < 0 || idx_temp[1] >= npoints_[1]) continue;
             for(int k = -span_[2]; k <= span_[2]; k++){
               idx_temp[2] = idx_ref[2] + k;
-              if(idx_temp[2] < 0 || idx_temp[2] >= npoints_[2]) continue;
+              if(hasBoxVec_ && (idx_temp[2] < 0 || idx_temp[2] >= npoints_[2])) continue;
               gridvals_[_map31(idx_temp)] += getGaussian(position, idx_temp);
             }
           }
