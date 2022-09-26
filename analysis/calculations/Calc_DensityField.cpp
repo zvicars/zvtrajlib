@@ -123,7 +123,13 @@ void Calc_DensityField::Calc_DensityField::calculate(){
       }
     }
     else{
-      if(!isInBox(position)) continue; 
+      bool testflag = 0;
+      if(hasBoxVec_){
+        for(int i = 0; i < 3; i++){
+          if(idx_ref[i] < 0 || idx_ref[i] >= npoints_[i]) testflag = 1;
+        }
+      }
+      if(testflag) continue;
       gridvals_[_map31(idx_ref)] += 1.0;
     }
   }
