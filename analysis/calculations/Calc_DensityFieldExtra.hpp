@@ -35,6 +35,8 @@ class Calc_DensityFieldExtra : public Calc_DensityField{
     }
     virtual void finalOutput(){
       Calc_DensityField::finalOutput();
+      avggridvals_ = (1.0/(double)nframes_) * avggridvals_;
+      avggridspacing_ = (1.0/(double)nframes_)  * avggridspacing_;
       std::vector<bool> isClaimed(avggridvals_.size(), 0);
       for(int i = 0; i < avggridvals_.size(); i++){
         if(avggridvals_[i] > start_thresh_ && !isClaimed[i]){
