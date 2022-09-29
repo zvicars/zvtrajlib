@@ -57,7 +57,7 @@ protected:
   std::vector<double> gridvals_, avggridvals_;
   Vec3<int> npoints_;
   Vec3<double> gridspacing_, avggridspacing_, minx_, maxx_, box_size_;
-  bool hasBoxVec_, coarseGrain_;
+  bool boxvec_provided_, coarseGrain_;
   //stuff for coarse-graining
   double sigma_; Vec3<int> span_;
   int nframes_;

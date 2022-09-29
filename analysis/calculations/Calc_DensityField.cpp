@@ -24,8 +24,8 @@ Calc_DensityField::Calc_DensityField(InputPack& input):Calculation{input}{
     npoints_[i] = npoints[i];
   }
   FANCY_ASSERT(npoints.size() == 3, "Improper size for npoints. Needs 3: nx, ny, nz");
-  hasBoxVec_ = input.params().readVector("box_vector", KeyType::Optional, box);
-  if(hasBoxVec_){
+  boxvec_provided_ = input.params().readVector("box_vector", KeyType::Optional, box);
+  if(boxvec_provided_){
     FANCY_ASSERT(box.size() == 6, "Improper size for box. Needs 6: min_x, min_y, min_z, max_x, max_y, max_z");
     for(int i = 0; i<3; i++){
       minx_[i] = box[i];
@@ -92,7 +92,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
     //will not use periodic boundaries if using a subvolume
     if(coarseGrain_){
       Vec3<int> idx_temp;
-      if(hasBoxVec_){
+      if(boxvec_provided_){
         for(int i = -span_[0]; i <= span_[0]; i++){
           idx_temp[0] = idx_ref[0] + i;
           if(idx_temp[0] < 0 || idx_temp[0] >= npoints_[0]) continue;
@@ -101,7 +101,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
             if(idx_temp[1] < 0 || idx_temp[1] >= npoints_[1]) continue;
             for(int k = -span_[2]; k <= span_[2]; k++){
               idx_temp[2] = idx_ref[2] + k;
-              if(hasBoxVec_ && (idx_temp[2] < 0 || idx_temp[2] >= npoints_[2])) continue;
+              if(boxvec_provided_ && (idx_temp[2] < 0 || idx_temp[2] >= npoints_[2])) continue;
               gridvals_[_map31(idx_temp)] += getGaussian(position, idx_temp);
             }
           }
@@ -115,7 +115,6 @@ void Calc_DensityField::Calc_DensityField::calculate(){
             idx_temp[1] = wrapIndex(idx_ref[1] + j, npoints_[1]);
             for(int k = -span_[2]; k <= span_[2]; k++){
               idx_temp[2] = wrapIndex(idx_ref[2], npoints_[2]);
-
               gridvals_[_map31(idx_temp)] += getGaussian(position, idx_temp);
             }
           }
@@ -124,7 +123,7 @@ void Calc_DensityField::Calc_DensityField::calculate(){
     }
     else{
       bool testflag = 0;
-      if(hasBoxVec_){
+      if(boxvec_provided_){
         for(int i = 0; i < 3; i++){
           if(idx_ref[i] < 0 || idx_ref[i] >= npoints_[i]) testflag = 1;
         }
@@ -143,7 +142,7 @@ void Calc_DensityField::update(){
   for(int i = 0; i < 3; i++){
     box_size_[i] = box->boxvec[i][i];
   }
-  if(!hasBoxVec_){
+  if(!boxvec_provided_){
     for(int i = 0; i < 3; i++){
       minx_[i] = 0;
       maxx_[i] = box->boxvec[i][i];

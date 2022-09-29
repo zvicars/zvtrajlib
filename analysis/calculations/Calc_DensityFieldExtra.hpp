@@ -21,7 +21,7 @@ class Calc_DensityFieldExtra : public Calc_DensityField{
           for(int k = -span_; k<=span_; k++){
             if(i == 0 && j == 0 && k == 0) continue;
             coord2[0] = coord[0]+i; coord2[1] = coord[1]+j; coord2[2] = coord[2]+k;
-            if(hasBoxVec_ && (coord2[0] < 0 || coord2[1] < 0 || coord2[2] < 0 || 
+            if(boxvec_provided_ && (coord2[0] < 0 || coord2[1] < 0 || coord2[2] < 0 || 
                 coord2[0] >= npoints_[0] || coord2[1] >= npoints_[1] || coord2[2] >= npoints_[2])) continue;
             int idx = _map31(coord2);
             if(avggridvals_[idx] > thresh_ && !isClaimed[idx]){
@@ -59,7 +59,7 @@ class Calc_DensityFieldExtra : public Calc_DensityField{
         for(auto idx : cluster){
           sum += avggridvals_[idx];
         }
-        if(sum > dclust_){
+        if(sum < dclust_){
           clusters_.erase(clusters_.begin() + i);
         }
       }
