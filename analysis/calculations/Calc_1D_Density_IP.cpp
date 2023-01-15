@@ -90,7 +90,7 @@ void Calc_1D_Density_IP::calculate(){
   }
   auto indices = atom_group_->getIndices();
   int counter = 0;
-  double com_offset = 0.0;
+  double com_dx_ = 0.0;
   if(com_corr_ != 0){
     double com_offset_temp = 0.0;
     //first, figure out if split near edge of box by comparing variances for 
@@ -111,10 +111,11 @@ void Calc_1D_Density_IP::calculate(){
     var1 /= (double)indices.size();
     //if half-length shifting gives lower variance, then we'll want to bake in an initial half-length shift
     //suggests that density is straddling box edge
-    if(var1 < var0)com_offset = 0.5*box_size_ - com1;
-    else com_offset = -com0;
+    if(var1 < var0)com_dx_ = 0.5*box_size_ - com1;
+    else com_dx_ = -com0;
     //if comm_corr_ == 1, we want the high density to be in the center of the box instead of 0
-    if(com_corr_ == 1) com_offset += 0.5*box_size_;
+    if(com_corr_ == 1) com_dx_ += 0.5*box_size_;
+    com_dx_ = com_dx_;
   }
   for(auto idx : indices){
     counter++;
@@ -134,7 +135,7 @@ void Calc_1D_Density_IP::calculate(){
      + std::to_string(box->time));
 
     auto position = box->atoms[idx].x;
-    position[dim_] += com_offset;
+    position[dim_] += com_dx_;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
   }

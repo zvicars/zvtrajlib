@@ -23,6 +23,9 @@ public:
   double get_x2(){
     return params_[2];
   }
+  double get_com_dx(){
+    return com_dx_;
+  }
   int get_dim(){
     return dim_;
   }
@@ -59,5 +62,6 @@ private:
   //coarse-graining
   bool coarseGrain;
   int com_corr_;
+  double com_dx_;
   double sigma_;
 };
