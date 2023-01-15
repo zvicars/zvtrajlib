@@ -1,6 +1,6 @@
 #include "Calc_1D_Density_IP.hpp"
 #include "../helper/functors.hpp"
-
+#include "../../tools/pbcfunctions.hpp"
 inline double heaviside(double x){
 	if(x <= 0) return 0;
 	return 1.0; 
@@ -42,6 +42,12 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   idx_range_[0] = xrange[0];
   idx_range_[1] = xrange[1];
   
+  //com_corr determines center-of-mass correction behavior
+  //after computing a 1d density field, it will translate it such that the maximum density
+  //is either in the middle of the box 1, the left-edge of the box 2 or it stays uncorrected 0
+  com_corr_ = 0;
+  input.params().readNumber("comcorrect", KeyType::Optional, com_corr_);
+
   frame_counter_ = 0;
   grid_density_.resize(npoints_, 0.0);
   average_grid_density_.resize(npoints_, 0.0);
@@ -84,6 +90,32 @@ void Calc_1D_Density_IP::calculate(){
   }
   auto indices = atom_group_->getIndices();
   int counter = 0;
+  double com_offset = 0.0;
+  if(com_corr_ != 0){
+    double com_offset_temp = 0.0;
+    //first, figure out if split near edge of box by comparing variances for 
+    //normal and half-box shifted configurations
+    double var0=0.0, var1=0.0, com0=0.0, com1=0.0;
+    for(auto idx : indices){
+      com0 += wrapNumber(box->atoms[idx].x[dim_], box_size_);
+      com1 += wrapNumber(box->atoms[idx].x[dim_] + 0.5*box_size_, box_size_);
+    }
+    com0 /= (double)indices.size();
+    com1 /= (double)indices.size();
+    //compute mean-centered variances
+    for(auto idx : indices){
+      var0 += pow(wrapNumber(box->atoms[idx].x[dim_], box_size_) - com0, 2);
+      var1 += pow(wrapNumber(box->atoms[idx].x[dim_] + 0.5*box_size_, box_size_) - com1, 2);
+    }
+    var0 /= (double)indices.size();
+    var1 /= (double)indices.size();
+    //if half-length shifting gives lower variance, then we'll want to bake in an initial half-length shift
+    //suggests that density is straddling box edge
+    if(var1 < var0)com_offset = 0.5*box_size_ - com1;
+    else com_offset = -com0;
+    //if comm_corr_ == 1, we want the high density to be in the center of the box instead of 0
+    if(com_corr_ == 1) com_offset += 0.5*box_size_;
+  }
   for(auto idx : indices){
     counter++;
     bool out_of_range_flag = 1;
@@ -102,9 +134,11 @@ void Calc_1D_Density_IP::calculate(){
      + std::to_string(box->time));
 
     auto position = box->atoms[idx].x;
+    position[dim_] += com_offset;
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
   }
+
   for(int i = 0; i < grid_density_.size(); i++){
     average_grid_density_[i] += grid_density_[i];
   }

@@ -437,6 +437,7 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   std::string bondtypes = getGMXTaggedParams(filetext,"bondtypes");
   std::string pbcbondtypes = getGMXTaggedParams(filetext,"pbcbondtypes");
   std::string exclusiontypes = getGMXTaggedParams(filetext, "exclusiontypes");
+  std::cout << exclusiontypes << std::endl;
   std::string constrainttypes = getGMXTaggedParams(filetext, "constrainttypes");
   std::string angletypes = getGMXTaggedParams(filetext,"angletypes");
   std::string angle2types = getGMXTaggedParams(filetext,"angletypes2"); //uses bonded information

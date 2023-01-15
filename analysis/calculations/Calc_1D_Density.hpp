@@ -50,8 +50,9 @@ protected:
   Vec<double> params_, guess_; // calculated per-frame
   Vec<double> tvec_, frame_vec_;
   Vec<Vec<double> > fits_;
-
   //coarse-graining
   bool coarseGrain;
   double sigma_;
+  bool hasPV_, hasRange_;
+  ProbeVolume* pv_;
 };

@@ -252,7 +252,7 @@ std::vector<ExclusionInst> boxtools::makeExclusions(Box& box, const boxtools::Pa
   for(int i = 0; i < natoms; i++){
     std::vector<int> indexes;
     for(int j = i+1; j < natoms; j++){
-      if(box.atoms[i].resnr != box.atoms[j].resnr) break;
+      //if(box.atoms[i].resnr != box.atoms[j].resnr) break;
       if(!isExclusionInTable(box.atoms[i], box.atoms[j], t)) continue;
       indexes.push_back(box.atoms[j].index);
     }

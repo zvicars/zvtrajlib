@@ -58,5 +58,6 @@ private:
 
   //coarse-graining
   bool coarseGrain;
+  int com_corr_;
   double sigma_;
 };

@@ -33,13 +33,19 @@ Calc_1D_Density::Calc_1D_Density(InputPack& input) : Calculation{input} {
   input.params().readFlag("fit", KeyType::Optional, fitSigmoidal);
   frame_counter_ = 0;
   std::vector<int> xrange;
-  input.params().readVector("x_range", KeyType::Optional, xrange);
-  FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
+  hasRange_ = input.params().readVector("x_range", KeyType::Optional, xrange);
+  if(hasRange_){
+    FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
+    FANCY_ASSERT(xrange.size() == 2, "Invalid guess provided");
+    idx_range_[0] = xrange[0];
+    idx_range_[1] = xrange[1];
+  }
+  else{
+    idx_range_[0] = 0;
+    idx_range_[1] = npoints_ - 1;
+  }
   guess_.resize(3, 1.0);
   input.params().readVector("guess", KeyType::Optional, guess_);
-  FANCY_ASSERT(xrange.size() == 2, "Invalid guess provided");
-  idx_range_[0] = xrange[0];
-  idx_range_[1] = xrange[1];
   frame_counter_ = 0;  
   grid_density_.resize(npoints_, 0.0);
   average_grid_density_.resize(npoints_, 0.0);
@@ -50,6 +56,14 @@ Calc_1D_Density::Calc_1D_Density(InputPack& input) : Calculation{input} {
   if(coarseGrain){
     input.params().readNumber("sigma", KeyType::Optional, sigma_);
   }
+
+  std::string pv_name;
+  hasPV_ = input.params().readString("probevolume", KeyType::Optional, pv_name);
+  if(hasPV_){
+    pv_ = input.findProbeVolume(pv_name);
+    FANCY_ASSERT(pv_ != 0, "failed to find probe volume");
+  }
+
   return;
 }
 
@@ -77,6 +91,11 @@ void Calc_1D_Density::calculate(){
   auto& indices = atom_group_->getIndices();
   for(auto idx : indices){
     auto position = box->atoms[idx].x;
+      if(hasPV_){
+        if(pv_->compute(position) ==0){
+          continue;
+        }
+      }
     if(coarseGrain) add_gaussian(position[dim_]);
     else putInBin(position);
   }
