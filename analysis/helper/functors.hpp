@@ -79,7 +79,7 @@ struct logisticStepFunctor : Functor<double>
       assert(b.size() == 5);
       assert(fjac.rows() == values());
       for(int i = 0; i < values(); i++){
-        Eigen::Vector4d jac_row;
+        Eigen::VectorXd jac_row(5);
         double dx = x[i] - b[2];
         double dx2 = x[i] - b[3];
         jac_row << 1.0/(1+exp(b[1]*dx)) - 1.0/(1+exp(b[1]*dx2)),  
