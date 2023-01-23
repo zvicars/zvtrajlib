@@ -2,6 +2,13 @@
 #include "Calculation.hpp"
 #include <cmath>
 
+struct c1d_fitpack{
+  double x;
+  double x2;
+  double a, b, c1, c2, k;
+  double com_dx;
+  int dim;
+};
 
 class Calc_1D_Density_IP : public Calculation{
 public:
@@ -28,6 +35,19 @@ public:
   }
   int get_dim(){
     return dim_;
+  }
+  c1d_fitpack get_fit_params(){
+    c1d_fitpack data;
+    data.x = get_x();
+    data.x2 = get_x2();
+    data.com_dx = get_com_dx();
+    data.dim = get_dim();
+    data.a = params_[0];
+    data.b = params_[1];
+    data.c1 = params_[2];
+    data.c2 = params_[3];
+    data.k = params_[4];
+    return data;
   }
 private:
   int getBin(double x){

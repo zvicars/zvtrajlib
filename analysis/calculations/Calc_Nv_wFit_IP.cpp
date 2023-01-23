@@ -14,10 +14,11 @@ Calc_Nv_wFit_IP::Calc_Nv_wFit_IP(InputPack& input) : Calc_Nv{input} {
 void Calc_Nv_wFit_IP::calculate(){
   if(!doCalculate()) return;
   if(!(calc_->hasCalculated())) calc_->calculate();
-  int dim = calc_->get_dim();
-  double x1 = calc_->get_x();
-  double x2 = calc_->get_x2();
-  double com_dx = calc_->get_com_dx();
+  auto fit_params = calc_->get_fit_params();
+  int dim = fit_params.dim;
+  double x1 = fit_params.x;
+  double x2 = fit_params.x2;
+  double com_dx = fit_params.com_dx;
   float sum = 0.0;
   for(int i = 0; i < atom_group_->getIndices().size(); i++){
     int idx = atom_group_->getIndices()[i];

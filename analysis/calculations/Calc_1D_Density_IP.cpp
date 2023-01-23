@@ -38,7 +38,10 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
 
   input.params().readVector("guess", KeyType::Optional, guess_);
-  FANCY_ASSERT(guess_.size() == 4, "Invalid guess provided");
+  FANCY_ASSERT(guess_.size() == 4 || guess_.size() == 5, "Invalid guess provided");
+  if(guess_.size() == 4){
+    guess_.push_back(0.0);
+  }
   idx_range_[0] = xrange[0];
   idx_range_[1] = xrange[1];
   
@@ -210,7 +213,8 @@ void Calc_1D_Density_IP::finalOutput(){
 
   std::ofstream ofile(base_ + "_avg_sigmoidal.txt");
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
-  if(fitSigmoidal) ofile << "# " << params_[0] << "   " << params_[1] << "   " <<  params_[2] << "   " <<  params_[3] << std::endl;
+  if(fitSigmoidal) ofile << "# " << params_[0] << "   " << params_[1] << "   " <<  params_[2] << "   " 
+                         <<  params_[3] << "   " << params_[4] << std::endl;
   for(int i = 0; i < average_grid_density_.size(); i++){
     ofile << (i+0.5)*average_grid_spacing_ << "     " << average_grid_density_[i] << std::endl;
   }
