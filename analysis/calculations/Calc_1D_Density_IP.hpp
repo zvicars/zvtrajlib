@@ -63,6 +63,8 @@ private:
     grid_density_[idx] += 1.0;
     return;
   }
+  void performFitStep();
+  void performFitAvg();
   void add_gaussian(double x_in);
   Vec<double> grid_density_, average_grid_density_;
   int dim_, npoints_, frame_counter_; //the axis that will be kept
@@ -78,6 +80,7 @@ private:
   Vec<double> tvec_, frame_vec_;
   Vec< std::array<double,5> > fits_;
   std::array<double,5> params_;
+  std::array<bool,5> fix_;
 
   //coarse-graining
   bool coarseGrain;

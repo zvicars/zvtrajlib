@@ -39,8 +39,10 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
 
   input.params().readVector("guess", KeyType::Optional, guess_);
   FANCY_ASSERT(guess_.size() == 4 || guess_.size() == 5, "Invalid guess provided");
+  fix_.fill(0);
   if(guess_.size() == 4){
     guess_.push_back(0.0);
+    fix_[4] = 1;
   }
   idx_range_[0] = xrange[0];
   idx_range_[1] = xrange[1];
@@ -156,30 +158,7 @@ void Calc_1D_Density_IP::calculate(){
     average_grid_density_[i] += grid_density_[i];
   }
   average_grid_spacing_ += grid_spacing_;
-  
-  if(fitSigmoidal){
-  Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
-  int iterator = 0;
-  for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
-    data(iterator, 1) = grid_density_[i];
-    data(iterator, 0) = (iterator+idx_range_[0]+0.5)*grid_spacing_;
-    iterator++;
-  }
-  
-  logisticStepFunctor f1(data);
-  Eigen::LevenbergMarquardt<logisticStepFunctor> lm_algo(f1);
-  Eigen::VectorXd b(5);
-  b << guess_[0], guess_[1], guess_[2], guess_[3], guess_[4];
-  int info = lm_algo.minimize(b);  
-  params_[0] = b[0];
-  params_[1] = b[1];
-  params_[2] = b[2];
-  params_[3] = b[3];
-  params_[4] = b[4];
-  fits_.push_back(params_);
-  tvec_.push_back(current_time_);
-  frame_vec_.push_back(current_frame_);
-  }
+  performFitStep();
   frame_counter_++;
   return;
 }
@@ -201,27 +180,7 @@ void Calc_1D_Density_IP::finalOutput(){
     gridval *= 1.0/(double)frame_counter_;
   }
   average_grid_spacing_*= 1.0/frame_counter_;
-  if(fitSigmoidal){
-  Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
-  int iterator = 0;
-  for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
-    data(iterator, 1) = average_grid_density_[i];
-    data(iterator, 0) = (iterator+idx_range_[0]+0.5)*average_grid_spacing_;
-    iterator++;
-  }
-  
-  logisticStepFunctor f1(data);
-  Eigen::LevenbergMarquardt<logisticStepFunctor> lm_algo(f1);
-  Eigen::VectorXd b(5);
-  b << guess_[0], guess_[1], guess_[2], guess_[3], guess_[4];
-  int info = lm_algo.minimize(b);  
-  params_[0] = b(0);
-  params_[1] = b(1);
-  params_[2] = b(2);
-  params_[3] = b(3);
-  params_[4] = b(4);
-  }
-
+  performFitAvg();
   std::ofstream ofile(base_ + "_avg_sigmoidal.txt");
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
   if(fitSigmoidal) ofile << "# " << params_[0] << "   " << params_[1] << "   " <<  params_[2] << "   " 
@@ -243,5 +202,52 @@ void Calc_1D_Density_IP::finalOutput(){
     }
     ofile.close();
   }
+  return;
+}
+
+void Calc_1D_Density_IP::performFitStep(){
+  if(!fitSigmoidal) return;
+  Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
+  int iterator = 0;
+  for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
+    data(iterator, 1) = grid_density_[i];
+    data(iterator, 0) = (iterator+idx_range_[0]+0.5)*grid_spacing_;
+    iterator++;
+  }
+  logisticStepFunctor f1(data, fix_);
+  Eigen::LevenbergMarquardt<logisticStepFunctor> lm_algo(f1);
+  Eigen::VectorXd b(5);
+  b << guess_[0], guess_[1], guess_[2], guess_[3], guess_[4];
+  int info = lm_algo.minimize(b);  
+  params_[0] = b(0);
+  params_[1] = b(1);
+  params_[2] = b(2);
+  params_[3] = b(3);
+  params_[4] = b(4);
+  fits_.push_back(params_);
+  tvec_.push_back(current_time_);
+  frame_vec_.push_back(current_frame_);
+}
+
+void Calc_1D_Density_IP::performFitAvg(){
+  if(!fitSigmoidal) return;
+  Eigen::MatrixXd data(idx_range_[1] - idx_range_[0] + 1, 2);
+  int iterator = 0;
+  for(int i = idx_range_[0]; i <= idx_range_[1]; i++){
+    data(iterator, 1) = average_grid_density_[i];
+    data(iterator, 0) = (iterator+idx_range_[0]+0.5)*average_grid_spacing_;
+    iterator++;
+  }
+  
+  logisticStepFunctor f1(data, fix_);
+  Eigen::LevenbergMarquardt<logisticStepFunctor> lm_algo(f1);
+  Eigen::VectorXd b(5);
+  b << guess_[0], guess_[1], guess_[2], guess_[3], guess_[4];
+  int info = lm_algo.minimize(b);  
+  params_[0] = b(0);
+  params_[1] = b(1);
+  params_[2] = b(2);
+  params_[3] = b(3);
+  params_[4] = b(4);
   return;
 }

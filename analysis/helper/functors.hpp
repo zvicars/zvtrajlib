@@ -60,9 +60,11 @@ struct logisticFunctor : Functor<double>
 struct logisticStepFunctor : Functor<double>
 {
     Eigen::VectorXd x, y;
-    logisticStepFunctor(Eigen::MatrixXd data): Functor<double>(5,Eigen::Dynamic) {
+    std::array<bool,5> fix;
+    logisticStepFunctor(Eigen::MatrixXd data, std::array<bool,5> fix_in): Functor<double>(5,Eigen::Dynamic) {
       x = data.col(0);
       y = data.col(1);
+      fix = fix_in;
       m_values = data.rows();
     };
     int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec)
@@ -87,6 +89,9 @@ struct logisticStepFunctor : Functor<double>
                    b[0]*b[1]*exp(b[1]*dx)/std::pow( 1 + exp(b[1]*dx), 2),
                    -b[0]*b[1]*exp(b[1]*dx2)/std::pow( 1 + exp(b[1]*dx2), 2), 
                    1;
+        for(int j = 0; j < 5; j++){
+          if(fix[j] == 1) jac_row[j] = 0;
+        }
         fjac.row(i) = jac_row;
       }
       return 0;
