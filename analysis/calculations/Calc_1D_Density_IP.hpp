@@ -17,7 +17,7 @@ public:
   virtual void update();
   virtual std::string printConsoleReport();
   virtual void finalOutput();
-  std::array<double,4> getFit(){
+  std::array<double,5> getFit(){
     if(!fitSigmoidal){
       std::cout << "1D density profile is not fitting a sigmoidal." << std::endl;
       throw 0;
@@ -76,8 +76,8 @@ private:
   Vec<double> guess_; // calculated per-frame
   
   Vec<double> tvec_, frame_vec_;
-  Vec< std::array<double,4> > fits_;
-  std::array<double,4> params_;
+  Vec< std::array<double,5> > fits_;
+  std::array<double,5> params_;
 
   //coarse-graining
   bool coarseGrain;
