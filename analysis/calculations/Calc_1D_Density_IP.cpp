@@ -64,6 +64,12 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   if(coarseGrain){
     input.params().readNumber("sigma", KeyType::Required, sigma_);
   }
+  std::string pv_name;
+  input.params().readString("probe_volume", KeyType::Required, pv_name);
+  auto pv_pointer = input.findProbeVolume(pv_name);
+  FANCY_ASSERT(pv_pointer != 0, "Failed to find specified probe volume.");
+  pv_ = pv_pointer;
+
   return;
 }
 
@@ -99,6 +105,7 @@ void Calc_1D_Density_IP::calculate(){
     //normal and half-box shifted configurations
     double var0=0.0, var1=0.0, com0=0.0, com1=0.0;
     for(auto idx : indices){
+      if(pv_->compute(box->atoms[idx].x)==0.0) continue;
       com0 += wrapNumber(box->atoms[idx].x[dim_], box_size_);
       com1 += wrapNumber(box->atoms[idx].x[dim_] + 0.5*box_size_, box_size_);
     }
@@ -106,6 +113,7 @@ void Calc_1D_Density_IP::calculate(){
     com1 /= (double)indices.size();
     //compute mean-centered variances
     for(auto idx : indices){
+      if(pv_->compute(box->atoms[idx].x)==0.0) continue;
       var0 += pow(wrapNumber(box->atoms[idx].x[dim_], box_size_) - com0, 2);
       var1 += pow(wrapNumber(box->atoms[idx].x[dim_] + 0.5*box_size_, box_size_) - com1, 2);
     }
@@ -121,6 +129,7 @@ void Calc_1D_Density_IP::calculate(){
   }
   for(auto idx : indices){
     counter++;
+    if(pv_->compute(box->atoms[idx].x)==0.0) continue;
     bool out_of_range_flag = 1;
     if(idx >= 0 && idx < box->atoms.size()) out_of_range_flag = 0;
     if(out_of_range_flag == 1){

@@ -84,4 +84,6 @@ private:
   int com_corr_;
   double com_dx_;
   double sigma_;
+  //probevolume
+  ProbeVolume* pv_;
 };
