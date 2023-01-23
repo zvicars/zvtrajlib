@@ -159,13 +159,14 @@ void Calc_1D_Density_IP::calculate(){
   
   logisticStepFunctor f1(data);
   Eigen::LevenbergMarquardt<logisticStepFunctor> lm_algo(f1);
-  Eigen::VectorXd b(4);
-  b << guess_[0], guess_[1], guess_[2], guess_[3];
+  Eigen::VectorXd b(5);
+  b << guess_[0], guess_[1], guess_[2], guess_[3], guess_[4];
   int info = lm_algo.minimize(b);  
   params_[0] = b[0];
   params_[1] = b[1];
   params_[2] = b[2];
   params_[3] = b[3];
+  params_[4] = b[4];
   fits_.push_back(params_);
   tvec_.push_back(current_time_);
   frame_vec_.push_back(current_frame_);
@@ -202,13 +203,14 @@ void Calc_1D_Density_IP::finalOutput(){
   
   logisticStepFunctor f1(data);
   Eigen::LevenbergMarquardt<logisticStepFunctor> lm_algo(f1);
-  Eigen::VectorXd b(4);
-  b << guess_[0], guess_[1], guess_[2], guess_[3];
+  Eigen::VectorXd b(5);
+  b << guess_[0], guess_[1], guess_[2], guess_[3], guess_[4];
   int info = lm_algo.minimize(b);  
   params_[0] = b(0);
   params_[1] = b(1);
   params_[2] = b(2);
   params_[3] = b(3);
+  params_[4] = b(3);
   }
 
   std::ofstream ofile(base_ + "_avg_sigmoidal.txt");
@@ -225,7 +227,7 @@ void Calc_1D_Density_IP::finalOutput(){
     FANCY_ASSERT(ofile.is_open(), "Failed to open output file for 1D density calculation.");
     for(int i = 0; i < fits_.size(); i++){
       ofile << tvec_[i] << "   " << frame_vec_[i] << "   ";
-      for(int j = 0; j < 4; j++){
+      for(int j = 0; j < 5; j++){
         ofile << fits_[i][j] << "   ";
       }
       ofile << "\n";
