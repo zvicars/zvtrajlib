@@ -38,11 +38,13 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   FANCY_ASSERT(xrange.size() == 2 && xrange[1] > xrange[0], "Invalid xrange parameter set in 1D Density calculation.");
 
   input.params().readVector("guess", KeyType::Optional, guess_);
-  FANCY_ASSERT(guess_.size() == 4 || guess_.size() == 5, "Invalid guess provided");
+  FANCY_ASSERT(guess_.size() == 5, "Invalid guess provided");
   fix_.fill(0);
-  if(guess_.size() == 4){
-    guess_.push_back(0.0);
-    fix_[4] = 1;
+  std::vector<bool> fix;
+  input.params().readVector("fix", KeyType::Optional, fix);
+  FANCY_ASSERT(fix_.size() == 5, "Invalid guess provided");  
+  for(int i = 0; i < fix.size(); i++){
+    fix_[i] = fix[i];
   }
   idx_range_[0] = xrange[0];
   idx_range_[1] = xrange[1];
