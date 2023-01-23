@@ -55,7 +55,7 @@ Calc_1D_Density_IP::Calc_1D_Density_IP(InputPack& input) : Calculation{input} {
   grid_density_.resize(npoints_, 0.0);
   average_grid_density_.resize(npoints_, 0.0);
 
-  for(int i = 0; i < 4; i++){
+  for(int i = 0; i < 5; i++){
     params_[i] = guess_[i];
   }
 
