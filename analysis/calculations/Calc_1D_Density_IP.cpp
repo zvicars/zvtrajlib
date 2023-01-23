@@ -210,7 +210,7 @@ void Calc_1D_Density_IP::finalOutput(){
   params_[1] = b(1);
   params_[2] = b(2);
   params_[3] = b(3);
-  params_[4] = b(3);
+  params_[4] = b(4);
   }
 
   std::ofstream ofile(base_ + "_avg_sigmoidal.txt");
