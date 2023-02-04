@@ -7,3 +7,17 @@ ProbeVolume::ProbeVolume(InputPack& input){
   update_flag_ = 0;
   return;
 }
+
+//default constructor for in-place construction of probe volume
+ProbeVolume::ProbeVolume(std::string name){
+  name_ = name;
+  box = 0;
+  update_flag_ = 0;
+  return;
+}
+ProbeVolume::ProbeVolume(){
+  name_ = "";
+  box = 0;
+  update_flag_ = 0;
+  return;
+}
