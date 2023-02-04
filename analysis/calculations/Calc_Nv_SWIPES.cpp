@@ -113,6 +113,8 @@ void Calc_Nv_SWIPES::finalOutput(){
     ofile.close();
     filepath = base_ + "_nvSWIPES.txt";
     ofile.open(filepath);
+    ofile << "#Output file for nv calculation with name \'" << name_ << "\'\n";   
+    ofile << "Timeseries: time (ps)     step  ... \n";
     std::vector<double> averages(pv_set_.size(),0.0);
     for(std::size_t i = 0; i < ts_values_.size(); i++){
       ofile << time_vec_[i] << "  " << step_vec_[i] << "  ";
