@@ -122,6 +122,14 @@ void Calc_Nv_SWIPES::finalOutput(){
       }
       ofile << "\n";
     }
+    ofile << "#X0       ";
+    for(auto& val : ranges_){
+      ofile << val[0] << "  ";
+    }
+    ofile << "#SPACING  ";
+    for(auto& val : ranges_){
+      ofile << val[1] << "  ";
+    }
     ofile << "#AVERAGES ";
     for(auto& val : averages){
       val *= 1.0/pv_set_.size();
