@@ -6,6 +6,8 @@ class ProbeVolume{ //probe volumes allow you to specify a particle position and 
 public:
   using KeyType = ParameterPack::KeyType;
   ProbeVolume(InputPack& input);
+  ProbeVolume(std::string name);
+  ProbeVolume();
   virtual ~ProbeVolume(){
     return; 
   }
