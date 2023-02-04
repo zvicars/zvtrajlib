@@ -22,10 +22,8 @@ Calc_Nv_SWIPES::Calc_Nv_SWIPES(InputPack& input):Calculation_Histogram{input}
   FANCY_ASSERT(xmax_range.size() == 3, "Invalid size given for xmax_range, you provided " 
               + std::to_string(xmax_range.size()) + " expected 3, [ min increment max ]");
   //should form an MINxMAX matrix of entries with every combination of origin and spacing
-  FANCY_ASSERT(xmin_range[0] < xmin_range[2], "Invalid range provided, for arguments [ min increment max ] \\
-  xmin should be less than xmax");
-  FANCY_ASSERT(xmax_range[0] < xmax_range[2], "Invalid range provided, for arguments [ min increment max ] \\
-  xmin should be less than xmax");  
+  FANCY_ASSERT(xmin_range[0] < xmin_range[2], "Invalid range provided, for arguments [ min increment max ] xmin should be less than xmax");
+  FANCY_ASSERT(xmax_range[0] < xmax_range[2], "Invalid range provided, for arguments [ min increment max ] xmin should be less than xmax");  
   FANCY_ASSERT(xmin_range[1] > 0, "increment should be > 0 for xmin");
   FANCY_ASSERT(xmax_range[1] > 0, "increment should be > 0 for xmax");
 
@@ -34,7 +32,7 @@ Calc_Nv_SWIPES::Calc_Nv_SWIPES(InputPack& input):Calculation_Histogram{input}
       std::array<double,2> xrange = {template_min[0], template_max[0]}, 
                            yrange = {template_min[1], template_max[1]},
                            zrange = {template_min[2], template_max[2]};
-      if(dim == 0) xrange = {x1, x2}; if(dim == 1) yrange = {x1, x2}; if(dim == 2) zrange = {x1, x2};
+      if(dim == 0) xrange = {x1, x1+x2}; if(dim == 1) yrange = {x1, x1+x2}; if(dim == 2) zrange = {x1, x1+x2};
       PV_DiscreteRect pv_temp = PV_DiscreteRect(xrange, yrange, zrange);
       pv_set_.push_back(pv_temp);
       ranges_.push_back({x1,x2});
