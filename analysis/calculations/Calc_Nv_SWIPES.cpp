@@ -44,13 +44,13 @@ Calc_Nv_SWIPES::Calc_Nv_SWIPES(InputPack& input):Calculation_Histogram{input}
 void Calc_Nv_SWIPES::calculate(){
   if(!doCalculate()) return;
   double sum = 0.0;
-  std::vector<double> data_step(pv_set_.size());
+  std::vector<double> data_step(pv_set_.size(), 0.0);
   for(int i = 0; i < atom_group_->getIndices().size(); i++){
     int idx = atom_group_->getIndices()[i];
     auto& x = box->atoms[idx].x;
     for(int j = 0; j < pv_set_.size(); j++){
-      data_step[j] = pv_set_[j].compute(x);
-      sum += data_step[j] / (ranges_[j][1]-ranges_[j][0]);
+      data_step[j] += pv_set_[j].compute(x);
+      sum += data_step[j] / ranges_[j][1];
     }
   }
   value_ = sum / (double)data_step.size();
@@ -126,13 +126,15 @@ void Calc_Nv_SWIPES::finalOutput(){
     for(auto& val : ranges_){
       ofile << val[0] << "  ";
     }
+    ofile << "\n";
     ofile << "#SPACING  ";
     for(auto& val : ranges_){
       ofile << val[1] << "  ";
     }
+    ofile << "\n";
     ofile << "#AVERAGES ";
     for(auto& val : averages){
-      val *= 1.0/pv_set_.size();
+      val *= 1.0/(double)time_vec_.size();
       ofile << val << "  ";
     }
     ofile.close();
