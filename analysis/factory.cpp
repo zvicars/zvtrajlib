@@ -87,7 +87,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "3d_density") return new Calc_DensityField(input);
   if(key == "2d_density") return new Calc_2D_Density(input);
   if(key == "1d_density") return new Calc_1D_Density(input);
-  if(key == "1d_densityfull") return new Calc_1D_Density(input);
+  if(key == "1d_densityfull") return new Calc_1D_DensityFull(input);
   if(key == "1d_density_ip") return new Calc_1D_Density_IP(input);
   if(key == "circlefit") return new Calc_SWIPES_CircleFit(input);
   if(key == "writextc") return new Calc_Write_Xtc(input);
