@@ -23,6 +23,7 @@ calculations/Calc_Angle.cpp
 calculations/Calc_DensityField.cpp
 calculations/Calc_2D_Density.cpp
 calculations/Calc_1D_Density.cpp
+calculations/Calc_1D_DensityFull.cpp
 calculations/Calc_1D_Density_IP.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
 calculations/Calc_Write_Xtc.cpp

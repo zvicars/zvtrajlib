@@ -98,6 +98,40 @@ struct logisticStepFunctor : Functor<double>
     }
 };
 
+struct logisticFunctorFull : Functor<double>
+{
+    Eigen::VectorXd x, y;
+    logisticFunctorFull(Eigen::MatrixXd data): Functor<double>(4,Eigen::Dynamic) {
+      x = data.col(0);
+      y = data.col(1);
+      m_values = data.rows();
+    };
+    int operator()(const Eigen::VectorXd &b, Eigen::VectorXd &fvec)
+    {
+        assert(b.size()==4);
+        for(int i=0; i < m_values; i++) {
+            fvec[i] = b[0]/(1+exp(b[1]*(x[i] - b[2]))) + b[3] - y[i];
+        }
+        return 0;
+    }
+
+    int df(const Eigen::VectorXd &b, Eigen::MatrixXd &fjac) const
+    {
+      assert(b.size() == 4);
+      assert(fjac.rows() == values());
+      for(int i = 0; i < values(); i++){
+        Eigen::Vector4d jac_row;
+        double dx = x[i] - b[2];
+        jac_row << 1.0/(1+exp(b[1]*dx)),  
+                   -b[0]*(dx)*exp(b[1]*dx)/std::pow( 1 + exp(b[1]*dx), 2), 
+                   b[0]*b[1]*exp(b[1]*dx)/std::pow( 1 + exp(b[1]*dx), 2), 1.0;
+        fjac.row(i) = jac_row;
+      }
+      return 0;
+    }
+};
+
+
  /* 
   Eigen::Vector3d radangles;
   radangles << angles[2]*M_PI/180.0, angles[1] * M_PI / 180.0, angles[0] * M_PI / 180.0;
