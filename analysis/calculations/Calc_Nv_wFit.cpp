@@ -23,11 +23,11 @@ void Calc_Nv_wFit::calculate(){
   double x;
   if(mode_ == 0){
     dim = calc_->get_dim();
-    calc_->get_x();
+    x = calc_->get_x();
   }
   else{
     dim = calc2_->get_dim();
-    calc2_->get_x();   
+    x = calc2_->get_x();   
   }
   float sum = 0.0;
   for(int i = 0; i < atom_group_->getIndices().size(); i++){
