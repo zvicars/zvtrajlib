@@ -154,7 +154,7 @@ void Calc_1D_DensityFull::finalOutput(){
     iterator++;
   }
   
-  logisticFunctor f1(data);
+  logisticFunctorFull f1(data);
   Eigen::LevenbergMarquardt<logisticFunctorFull> lm_algo(f1);
   Eigen::VectorXd b(4);
   b << guess_[0], guess_[1], guess_[2], guess_[3];
