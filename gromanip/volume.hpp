@@ -9,6 +9,17 @@ class Volume{
       return;
     }
     virtual bool isInside(const Vec3<double>& x) const = 0;
+    virtual bool isInside(const Vec3<double>& x, const Vec3<double>& boxvec) const {
+      //check for each periodic image
+      for(int ix = -1; ix <= 1; ix++){
+      for(int iy = -1; iy <= 1; iy++){
+      for(int iz = -1; iz <= 1; iz++){
+            Vec3<double> temp_pos = x;
+            temp_pos[0] += ix*boxvec[0]; temp_pos[1] += iy*boxvec[1]; temp_pos[2] += iz*boxvec[2];
+            if(isInside(temp_pos)) return 1;
+      }}}
+      return 0;
+    }
     virtual std::vector<double> getBoundingBox() = 0;
 
 };

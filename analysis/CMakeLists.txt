@@ -35,6 +35,8 @@ calculations/Calc_IceID.cpp
 calculations/Calc_SR.cpp
 calculations/Calc_DensityField_H2Omin.cpp
 calculations/Calc_HBonds.cpp
+calculations/Calc_HPolarity.cpp
+calculations/Calc_AvgOrientation.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp

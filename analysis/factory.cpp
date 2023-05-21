@@ -44,6 +44,8 @@
 #include "calculations/Calc_SR_LJAtt.hpp"
 #include "calculations/Calc_1D_HBond.hpp"
 #include "calculations/Calc_HBonds.hpp"
+#include "calculations/Calc_HPolarity.hpp"
+#include "calculations/Calc_AvgOrientation.hpp"
 //#include "calculations/Calc_SR_LJTest.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
@@ -98,6 +100,8 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "ljatt") return new Calc_SR_LJAtt(input);
   if(key == "1dhbond") return new Calc_1D_HBond(input);
   if(key == "hbond") return new Calc_HBonds(input);
+  if(key == "hpolarity") return new Calc_HPolarity(input);
+  if(key == "avgorientation") return new Calc_AvgOrientation(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }

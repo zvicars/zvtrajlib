@@ -1,4 +1,6 @@
 #include "boxtools.hpp"
+#include "../tools/pbcfunctions.hpp"
+#include "../tools/stlmath.hpp"
 #include <set>
 double getPeriodicDistance1D(double x1, double x2, double lx){
 	double dx = fabs(x2-x1);
@@ -14,6 +16,20 @@ double getPeriodicDistance2(const Atom& a1, const Atom& a2, const Vec3<double>& 
 	double dz = periodic_directions[2] ? getPeriodicDistance1D(a1.x[2], a2.x[2], box_dims[2]) : (a2.x[2] - a1.x[2]);
 	return dx*dx + dy*dy + dz*dz;
 }
+
+double getPeriodicAngle(const Atom& a1, const Atom& a2, const Atom& a3, const Vec3<double>& box_dims){
+  auto pos1 = a1.x, pos2 = a2.x, pos3 = a3.x;
+  getNearestImage3D(pos1, pos2, box_dims);
+  getNearestImage3D(pos3, pos2, box_dims);
+  auto v23 = pos3 - pos2;
+  auto v21 = pos1 - pos2;
+  double costheta = dot(v23, v21) / (norm2(v23) * norm2(v21));
+  if(costheta > 1) costheta = 1;
+  if(costheta < -1) costheta = -1;
+  double theta = acos(costheta)*180/M_PI;
+	return theta;
+}
+
 int isBondInTable(const Atom& i, const Atom& j, const boxtools::ParameterTable<BondType>& btable)
 {
   int counter = 0;
@@ -240,6 +256,57 @@ std::vector<AngleInst> boxtools::makeAnglesUsingBonds(const Box& box, const boxt
       int swap = isAngleInTable(a1, a2, a3, atable, pos);
       if(pos == -1) continue;
       if(swap == 0) angles.push_back(AngleInst(a, b, c, atable.entries[pos])); //no index-swapping here since the bonding information is important
+    }
+  }
+  return angles;  
+}
+
+std::vector<AngleInst> boxtools::makePBCAnglesUsingBonds(const Box& box, const boxtools::ParameterTable<AngleType>& atable, const std::vector<BondInst>& bonds){
+  std::vector<AngleInst> angles;
+  Vec3<double> box_dims = {box.boxvec[0][0], box.boxvec[1][1], box.boxvec[2][2]};
+  if( atable.entries.size() == 0) return angles;
+  int natoms = box.atoms.size();
+  for(int i = 0; i < bonds.size(); i++){
+    for(int j = i+1; j < bonds.size(); j++){
+      auto& bond1 = bonds[i];
+      auto& bond2 = bonds[j];
+      int a,b,c;
+      if(bond1.i == bond2.i){
+        a = bond1.j;
+        b = bond1.i;
+        c = bond2.j;
+      }
+      else if(bond1.i == bond2.j){
+        a = bond1.j;
+        b = bond1.i;
+        c = bond2.i;
+      }
+      else if(bond1.j == bond2.i){
+        a = bond1.i;
+        b = bond1.j;
+        c = bond2.j;
+      }
+      else if(bond1.j == bond2.j){
+        a = bond1.i;
+        b = bond1.j;
+        c = bond2.i;
+      }
+      else continue; //keep going if there are no shared indices
+      //kludge, need more reliable way to go from gro file index to true index
+      const Atom& a1 = box.atoms[a-1], a2 = box.atoms[b-1], a3 = box.atoms[c-1];
+      double angle = getPeriodicAngle(a1, a2, a3, box_dims);
+      if(std::isnan(angle)){
+        std::cout << a1.x[0] << "  " << a1.x[1] << "  " << a1.x[2] << "\n";
+        std::cout << a2.x[0] << "  " << a2.x[1] << "  " << a2.x[2] << "\n";
+        std::cout << a3.x[0] << "  " << a3.x[1] << "  " << a3.x[2] << "\n";
+      }
+      int pos;
+      int swap = isAngleInTable(a1, a2, a3, atable, pos);
+      if(pos == -1) continue;
+      auto ref_angle = atable.entries[pos];
+      FANCY_ASSERT(ref_angle.function_type == 1, "PBC angles only supported for function type 1.");
+      ref_angle.params[0] = angle;
+      if(swap == 0) angles.push_back(AngleInst(a, b, c, ref_angle)); //no index-swapping here since the bonding information is important
     }
   }
   return angles;  

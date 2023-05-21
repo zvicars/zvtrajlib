@@ -3,6 +3,7 @@
 #include "../tools/StringTools.hpp"
 #include "../tools/stlmath.hpp"
 #include <set>
+#include <random>
 void boxtools::actions::merge(GroManipData& data, const std::vector<std::string>& args){
   //takes two box names and an output box name
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::merge(), requires input_box_name, input_box_name, and output_box_name");
@@ -108,7 +109,25 @@ void boxtools::actions::trimvolumebyresnameinv(GroManipData& data, const std::ve
   data.addBox(args[2], b_out);
   return; 
 }
-
+void boxtools::actions::trimvolumebyresnameinvperiodic(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, a volume name, and an output name
+  FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::trimvolume(), requires input_box_name, volume_name and output_box_name");
+  Box* b_out = data.findBox(args[2]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  Volume *v1;
+  b1 = data.findBox(args[0]);
+  v1 = data.findVolume(args[1]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::trimvolume()");
+  FANCY_ASSERT(v1 != 0,  "Failed to find input volume in boxtools::actions::trimvolume()");
+  Box box_out = *b1;
+  boxtools::removeResNumbers(box_out, boxtools::getResnrNotWithinVolumePeriodic(box_out, *v1));
+  *b_out = box_out;
+  data.addBox(args[2], b_out);
+  return; 
+}
 void boxtools::actions::trimvolumebyatomname(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name, a volume name, and an output name
   FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::trimvolumebyatomname(), \
@@ -149,6 +168,28 @@ void boxtools::actions::trimvolumebyatomnameinv(GroManipData& data, const std::v
   data.addBox(args[3], b_out);
   return; 
 }
+
+void boxtools::actions::trimvolumebyatomnameinvperiodic(GroManipData& data, const std::vector<std::string>& args){
+  //takes a box name, a volume name, and an output name
+  FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::trimvolumebyatomname(), \
+  requires input_box_name, volume_name, atom_name,  and output_box_name");
+  Box* b_out = data.findBox(args[3]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  Volume *v1;
+  b1 = data.findBox(args[0]);
+  v1 = data.findVolume(args[1]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::trimvolumebyatomname()");
+  FANCY_ASSERT(v1 != 0,  "Failed to find input volume in boxtools::actions::trimvolumebyatomname()");
+  Box box_out = *b1;
+  boxtools::removeResNumbers(box_out, boxtools::getResnrWithinVolumebyAtomNamePeriodic(box_out, *v1, args[2]));
+  *b_out = box_out;
+  data.addBox(args[3], b_out);
+  return; 
+}
+
 void boxtools::actions::rotate(GroManipData& data, const std::vector<std::string>& args){
   //takes a box name, euler angles (degrees), and an output box name
   FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::rotate(), \
@@ -410,6 +451,36 @@ void boxtools::actions::setboxsize(GroManipData& data, const std::vector<std::st
   return;
 }
 
+void boxtools::actions::deleterandom(GroManipData& data, const std::vector<std::string>& args){
+  //argument is a list of volume names
+  FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::deleterandom(), needs input box, resname, count, and output box name");
+  std::vector<std::string>  new_args = args;
+  std::string input_name = args[0], output_name = args[3], resname = args[1];
+  int count = std::stoi(args[2]);
+  Box *b1 = data.findBox(input_name);
+  FANCY_ASSERT(b1 != 0, "boxtools::actions::deleterandom() box not found");
+  Box box_out = *b1;
+  Box* b_out = data.findBox(output_name);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  int nres = countRes(box_out, resname);
+  int deleteCounter = nres - count;
+  std::vector<int> vec_resnrs;
+  std::set<int> set_resnrs;
+  std::default_random_engine generator;
+  std::uniform_int_distribution<int> distribution(1, nres);
+  while(set_resnrs.size() < deleteCounter){
+    int idx = distribution(generator);
+    set_resnrs.insert(idx);
+  }
+  vec_resnrs.insert(vec_resnrs.end(), set_resnrs.begin(), set_resnrs.end());
+  removeResNumbers(box_out,vec_resnrs);
+  *b_out = box_out;
+  data.addBox(output_name, b_out); 
+  return;  
+}
+
 //assumes entire box is one big molecule
 void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std::string>& args){
   //a molecule definition has the following components
@@ -441,6 +512,7 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   std::string constrainttypes = getGMXTaggedParams(filetext, "constrainttypes");
   std::string angletypes = getGMXTaggedParams(filetext,"angletypes");
   std::string angle2types = getGMXTaggedParams(filetext,"angletypes2"); //uses bonded information
+  std::string angle3types = getGMXTaggedParams(filetext,"angletypes3"); //uses bonded information  
   std::string dihedraltypes = getGMXTaggedParams(filetext,"dihedraltypes");
   std::string vsitetypes = getGMXTaggedParams(filetext,"vsite3types");
 
@@ -450,6 +522,7 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   auto PBCBondTable = generateTable<PBCBondType>(pbcbondtypes);
   auto AngleTable = generateTable<AngleType>(angletypes);
   auto AngleTable2 = generateTable<AngleType>(angle2types);
+  auto AngleTable3 = generateTable<AngleType>(angle3types);
   auto ExclusionTable = generateTable<ExclusionType>(exclusiontypes);
   auto ConstraintTable = generateTable<ConstraintType>(constrainttypes);
   auto VsiteTable = generateTable<Vsite3Type>(vsitetypes);
@@ -461,7 +534,9 @@ void boxtools::actions::outputmolecule(GroManipData& data, const std::vector<std
   bonds.insert(bonds.end(), pbc_bonds.begin(), pbc_bonds.end());
   std::vector<AngleInst> angles = makeAngles(*b1, AngleTable);
   std::vector<AngleInst> angles2 = makeAnglesUsingBonds(*b1, AngleTable2, bonds);
+  std::vector<AngleInst> angles3 = makePBCAnglesUsingBonds(*b1, AngleTable3, bonds);
   angles.insert(angles.end(), angles2.begin(), angles2.end());
+  angles.insert(angles.end(), angles3.begin(), angles3.end());
   std::vector<ExclusionInst> exclusions = makeExclusions(*b1, ExclusionTable);
   std::vector<ConstraintInst> constraints = makeConstraints(*b1, ConstraintTable);
   std::vector<Vsite3Inst> vsites = makeVsites(*b1, VsiteTable);

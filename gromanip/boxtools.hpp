@@ -41,6 +41,7 @@ namespace boxtools{
   std::vector<BondInst> makeBonds(const Box& box, const ParameterTable<BondType>& btable);
   std::vector<AngleInst> makeAngles(const Box& box, const ParameterTable<AngleType>& atable);
   std::vector<AngleInst> makeAnglesUsingBonds(const Box& box, const ParameterTable<AngleType>& atable, const std::vector<BondInst>& bonds);
+  std::vector<AngleInst> makePBCAnglesUsingBonds(const Box& box, const ParameterTable<AngleType>& atable, const std::vector<BondInst>& bonds);
   std::vector<BondInst> makePeriodicBonds(Box& b1, const ParameterTable<PBCBondType>& t);
   std::vector<ExclusionInst> makeExclusions(Box& b1, const ParameterTable<ExclusionType>& t);
   std::vector<ConstraintInst> makeConstraints(Box& b1, const ParameterTable<ConstraintType>& t);
@@ -52,9 +53,12 @@ namespace boxtools{
   bool deleteNotRestype(Box& box, std::string resname);
   Box mergeBox(const Box& b1, const Box& b2);
   void removeResNumbers(Box& box, std::vector<int> res_list);
+  int countRes(Box& box, std::string resname);
   std::vector<int> getResnrWithinVolume(const Box& box, const Volume& volume);
   std::vector<int> getResnrNotWithinVolume(const Box& box, const Volume& volume);
+  std::vector<int> getResnrNotWithinVolumePeriodic(const Box& box, const Volume& volume);
   std::vector<int> getResnrWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name);
+  std::vector<int> getResnrWithinVolumebyAtomNamePeriodic(const Box& box, const Volume& volume, std::string at_name);
   std::vector<int> getResnrNotWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name);
   std::vector<int> getResnrAllButResname(const Box& box, const Volume& volume, std::string res_name);
   void rotateEulerAngles(Box& box, Vec3<double> angles);

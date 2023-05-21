@@ -16,6 +16,8 @@ namespace boxtools::actions{
   void trimvolumebyresnameinv(GroManipData&, const std::vector<std::string>&);
   void trimvolumebyatomname(GroManipData&, const std::vector<std::string>&);
   void trimvolumebyatomnameinv(GroManipData&, const std::vector<std::string>&);
+  void trimvolumebyatomnameinvperiodic(GroManipData&, const std::vector<std::string>&);
+  void trimvolumebyresnameinvperiodic(GroManipData&, const std::vector<std::string>&);
   void rotate(GroManipData&, const std::vector<std::string>&);
   void invrotate(GroManipData&, const std::vector<std::string>&);
   void rotate_vector(GroManipData&, const std::vector<std::string>&);
@@ -34,6 +36,7 @@ namespace boxtools::actions{
   void outputmolecule(GroManipData&, const std::vector<std::string>&);
   void deleteoverlapping(GroManipData&, const std::vector<std::string>&);
   void pbccorrect(GroManipData&, const std::vector<std::string>&);
+  void deleterandom(GroManipData&, const std::vector<std::string>&);
   //crystals
   void supercell(GroManipData&, const std::vector<std::string>&);
   void decoratefeldspar(GroManipData& data, const std::vector<std::string>& args);
@@ -52,8 +55,10 @@ namespace boxtools::actions{
     action_map.emplace("duplicate", &duplicate);
     action_map.emplace("trimbyresname", &trimvolumebyresname);
     action_map.emplace("trimbyresnameinv", &trimvolumebyresnameinv);
+    action_map.emplace("trimbyresnameinvp", &trimvolumebyresnameinvperiodic);
     action_map.emplace("trimbyatomname", &trimvolumebyatomname);
     action_map.emplace("trimbyatomnameinv", &trimvolumebyatomnameinv);
+    action_map.emplace("trimbyatomnameinvp", &trimvolumebyatomnameinvperiodic);
     action_map.emplace("trimbymesh", &trimbymesh);
     action_map.emplace("rotate", &rotate);
     action_map.emplace("invrotate", &invrotate);
@@ -78,6 +83,7 @@ namespace boxtools::actions{
     action_map.emplace("hydrogenatefeldspar", &hydrogenatefeldspar);
     action_map.emplace("printindicesnear", &printindicesnear);
     action_map.emplace("addatom", &addatom);
+    action_map.emplace("deleterandom", &deleterandom);
     return;
   }
   static inline void performAction(GroManipData& data, std::vector<std::string> args){

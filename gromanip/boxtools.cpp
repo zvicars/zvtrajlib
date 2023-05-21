@@ -30,6 +30,22 @@ bool boxtools::renumberBox(Box& box){
   return 0;
 }
 
+int boxtools::countRes(Box& box, std::string resname){
+  boxtools::checkBoxValid(box);
+  int prevResNum = box.atoms[0].resnr;
+  int resCounter = 1;
+  int atomCounter = 1;
+  for(auto & atom : box.atoms){
+    if(atom.resname != resname) continue;
+    if(atom.resnr != prevResNum){
+      resCounter++;
+      prevResNum = atom.resnr;
+    }
+    atomCounter++;
+  }
+  return resCounter;
+}
+
 bool offsetRes(Box& box, const Atom& last){
   for(auto & atom : box.atoms){
     atom.resnr += last.resnr;
@@ -129,6 +145,14 @@ std::vector<int> boxtools::getResnrNotWithinVolume(const Box& box, const Volume&
   }
   return retVec;
 }
+std::vector<int> boxtools::getResnrNotWithinVolumePeriodic(const Box& box, const Volume& volume){
+  std::vector<int> retVec;
+  Vec3<double> boxdims = {box.boxvec[0][0], box.boxvec[1][1], box.boxvec[2][2]};
+  for(auto& atom : box.atoms){
+    if(volume.isInside(atom.x, boxdims)) retVec.push_back(atom.resnr);
+  }
+  return retVec;
+}
 std::vector<int> boxtools::getResnrNotWithinVolumebyAtomName(const Box& box, const Volume& volume, std::string at_name){
   std::vector<int> retVec;
   for(auto& atom : box.atoms){
@@ -140,6 +164,14 @@ std::vector<int> boxtools::getResnrWithinVolumebyAtomName(const Box& box, const 
   std::vector<int> retVec;
   for(auto& atom : box.atoms){
     if(volume.isInside(atom.x) && atom.name == at_name) retVec.push_back(atom.resnr);
+  }
+  return retVec;
+}
+std::vector<int> boxtools::getResnrWithinVolumebyAtomNamePeriodic(const Box& box, const Volume& volume, std::string at_name){
+  std::vector<int> retVec;
+  Vec3<double> boxdims = {box.boxvec[0][0], box.boxvec[1][1], box.boxvec[2][2]};
+  for(auto& atom : box.atoms){
+    if(volume.isInside(atom.x, boxdims) && atom.name == at_name) retVec.push_back(atom.resnr);
   }
   return retVec;
 }
