@@ -28,6 +28,7 @@
 #include "calculations/Calc_1D_Density.hpp"
 #include "calculations/Calc_1D_DensityFull.hpp"
 #include "calculations/Calc_1D_Density_IP.hpp"
+#include "calculations/Calc_1D_Mv.hpp"
 #include "calculations/Calc_Write_Xtc.hpp"
 #include "calculations/Calc_Lattice_Motion.hpp"
 #include "calculations/Calc_Write_AvgPos.hpp"
@@ -46,6 +47,7 @@
 #include "calculations/Calc_HBonds.hpp"
 #include "calculations/Calc_HPolarity.hpp"
 #include "calculations/Calc_AvgOrientation.hpp"
+#include "calculations/Calc_Mv.hpp"
 //#include "calculations/Calc_SR_LJTest.hpp"
 
 ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
@@ -74,6 +76,7 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
 Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "isosurface") return new Calc_Isosurface(input);
   if(key == "nv") return new Calc_Nv(input);
+  if(key == "mv") return new Calc_Mv(input);
   if(key == "nv_swipes") return new Calc_Nv_SWIPES(input);
   if(key == "nvwfit") return new Calc_Nv_wFit(input);
   if(key == "nvwfit_ip") return new Calc_Nv_wFit_IP(input);
@@ -91,6 +94,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "1d_density") return new Calc_1D_Density(input);
   if(key == "1d_densityfull") return new Calc_1D_DensityFull(input);
   if(key == "1d_density_ip") return new Calc_1D_Density_IP(input);
+  if(key == "1d_density_mv") return new Calc_1D_Mv(input);
   if(key == "circlefit") return new Calc_SWIPES_CircleFit(input);
   if(key == "writextc") return new Calc_Write_Xtc(input);
   if(key == "lattice_motion") return new Calc_Lattice_Motion(input);

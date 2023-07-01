@@ -25,6 +25,7 @@ calculations/Calc_2D_Density.cpp
 calculations/Calc_1D_Density.cpp
 calculations/Calc_1D_DensityFull.cpp
 calculations/Calc_1D_Density_IP.cpp
+calculations/Calc_1D_Mv.cpp
 calculations/Calc_SWIPES_CircleFit.cpp
 calculations/Calc_Write_Xtc.cpp
 calculations/Calc_Dipole.cpp
@@ -37,6 +38,7 @@ calculations/Calc_DensityField_H2Omin.cpp
 calculations/Calc_HBonds.cpp
 calculations/Calc_HPolarity.cpp
 calculations/Calc_AvgOrientation.cpp
+calculations/Calc_Mv.cpp
 probevolumes/ProbeVolume.cpp
 probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
