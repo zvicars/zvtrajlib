@@ -52,7 +52,11 @@ Calc_1D_Mv::Calc_1D_Mv(InputPack& input) : Calculation{input} {
   if(coarseGrain){
     input.params().readNumber("sigma", KeyType::Optional, sigma_);
   }
-
+  std::string mvname;
+  input.params().readString("mv_name", KeyType::Required, mvname);
+  Calculation* calc_pointer = input.findCalculation(mvname);
+  FANCY_ASSERT(calc_pointer != 0, "Failed to find specified calculation.");  
+  mvcalc_ = dynamic_cast<Calc_Mv*>(calc_pointer);  
   return;
 }
 
