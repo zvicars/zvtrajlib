@@ -18,8 +18,8 @@ public:
   virtual std::string printConsoleReport();
   virtual void finalOutput();
   virtual void getAtomwiseInformation(Vec<Vec3<double> >& positions, Vec<double>& mvals){
-    positions = positions_;
-    mvals = mvals_;
+    positions_ = positions;
+    mvals_ = mvals;
     return;
   }
   virtual void update(){

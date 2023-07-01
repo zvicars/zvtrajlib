@@ -138,6 +138,9 @@ void Calc_Mv::calculate(){
       qbar_values[i] = 0.0;
       mtilde_values[i] = 0.0;
     }
+    if(std::isnan(mtilde_values[i])){
+      mtilde_values[i] = 0.0;
+    }
   }
   sum = 0.0;
   for(int i = 0; i < mtilde_values.size(); i++){
