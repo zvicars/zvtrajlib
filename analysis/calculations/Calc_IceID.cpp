@@ -221,7 +221,7 @@ void Calc_IceID::finalOutput(){
     ofile << "#Output file for IceID calculation with name \'" << name_ << "\'\n";   
     ofile << "Timeseries: time (ps)     step     nv     original count\n";
     for(std::size_t i = 0; i < n_vec_.size(); i++){
-        ofile << t_vec_[i] << "     " << step_vec_[i] << "     " << n_vec_[i] << "\n"; 
+        ofile << t_vec_[i] << "     " << step_vec_[i] << "     " << n_vec_[i] << "     " << no_vec_[i] << "\n"; 
     }
     ofile.close();
   }

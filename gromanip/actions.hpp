@@ -47,6 +47,10 @@ namespace boxtools::actions{
   void addatom(GroManipData& data, const std::vector<std::string>& args);
   //for getting atoms for union of spheres volume
   void printindicesnear(GroManipData& data, const std::vector<std::string>& args);
+  //remove atoms with a certain number of nearest neighbors
+  void hollow(GroManipData& data, const std::vector<std::string>& args);
+  //wrap atoms to pbc
+  void wrap(GroManipData& data, const std::vector<std::string>& args);
   //void outputbonds(GroManipData&, const std::vector<std::string>&);
   static inline void registerActions(){
     action_map.emplace("merge", &merge);
@@ -84,6 +88,8 @@ namespace boxtools::actions{
     action_map.emplace("printindicesnear", &printindicesnear);
     action_map.emplace("addatom", &addatom);
     action_map.emplace("deleterandom", &deleterandom);
+    action_map.emplace("hollow", &hollow);
+    action_map.emplace("wrap", &wrap);
     return;
   }
   static inline void performAction(GroManipData& data, std::vector<std::string> args){

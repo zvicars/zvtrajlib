@@ -2,6 +2,7 @@
 #include "../tools/pbcfunctions.hpp"
 #include "../tools/StringTools.hpp"
 #include "../tools/stlmath.hpp"
+#include "../tools/cellgrid.hpp"
 #include <set>
 #include <random>
 void boxtools::actions::merge(GroManipData& data, const std::vector<std::string>& args){
@@ -733,4 +734,73 @@ void boxtools::actions::printindicesnear(GroManipData& data, const std::vector<s
   }
   ofile.close();
   return;
+}
+
+void boxtools::actions::hollow(GroManipData& data, const std::vector<std::string>& args){
+  //this can break up residues, so use judiciously
+  FANCY_ASSERT(args.size() == 4, "Invalid call to boxtools::actions::hollow(), \
+  requires input_box_name, atom_name, num_neighbors, cutoff distance, and output_box_name");
+  Box* b_out = data.findBox(args[3]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::hollow()");
+  Box box_out = *b1;
+  double cutoff_distance = std::stod(args[2]);
+  int num_neighbors = std::stoi(args[1]);
+  CellGrid c1;
+  auto box_vec = box_out.boxvec;
+  Vec3<double> box_vector;
+  double box_volume = 0.0;
+  for(int i=0; i<3; i++){
+    box_vector[i] = box_vec[i][i];
+    box_volume *= box_vec[i][i];
+  }
+  if(box_volume == 0.0){
+    for(int i=0; i<3; i++) box_vector[i] = 100; //using large but reasonable number to ensure pbc's don't come into play
+  }
+  std::set<int> index_list;
+  c1.reset(cutoff_distance, box_vector);
+  for(int i = 0; i < box_out.atoms.size(); i++){
+    c1.addIndexToGrid(i, box_out.atoms[i].x);
+  }
+  for(int i = 0; i < box_out.atoms.size(); i++){
+    auto pos1 = box_out.atoms[i].x;
+    auto indices = c1.getNearbyIndices(box_out.atoms[i].x);
+    int counter=0;
+    for(auto index : indices){
+      auto pos2 = box_out.atoms[index].x;
+      if(getDistance(pos2, pos1, box_vector) < cutoff_distance){
+        counter++;
+      }
+    }
+    counter--; //accounting for self-interaction
+    if(counter > num_neighbors) index_list.insert(box_out.atoms[i].resnr);
+  }
+  std::vector<int> index_list2; 
+  index_list2.insert(index_list2.begin(), index_list.begin(), index_list.end());
+  removeResNumbers(box_out, index_list2);
+  *b_out = box_out;
+  data.addBox(args[3], b_out);
+  return; 
+}
+
+void boxtools::actions::wrap(GroManipData& data, const std::vector<std::string>& args){
+  //this can break up residues, so use judiciously
+  FANCY_ASSERT(args.size() == 2, "Invalid call to boxtools::actions::wrap(), \
+  requires input_box_name, output_box_name");
+  Box* b_out = data.findBox(args[1]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  Box *b1;
+  b1 = data.findBox(args[0]);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::wrap()");
+  Box box_out = *b1;
+  wrapPBC(box_out);
+  *b_out = box_out;
+  data.addBox(args[1], b_out);
+  return; 
 }
