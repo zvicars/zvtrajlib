@@ -32,20 +32,20 @@ public:
     size_ = dims;
     return; 
   }
-  T& at(std::array<std::size_t, N> index){
+  T& at(const std::array<std::size_t, N>& index){
     return data_[mapN1(index)];
   }
   const T& read_at(std::array<std::size_t, N> index) const{
     return read_at_1d(mapN1(index));
   }
-  T& at(std::array<int, N> index){
+  T& at(const std::array<int, N>& index){
     std::array<std::size_t, N> new_index;
     for(int i = 0; i < N; i++){
       new_index[i] = index[i];
     }
     return at_1d(mapN1(new_index));
   }
-  const T& read_at(std::array<int, N> index) const{
+  const T& read_at(const std::array<int, N>& index) const{
     std::array<std::size_t, N> new_index;
     for(int i = 0; i < N; i++){
       new_index[i] = index[i];
@@ -100,12 +100,15 @@ public:
     }
     return;
   }
+  //N dimensional size of array 
   std::array<std::size_t, N> size() const{
     return size_;
   }
+  //one-dimensional size of array
   std::size_t size_1d() const{
     return data_.size();
-  } 
+  }
+  //remove all of the elements
   void clear(){
     data_.clear();
     for(auto& val : size_){
@@ -113,58 +116,67 @@ public:
     }
     return;
   }
-
+  //add a matrix and change the current array
   void add_inPlace(Matrix<T,N> b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] += b.at_1d(i);
     }
   }
+  //add a constant and change the current array
   void add_inPlace(T b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] += b;
     }
   }
+  //subtract by a matrix and change the current array
   void sub_inPlace(Matrix<T,N> b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] -= b.at_1d(i);
     }
   }
+  //subtract by a constant and change the current array
   void sub_inPlace(T b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] -= b;
     }
   }
+  //multiply by a matrix and change the current array
   void mult_inPlace(Matrix<T,N> b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] *= b.at_1d(i);
     }
   }
+  //multiply by a constant and change the current array
   void mult_inPlace(T b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] *= b;
     }
   }
+  //divide by a matrix and change the current array
   void div_inPlace(Matrix<T,N> b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] /= b.at_1d(i);
     }
-  }  
+  } 
+  //divide by a constant and change the current array
   void div_inPlace(T b){
     #pragma omp parallel for
     for(int i = 0; i < data_.size(); i++){
       data_[i] /= b;
     }
   }
+  //checks if both arrays are identical
   bool operator==(const Matrix<T,N>& b) const{
     return data_ == b.data_ &&  size_ == b.size_;
   }
+  //element-wise addition between two identically-sized matrices 
   Matrix<T,N> operator+(Matrix<T,N>& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -176,6 +188,7 @@ public:
     }
     return output;
   }
+  //element-wise subtraction between two identically-sized matrices 
   Matrix<T,N> operator-(Matrix<T,N>& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -186,7 +199,8 @@ public:
       output.at_1d(i) = at_1d(i) - b.at_1d(i);
     }
     return output;
-  } 
+  }
+  //element-wise multiplication between two identically-sized matrices 
   Matrix<T,N> operator*(Matrix<T,N>& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -198,6 +212,7 @@ public:
     }
     return output;
   }
+  //element-wise division between two identically-sized matrices 
   Matrix<T,N> operator/(Matrix<T,N>& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -208,8 +223,9 @@ public:
       output.at_1d(i) = at_1d(i) / b.at_1d(i);
     }
     return output;
-  } 
-Matrix<T,N> operator+(const T& b){
+  }
+  //element-wise addition
+  Matrix<T,N> operator+(const T& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
     #pragma omp parallel for
@@ -218,6 +234,7 @@ Matrix<T,N> operator+(const T& b){
     }
     return output;
   }
+  //element-wise subtraction
   Matrix<T,N> operator-(const T& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -227,6 +244,7 @@ Matrix<T,N> operator+(const T& b){
     }
     return output;
   } 
+  //element-wise multiplication
   Matrix<T,N> operator*(const T& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -236,6 +254,7 @@ Matrix<T,N> operator+(const T& b){
     }
     return output;
   }
+  //element-wise division
   Matrix<T,N> operator/(const T& b){
     Matrix<T,N> output(size_);
     std::size_t numel = data_.size();
@@ -245,6 +264,14 @@ Matrix<T,N> operator+(const T& b){
     }
     return output;
   }
+  //returns a pointer to the start of the vector data
+  //use this for 1d sums
+  T* data(const T& b){
+    return data_.data();
+  }
+  std::vector<T>& vector(const T& b){
+    return data_;
+  }  
 protected:
   std::vector<T> data_;
   std::array<std::size_t, N> size_;

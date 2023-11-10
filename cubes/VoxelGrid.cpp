@@ -61,7 +61,7 @@ void VoxelGrid::add_gaussian(Vec3<double> x_in)
     int  lymax = ceil((y+2*sigma_)/grid_spacing_[1]);
     int lzmin = floor((z-2*sigma_)/grid_spacing_[2]);
     int lzmax = ceil((z+2*sigma_)/grid_spacing_[2]);    
-    #pragma omp parallel for collapse(3)
+    //#pragma omp parallel for collapse(3)
     for(int ix = lxmin; ix <= lxmax; ix++)
     for(int iy = lymin; iy <= lymax; iy++)
     for(int iz = lzmin; iz <= lzmax; iz++)
