@@ -45,6 +45,7 @@ void Calc_IceID::update(){
   if(!initialized_){
     xdr_prec_ = 1000;
     xdr_x_ = new xdr::rvec[xdr_natoms_];
+    xdr_x2_ = new xdr::rvec[xdr_natoms_];
     output_handle_ = xdr::xdrfile_open(filename_.c_str(), "w");
     output_handle2_ = xdr::xdrfile_open(filename2_.c_str(), "w");
     FANCY_ASSERT(output_handle_!=0, "xtc output file is null");
@@ -185,7 +186,7 @@ void Calc_IceID::output(){
     int index = indices2[i];
     for(int j = 0; j < 3; j++){ //also going to include HW1 and HW2, so need to do index +1 and index +2, excluding virtual sites for now
       for(int dim = 0; dim < 3; dim++){
-        xdr_x_[index+j][dim] = box->atoms[index+j].x[dim];
+        xdr_x2_[index+j][dim] = box->atoms[index+j].x[dim];
       }
     }
   }
@@ -246,6 +247,7 @@ void Calc_IceID::finalOutput(){
   xdr::xdrfile_close(output_handle_);
   xdr::xdrfile_close(output_handle2_);
   delete xdr_x_;
+  delete xdr_x2_;
   index_out_.close();
   return;
 }
