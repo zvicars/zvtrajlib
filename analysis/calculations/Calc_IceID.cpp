@@ -4,8 +4,10 @@
 #include <omp.h>
 #include <unordered_set>
 Calc_IceID::Calc_IceID(InputPack& input) : Calculation_Histogram{input} {
-  filename_ = name_ + ".xtc";
+  filename_ = name_ + "_ic.xtc";
   input.params().readString("filename", KeyType::Optional, filename_);
+  filename_ = name_ + "_ic.xtc";
+  filename2_ = name_ + "_sa.xtc";
 
   input.params().readString("ice_group", KeyType::Required, icename_);
   ice_group_ = input.findAtomGroup(icename_);
@@ -44,8 +46,9 @@ void Calc_IceID::update(){
     xdr_prec_ = 1000;
     xdr_x_ = new xdr::rvec[xdr_natoms_];
     output_handle_ = xdr::xdrfile_open(filename_.c_str(), "w");
+    output_handle2_ = xdr::xdrfile_open(filename2_.c_str(), "w");
     FANCY_ASSERT(output_handle_!=0, "xtc output file is null");
-
+    FANCY_ASSERT(output_handle2_!=0, "xtc output file 2 is null");
     index_out_.open(name_ + ".index");
     initialized_ = 1;
   }
@@ -163,14 +166,27 @@ void Calc_IceID::output(){
   for(int i = 0; i < box->atoms.size(); i++){
     for(int j = 0; j < 3; j++){
       xdr_x_[i][j] = -1.0f;
+      xdr_x2_[i][j] = -1.0f;
     }
   }
 
   auto indices = final_ice_indices_;
   for(int i = 0; i < indices.size(); i++){
     int index = indices[i];
-    for(int j = 0; j < 3; j++){
-      xdr_x_[index][j] = box->atoms[index].x[j];
+    for(int j = 0; j < 3; j++){ //also going to include HW1 and HW2, so need to do index +1 and index +2, excluding virtual sites for now
+      for(int dim = 0; dim < 3; dim++){
+        xdr_x_[index+j][dim] = box->atoms[index+j].x[dim];
+      }
+    }
+  }
+
+  auto indices2 = ice_group_->getIndices();
+  for(int i = 0; i < indices2.size(); i++){
+    int index = indices2[i];
+    for(int j = 0; j < 3; j++){ //also going to include HW1 and HW2, so need to do index +1 and index +2, excluding virtual sites for now
+      for(int dim = 0; dim < 3; dim++){
+        xdr_x_[index+j][dim] = box->atoms[index+j].x[dim];
+      }
     }
   }
 
@@ -181,6 +197,7 @@ void Calc_IceID::output(){
   }
 
   xdr::write_xtc(output_handle_, xdr_natoms_, xdr_step_, xdr_time_, xdr_box_, xdr_x_, xdr_prec_);
+  xdr::write_xtc(output_handle2_, xdr_natoms_, xdr_step_, xdr_time_, xdr_box_, xdr_x2_, xdr_prec_);
 
   index_out_ << current_time_ << "   ";
   for(auto index : final_ice_indices_){
@@ -227,6 +244,7 @@ void Calc_IceID::finalOutput(){
   }
 
   xdr::xdrfile_close(output_handle_);
+  xdr::xdrfile_close(output_handle2_);
   delete xdr_x_;
   index_out_.close();
   return;

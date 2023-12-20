@@ -25,14 +25,15 @@ protected:
   std::vector<int> step_vec_;
   std::vector<double> t_vec_;
   //xtc output
-  xdr::XDRFILE* output_handle_;
+  xdr::XDRFILE* output_handle_, *output_handle2_;
   int xdr_natoms_, xdr_step_;
   float xdr_time_;
   xdr::matrix xdr_box_;
-  xdr::rvec* xdr_x_;
+  xdr::rvec* xdr_x_, *xdr_x2_;
   float xdr_prec_;
   bool initialized_;
-  std::string filename_;
+  //filename1 is for the icecalc atoms, filename2 is for the original xtc atoms
+  std::string filename_, filename2_;
   //index output
   std::ofstream index_out_;
   std::string index_filename_;
