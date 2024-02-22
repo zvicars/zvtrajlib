@@ -19,6 +19,8 @@ calculations/Calc_Nv_wFit.cpp
 calculations/Calc_Nv_wFit_IP.cpp
 calculations/Calc_Nv_SWIPES.cpp
 calculations/Calc_Isosurface.cpp
+calculations/Calc_Isosurface3phase.cpp
+calculations/Calc_IsosurfaceMultiphase.cpp
 calculations/Calc_Angle.cpp
 calculations/Calc_DensityField.cpp
 calculations/Calc_2D_Density.cpp
@@ -44,6 +46,7 @@ probevolumes/PV_Simple.cpp
 probevolumes/PV_Cylinder.cpp
 probevolumes/PV_Boolean.cpp
 probevolumes/PV_DynamicBox.cpp
+probevolumes/PV_Trivial.cpp
 InputPack.cpp
 factory.cpp
 )

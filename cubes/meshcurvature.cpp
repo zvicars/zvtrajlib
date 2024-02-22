@@ -214,3 +214,34 @@ std::string printPLYWithCurvature(const Mesh& mesh, const std::vector<double>& c
 
   return ss.str();
 }
+
+std::string printPLYWithRGB(const Mesh& mesh, const std::vector<RGB>& cv){
+  std::stringstream ss;
+  ss << "ply\nformat ascii 1.0\n";
+  ss << "element vertex " << mesh.nvtx << "\n";
+  ss << "property float x\n";
+  ss << "property float y\n";
+  ss << "property float z\n";
+  ss << "property uchar red\n";
+  ss << "property uchar green\n";
+  ss << "property uchar blue\n";
+  ss << "element face " << mesh.ntri << "\n";
+  ss << "property list uchar int vertex_index\n";
+  ss << "end_header\n";
+  for(int i = 0; i < mesh.nvtx; i++){
+    ss << mesh.vertices[i][0] << " " << mesh.vertices[i][1] << " " << mesh.vertices[i][2] << " ";
+    std::array<unsigned char,3> channels;
+    channels[0] = cv[i].r;
+    channels[1] = cv[i].g;
+    channels[2] = cv[i].b;
+    for(int j = 0; j < 3; j++){
+      ss << (int)channels[j] << " ";
+    }
+    ss << "\n";
+  }
+  for(int i = 0; i < mesh.ntri; i++){
+    ss << "3 " << mesh.triangles[i].indices[0] << " " << mesh.triangles[i].indices[1] << " " << mesh.triangles[i].indices[2] << "\n";
+  }
+
+  return ss.str();
+}

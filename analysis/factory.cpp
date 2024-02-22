@@ -18,6 +18,8 @@
 #include "atomgroups/AtomGroup_system.hpp"
 //CALCULATIONS
 #include "calculations/Calc_Isosurface.hpp"
+#include "calculations/Calc_Isosurface3phase.hpp"
+#include "calculations/Calc_IsosurfaceMultiphase.hpp"
 #include "calculations/Calc_Angle.hpp"
 #include "calculations/Calc_Nv.hpp"
 #include "calculations/Calc_Nv_wFit.hpp"
@@ -75,6 +77,8 @@ AtomGroup* AtomGroup_Factory(std::string key, InputPack& input){
 
 Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "isosurface") return new Calc_Isosurface(input);
+  if(key == "isosurface3phase") return new Calc_Isosurface3phase(input);
+  if(key == "isosurfacemultiphase") return new Calc_IsosurfaceMultiphase(input);
   if(key == "nv") return new Calc_Nv(input);
   if(key == "mv") return new Calc_Mv(input);
   if(key == "nv_swipes") return new Calc_Nv_SWIPES(input);

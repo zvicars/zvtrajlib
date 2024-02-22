@@ -38,6 +38,10 @@ public:
 	double getGridVal(int i, int j, int k) const{
 		return grid_density_[i][j][k];
 	}
+	void setGridVal(int i, int j, int k, double val){
+		grid_density_[i][j][k] = val;
+		return;
+	}
 	double getIsovalue() const{
 		return isovalue_;
 	}

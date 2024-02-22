@@ -33,7 +33,7 @@ static inline double h_x(double x, double xmin, double xmax, double sigma, doubl
 static inline double dh_x(double x, double xmin, double xmax, double sigma, double xc){
     return phi_x(xmin-x, sigma, xc)-phi_x(xmax-x, sigma, xc);
 }
-static inline double h_r(double x, double xmin, double xmax, double sigma, double xc){
+static inline double h_r(double x, double xmax, double sigma, double xc){
     double eval = 0.0;
     double k, k1, k2, invk;
     double sigma2 = sigma*sigma;

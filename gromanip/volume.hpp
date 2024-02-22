@@ -120,9 +120,52 @@ class CuboidVolume : public Volume{
     Vec3<double> max_x;
 };
 
+class CylinderVolume : public Volume{
+  public:
+    CylinderVolume(std::vector<std::string> args){
+      FANCY_ASSERT(args.size() == 6, "Incorrect number of arguments in CylinderVolume definition");
+      for(int i = 0; i < 3; i++){
+        origin[i] = std::stod(args[i]);
+      }
+      radius2 = std::stod(args[3])*std::stod(args[3]);
+      height = std::stod(args[4]);
+      axis = std::stoi(args[5]);
+      return;
+    }
+    virtual bool isInside(const Vec3<double>& x) const{
+      double dist2 = 0.0;
+      for(int i = 0; i < 3; i++){
+        if(i == axis) continue;
+        dist2 +=  (x[i] - origin[i]) * (x[i] - origin[i]);
+      }
+      if(dist2 <= radius2){
+        if(x[axis] >= origin[axis] && x[axis] <= origin[axis] + height){
+          return 1;
+        }
+      }
+      return 0;
+    }
+    virtual std::vector<double> getBoundingBox(){
+      std::vector<double> vec(6, 0.0);
+      for(int i = 0; i < 3; i++){
+        vec[i] = origin[i] - std::sqrt(radius2);
+        vec[i+3] = origin[i] + std::sqrt(radius2);
+      }
+      vec[axis] = origin[axis];
+      vec[axis+3] = origin[axis] + height;
+      return vec;
+    }
+  protected:
+  Vec3<double> origin;
+  double height;
+  int axis;
+  double radius2;
+};
+
 static inline Volume* createPrimitiveVolume(std::string name, std::vector<std::string> args){
   if(name == "cuboid") return new CuboidVolume(args);
   if(name == "sphere") return new SphereVolume(args);
+  if(name == "cylinder") return new CylinderVolume(args);
   return 0;
 }
 

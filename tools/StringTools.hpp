@@ -266,7 +266,6 @@ std::ostream& os, const FixedWidthValue<T> value
 };
 
 void swap(std::string& s1, std::string& s2);
-
 } // end namespace StringTools
 
 #endif // ifndef STRING_TOOLS_H
