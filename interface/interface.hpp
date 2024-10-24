@@ -103,8 +103,7 @@ static inline Trajectory* loadTrajectory(std::string trajectory_file){
     return new XTCTrajectory(trajectory_file);
   }
   if (filetype == "trr"){
-    std::cout << "trr files have not been implemented yet!" << std::endl;
-    throw 1;
+    return new TRRTrajectory(trajectory_file);
     return 0;
   }
   if (filetype == "gro"){

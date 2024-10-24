@@ -53,6 +53,8 @@ class UnionVolume : public Volume{
           xmin = std::min(bb[i], xmin);
           xmax = std::max(bb[i+3], xmax);
         }
+        vec[i] = xmin;
+        vec[i+3] = xmax;
       }
       return vec;
     }
@@ -162,10 +164,52 @@ class CylinderVolume : public Volume{
   double radius2;
 };
 
+
+class EllipseVolume : public Volume{
+  public:
+    EllipseVolume(std::vector<std::string> args){
+      FANCY_ASSERT(args.size() == 6, "Incorrect number of arguments in CylinderVolume definition");
+      for(int i = 0; i < 3; i++){
+        origin[i] = std::stod(args[i]);
+      }
+      semi_axes = {std::stod(args[3])*std::stod(args[3]), std::stod(args[4])*std::stod(args[4]), std::stod(args[5])*std::stod(args[5])};
+      for(int i = 0; i < 3; i++){
+        inv_axes[i] = 1.0/semi_axes[i];
+      }
+      return;
+    }
+    virtual bool isInside(const Vec3<double>& x) const{
+      double dist2 = 0.0;
+      //evaluate ellipse function x2/a2 + y2/b2 ...
+      double eval = 0.0;
+
+      for(int i = 0; i < 3; i++){
+        eval += std::pow(x[i] - origin[i],2)*inv_axes[i];
+      }
+
+      if(eval <= 1.0){
+          return 1;
+      }
+
+      return 0;
+    }
+    virtual std::vector<double> getBoundingBox(){
+      std::vector<double> vec(6, 0.0);
+      for(int i = 0; i < 3; i++){
+        vec[i] = origin[i] - std::sqrt(semi_axes[i]);
+        vec[i+3] = origin[i] + std::sqrt(semi_axes[i]);
+      }
+      return vec;
+    }
+  protected:
+  Vec3<double> origin, semi_axes, inv_axes;
+};
+
 static inline Volume* createPrimitiveVolume(std::string name, std::vector<std::string> args){
   if(name == "cuboid") return new CuboidVolume(args);
   if(name == "sphere") return new SphereVolume(args);
   if(name == "cylinder") return new CylinderVolume(args);
+  if(name == "ellipse") return new EllipseVolume(args);
   return 0;
 }
 

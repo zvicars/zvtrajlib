@@ -3,8 +3,21 @@
 #include "../tools/StringTools.hpp"
 #include "../tools/stlmath.hpp"
 #include "../tools/cellgrid.hpp"
+#include "./add_particle_extra/safe_particle_insert.hpp"
 #include <set>
 #include <random>
+
+void boxtools::actions::makebox(GroManipData& data, const std::vector<std::string>& args){
+    //takes a filename and an output box name
+  FANCY_ASSERT(args.size() == 1, "Invalid call to boxtools::actions::makebox(), requires box_name");
+  Box* b_out = data.findBox(args[0]);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  data.addBox(args[0], b_out);
+  return;
+}
+
 void boxtools::actions::merge(GroManipData& data, const std::vector<std::string>& args){
   //takes two box names and an output box name
   FANCY_ASSERT(args.size() == 3, "Invalid call to boxtools::actions::merge(), requires input_box_name, input_box_name, and output_box_name");
@@ -663,12 +676,12 @@ void boxtools::actions::pbccorrect(GroManipData& data, const std::vector<std::st
 //good for adding a single atom to the dataset to balance the charge
 void boxtools::actions::addatom(GroManipData& data, const std::vector<std::string>& args){
   //argument is a list of volume names
-  FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::setboxsize(), needs input box, name, resname, position [x,y,z], output box name");
+  FANCY_ASSERT(args.size() == 5, "Invalid call to boxtools::actions::addatom(), needs input box, name, resname, position [x,y,z], output box name");
   std::string in = args[0], out = args[4];
   auto pos = StringTools::stringToVector<double>(args[3]);
   std::string atom_name = args[1], resname = args[2];
   Box *b1 = data.findBox(in);
-  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::setboxsize()");
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::addatom()");
   Box box_out = *b1;
   Box* b_out = data.findBox(out);
   if(b_out == 0){
@@ -682,6 +695,67 @@ void boxtools::actions::addatom(GroManipData& data, const std::vector<std::strin
   new_atom.resnr = box_out.atoms.back().resnr + 1;
   new_atom.type = atom_name;
   box_out.atoms.push_back(new_atom);
+  *b_out = box_out;
+  data.addBox(out, b_out); 
+  return;
+}
+
+//adds a set of single-atom residues within a given volume
+//argument list: input box, volume_name, minimum distance, resname, atomname, quantity, output box
+//resname, atomname, and quantity can be repeated multiple times, so (nargs-4)%3 must be 0 with string, string, int args
+void boxtools::actions::addparticles(GroManipData& data, const std::vector<std::string>& args){
+  //argument is a list of volume names
+  int nargs = args.size();
+  FANCY_ASSERT(nargs>=7, "Invalid call to boxtools::actions::particles(), need at least 7 arguments");
+  FANCY_ASSERT((nargs-4)%3 == 0, "Invalid call to boxtools::actions::particles(), look at code for function arguments");
+  std::string in = args[0], out = args[nargs-1];
+  std::string volume_name = args[1];
+  Volume* v1 = data.findVolume(volume_name);
+  FANCY_ASSERT(v1 != 0,  "Failed to find input volume in boxtools::actions::trimvolume()");
+  double min_dist = std::stod(args[2]);
+
+  std::vector<std::string> atom_args;
+  for(int i = 3; i < nargs-1; i++){
+    atom_args.push_back(args[i]);
+  }
+  int num_atoms = atom_args.size()/3;
+  std::vector<std::string> atom_names(num_atoms);
+  std::vector<std::string> res_names(num_atoms);
+  std::vector<int> atom_counts(num_atoms);
+  for(int i=0; i<num_atoms; i++){
+    res_names[i] = atom_args[3*i];
+    atom_names[i] = atom_args[3*i+1];
+    atom_counts[i] = std::stoi(atom_args[3*i+2]);
+  }
+  std::string atom_name = args[1], resname = args[2];
+  Box *b1 = data.findBox(in);
+  FANCY_ASSERT(b1 != 0, "Failed to find input box in boxtools::actions::addatom()");
+  Box box_out = *b1;
+  Box* b_out = data.findBox(out);
+  if(b_out == 0){
+    b_out = new Box;
+  }
+  //meat goes here
+  safeInsert s(0.1,v1);
+  for(int i = 0; i < num_atoms; i++){
+    Atom atom_step;
+    atom_step.name = atom_names[i];
+    atom_step.resname = res_names[i];
+    for(int j = 0; j < atom_counts[i]; j++){
+      bool fail = s.getSafePosition(atom_step.x, min_dist);
+      FANCY_ASSERT(!fail, "unable to get a safe position, particle density is too high!");
+      if(box_out.atoms.size() == 0){
+        atom_step.index = 1;
+        atom_step.resnr = 1;
+      }
+      else{
+        atom_step.index = box_out.atoms.back().index + 1;
+        atom_step.resnr = box_out.atoms.back().resnr + 1;
+      }
+      box_out.atoms.push_back(atom_step);
+    }
+  }
+  box_out.hasNamedAtoms=1;
   *b_out = box_out;
   data.addBox(out, b_out); 
   return;

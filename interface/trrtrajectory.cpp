@@ -23,6 +23,7 @@ TRRTrajectory::TRRTrajectory(std::string trajfile){
   }
 	x_ = new xdr::rvec[natoms_];
   v_ = new xdr::rvec[natoms_];
+  f_ = new xdr::rvec[natoms_];
 	xd_ = xdr::xdrfile_open(tf, "r");
   nframes_ = 0;
   return;

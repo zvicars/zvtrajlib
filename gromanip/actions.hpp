@@ -8,6 +8,7 @@
 namespace boxtools::actions{
   static std::unordered_map<std::string, void (*)(GroManipData&, const std::vector<std::string>&)> action_map;
   //use to initialize registry
+  void makebox(GroManipData&, const std::vector<std::string>&);
   void merge(GroManipData&, const std::vector<std::string>&);
   void eraseres(GroManipData&, const std::vector<std::string>&);
   void keepres(GroManipData&, const std::vector<std::string>&);
@@ -45,6 +46,8 @@ namespace boxtools::actions{
   void trimbymesh(GroManipData& data, const std::vector<std::string>& args);
   //for adding a single atom to the box, charge equalization
   void addatom(GroManipData& data, const std::vector<std::string>& args);
+  //specialty function for generating randomly distributed atomtypes within a volume
+  void addparticles(GroManipData& data, const std::vector<std::string>& args);
   //for getting atoms for union of spheres volume
   void printindicesnear(GroManipData& data, const std::vector<std::string>& args);
   //remove atoms with a certain number of nearest neighbors
@@ -53,6 +56,7 @@ namespace boxtools::actions{
   void wrap(GroManipData& data, const std::vector<std::string>& args);
   //void outputbonds(GroManipData&, const std::vector<std::string>&);
   static inline void registerActions(){
+    action_map.emplace("makebox", &makebox);
     action_map.emplace("merge", &merge);
     action_map.emplace("eraseres", &eraseres);
     action_map.emplace("keepres", &keepres);
@@ -87,6 +91,7 @@ namespace boxtools::actions{
     action_map.emplace("hydrogenatefeldspar", &hydrogenatefeldspar);
     action_map.emplace("printindicesnear", &printindicesnear);
     action_map.emplace("addatom", &addatom);
+    action_map.emplace("addparticles", &addparticles);
     action_map.emplace("deleterandom", &deleterandom);
     action_map.emplace("hollow", &hollow);
     action_map.emplace("wrap", &wrap);

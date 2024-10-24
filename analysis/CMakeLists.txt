@@ -24,6 +24,7 @@ calculations/Calc_IsosurfaceMultiphase.cpp
 calculations/Calc_Angle.cpp
 calculations/Calc_DensityField.cpp
 calculations/Calc_2D_Density.cpp
+calculations/Calc_2D_TempProfile.cpp
 calculations/Calc_1D_Density.cpp
 calculations/Calc_1D_DensityFull.cpp
 calculations/Calc_1D_Density_IP.cpp

@@ -27,6 +27,7 @@
 #include "calculations/Calc_Nv_wFit_IP.hpp"
 #include "calculations/Calc_Dipole.hpp"
 #include "calculations/Calc_2D_Density.hpp"
+#include "calculations/Calc_2D_TempProfile.hpp"
 #include "calculations/Calc_1D_Density.hpp"
 #include "calculations/Calc_1D_DensityFull.hpp"
 #include "calculations/Calc_1D_Density_IP.hpp"
@@ -95,6 +96,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "3d_densityextra") return new Calc_DensityFieldExtra(input);  
   if(key == "3d_density") return new Calc_DensityField(input);
   if(key == "2d_density") return new Calc_2D_Density(input);
+  if(key == "2d_temp") return new Calc_2D_TempProfile(input);
   if(key == "1d_density") return new Calc_1D_Density(input);
   if(key == "1d_densityfull") return new Calc_1D_DensityFull(input);
   if(key == "1d_density_ip") return new Calc_1D_Density_IP(input);

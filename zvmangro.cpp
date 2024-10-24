@@ -12,7 +12,7 @@ int main(int argc, char **argv)
   GroManipData data;
   std::string line;
   while(std::getline(ifile, line)){
-    if(line.at(0) == '#' || line.length() == 0 || line.at(0) == ';' || line.at(0) == ' ') continue;
+    if(line.at(0) == '#' || line.length() == 0 || line.at(0) == ';' || line.at(0) == ' ' || line.length()==0) continue;
     std::stringstream ss(line);
     std::vector<std::string> line_args;
     std::string lineval;

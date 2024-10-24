@@ -101,5 +101,11 @@ void Calc_Isosurface::finalOutput(){
   FANCY_ASSERT(ofile.is_open(), "Failed to open output file for instantaneous interface average.");
   ofile << gc_info;
   ofile.close();
+  filepath = base_ + "_ac.txt";
+  ofile.open(filepath);
+  for(int i = 0; i < ac.size(); i++){
+    ofile << mesh_.vertices[i][0] << "  " << mesh_.vertices[i][1] << "  " << mesh_.vertices[i][2] << "   " << ac[i] << "  " << gc[i];
+  }
+  ofile.close();
   return;
 };
