@@ -18,6 +18,7 @@ calculations/Calc_Nv.cpp
 calculations/Calc_Nv_wFit.cpp
 calculations/Calc_Nv_wFit_IP.cpp
 calculations/Calc_Nv_SWIPES.cpp
+calculations/Calc_NvNearSurf.cpp
 calculations/Calc_Isosurface.cpp
 calculations/Calc_Isosurface3phase.cpp
 calculations/Calc_IsosurfaceMultiphase.cpp
@@ -48,6 +49,7 @@ probevolumes/PV_Cylinder.cpp
 probevolumes/PV_Boolean.cpp
 probevolumes/PV_DynamicBox.cpp
 probevolumes/PV_Trivial.cpp
+probevolumes/PV_INDUSRect.cpp
 InputPack.cpp
 factory.cpp
 )

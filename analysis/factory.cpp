@@ -6,6 +6,7 @@
 #include "probevolumes/PV_Cylinder.hpp"
 #include "probevolumes/PV_Boolean.hpp"
 #include "probevolumes/PV_DynamicBox.hpp"
+#include "probevolumes/PV_INDUSRect.hpp"
 //ATOM GROUPS
 #include "atomgroups/AtomGroup_name.hpp"
 #include "atomgroups/AtomGroup_range.hpp"
@@ -25,6 +26,7 @@
 #include "calculations/Calc_Nv_wFit.hpp"
 #include "calculations/Calc_Nv_SWIPES.hpp"
 #include "calculations/Calc_Nv_wFit_IP.hpp"
+#include "calculations/Calc_NvNearSurf.hpp"
 #include "calculations/Calc_Dipole.hpp"
 #include "calculations/Calc_2D_Density.hpp"
 #include "calculations/Calc_2D_TempProfile.hpp"
@@ -58,6 +60,7 @@ ProbeVolume* ProbeVolume_Factory(std::string key, InputPack& input){
   if(key == "dynbox") return new PV_DynBox(input);
   if(key == "cylinder") return new PV_Cylinder(input);
   if(key == "boolean") return new PV_Boolean(input);
+  if(key == "INDUSrect") return new PV_INDUSRect(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }
@@ -112,6 +115,7 @@ Calculation* Calculation_Factory(std::string key, InputPack& input){
   if(key == "hbond") return new Calc_HBonds(input);
   if(key == "hpolarity") return new Calc_HPolarity(input);
   if(key == "avgorientation") return new Calc_AvgOrientation(input);
+  if(key == "nvwithsurf") return new Calc_NvNearSurf(input);
   FANCY_ASSERT(0, "Failed to find matching case for key: " + key);
   return 0;
 }

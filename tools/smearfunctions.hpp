@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 static inline double heaviside(double x){
 	if(x <= 0) return 0;
 	return 1.0; 
