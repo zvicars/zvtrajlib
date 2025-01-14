@@ -47,9 +47,10 @@ Calc_1D_Mv::Calc_1D_Mv(InputPack& input) : Calculation{input} {
   average_grid_density_.resize(npoints_, 0.0);
   params_.resize(3, 0.0);
 
+  //coarse graining (0 = no coarse-graining, 1 = gaussian smoothing, 2 = moving average, sigma used for 1,2)
   coarseGrain = 0;
-  input.params().readFlag("smear", KeyType::Optional, coarseGrain);
-  if(coarseGrain){
+  input.params().readNumber("smear", KeyType::Optional, coarseGrain);
+  if(coarseGrain != 0){
     input.params().readNumber("sigma", KeyType::Optional, sigma_);
   }
   std::string mvname;
@@ -80,6 +81,30 @@ void Calc_1D_Mv::add_gaussian(double x_in, double weight)
     return;
 }
 
+void Calc_1D_Mv::add_movav(double x_in, double weight)
+{
+    double x = x_in;
+    double half_sigma = 0.5*sigma_;
+    int lxmin = floor((x-half_sigma)/grid_spacing_);
+    int lxmax = ceil((x+half_sigma)/grid_spacing_); 
+    //density will be evenly shared between sigma / gridspacing cells
+    double e_min = x - half_sigma;
+    double e_max = x + half_sigma;
+    #pragma omp parallel for
+    for(int ix = lxmin; ix <= lxmax; ix++)
+    {
+      int idx = ix;
+      if(idx >= grid_density_.size()) continue;
+      else if(idx < 0) continue;
+      double xmin, xmax;
+      xmin = ix * grid_spacing_;
+      xmax = xmin + grid_spacing_;
+      double f = std::max( (std::min(e_max, xmax) - std::max(e_min, xmin))/sigma_, 0.0 );
+      grid_density_[idx] += weight*f;
+    }
+    return;
+}
+
 void Calc_1D_Mv::calculate(){
   if(!doCalculate()) return;
   if(!mvcalc_->hasCalculated()){
@@ -91,7 +116,8 @@ void Calc_1D_Mv::calculate(){
   for(int i = 0; i < positions.size(); i++){
     auto& position = positions[i];
     double mval = mvals[i];
-    if(coarseGrain) add_gaussian(position[dim_], mval);
+    if(coarseGrain == 1) add_gaussian(position[dim_], mval);
+    else if (coarseGrain == 2) add_movav(position[dim_], mval);
     else putInBin(position, mval);
   }
   average_grid_density_ = average_grid_density_ + grid_density_;

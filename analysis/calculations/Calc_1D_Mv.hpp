@@ -39,6 +39,7 @@ protected:
     return;
   }
   void add_gaussian(double x_in, double weight);
+  void add_movav(double x_in, double weight);
   double h_x(double x, double xmin, double xmax, double sigma, double xc);
   double heaviside(double x);
   Vec<double> grid_density_, average_grid_density_;
@@ -52,7 +53,7 @@ protected:
   Vec<double> tvec_, frame_vec_;
   Vec<Vec<double> > fits_;
   //coarse-graining
-  bool coarseGrain;
+  int coarseGrain;
   double sigma_;
   bool hasPV_, hasRange_;
   ProbeVolume* pv_;
