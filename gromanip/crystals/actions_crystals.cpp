@@ -182,7 +182,13 @@ void boxtools::actions::supercell(GroManipData& data, const std::vector<std::str
 	std::vector<Atom> atoms = replicate_cells(std::stoi(args[1]), std::stoi(args[2]), std::stoi(args[3]), ucell, box_dims);
 	b_out->atoms = atoms;
 	b_out->hasNamedAtoms = 1;
-	makeOrthorhombic(*b_out);
+	if(ucell.alpha == 90.0 && ucell.beta == 90.0 && ucell.gamma == 90.0){
+		std::cout << "detected orthorhombic box" << std::endl;
+		for(int i = 0; i < 3; i++){
+          b_out->boxvec[i][i] = box_dims[i];
+		}
+	}
+	else makeOrthorhombic(*b_out);
   data.addBox(args[4], b_out);
   return;	
 }
