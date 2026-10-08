@@ -1,7 +1,7 @@
 #include "VoxelGrid.hpp"
 #include <omp.h>
 inline double heaviside(double x){
-	if(x <= 0) return 0;
+	if(x < 0.0) return 0.0;
 	return 1.0; 
 }
 inline double phi(double x, double sigma, double prefactor){
@@ -13,12 +13,12 @@ inline double h_x(double x, double xmin, double xmax, double sigma, double xc){
     double eval = 0.0;
     double k, k1, k2, invk;
     double sigma2 = sigma*sigma;
-    k = sqrt(2*M_PI)*sigma*erf(xc/(sqrt(2)*sigma)) - 2*xc*exp(-(xc*xc)/(2*sigma2));
+    k = sqrt(2.0*M_PI)*sigma*erf(xc/(sqrt(2.0)*sigma)) - 2.0*xc*exp(-(xc*xc)/(2.0*sigma2));
     invk = 1/k;
     k1 = invk*sqrt(0.5*M_PI*sigma2);
     k2 = invk*exp(-0.5*(xc*xc)/sigma2);
-    eval = (k1 * erf((xmax-x)/(sqrt(2)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x))
-    + (k1 * erf((x-xmin)/(sqrt(2)*sigma)) - k2*(x-xmin) - 0.5)*heaviside(xc - fabs(x-xmin))
+    eval = (k1 * erf((xmax-x)/(sqrt(2.0)*sigma)) - k2*(xmax-x) - 0.5)*heaviside(xc - fabs(xmax-x))
+    + (k1 * erf((x-xmin)/(sqrt(2.0)*sigma)) - k2*(x-xmin) - 0.5)*heaviside(xc - fabs(x-xmin))
     + heaviside(xc + 0.5*(xmax-xmin) - fabs(x - 0.5*(xmin+xmax)));
     return eval;
 }
@@ -55,10 +55,13 @@ void VoxelGrid::add_gaussian(Vec3<double> x_in)
     double x = x_in[0];
     double y = x_in[1];
     double z = x_in[2];
+    std::cout <<  " xin " << x_in[0];
     int lxmin = floor((x-2*sigma_)/grid_spacing_[0]);
+    std::cout <<  " lxmin " << lxmin;
     int lxmax = ceil((x+2*sigma_)/grid_spacing_[0]);
+    std::cout << " lxmax " << lxmax;
     int lymin = floor((y-2*sigma_)/grid_spacing_[1]);
-    int  lymax = ceil((y+2*sigma_)/grid_spacing_[1]);
+    int lymax = ceil((y+2*sigma_)/grid_spacing_[1]);
     int lzmin = floor((z-2*sigma_)/grid_spacing_[2]);
     int lzmax = ceil((z+2*sigma_)/grid_spacing_[2]);    
     //#pragma omp parallel for collapse(3)

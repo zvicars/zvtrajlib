@@ -13,7 +13,7 @@ int main(){
     double sigma = 2.0;
     double isovalue = 0.5;
     VoxelGrid v1(size, box_size, density, sigma, isovalue);
-    std::array<double, 3> x_in = {10, 7.5, 5.0};
+    std::array<double, 3> x_in = {10.0, 7.5, 5.0};
     v1.add_gaussian(x_in);
     double tot_mass = v1.getTot();
     auto tot_com = v1.getWeightedCOM();
@@ -21,6 +21,8 @@ int main(){
     double diff = fabs(1 - v1.getTot());
     double diff2 = 0.0;
     
+    bool fail_flag = 0;
+
     for(int i = 0; i < 3; i++){
         diff2 += fabs(x_in[i] - tot_com[i]); 
     }
@@ -29,7 +31,7 @@ int main(){
         std::cout << "Total mass is not being conserved." << std::endl;
         std::cout << "System mass = " << tot_mass << std::endl;
         std::cout << "Expected mass = 1.0" << std::endl;
-        return 1;
+        fail_flag = 1;
     }
     if(diff2 > testing_threshold){
         std::cout << "Center of mass is not being conserved." << std::endl;
@@ -37,7 +39,7 @@ int main(){
             std::cout << "Observed COM for dim " << i << " = " << tot_com[i] << std::endl;
             std::cout << "Expected COM for dim " << i << " = " << x_in[i] << std::endl;
         }
-        return 1;
+        fail_flag = 1;
     }
-    return 0;
+    return fail_flag;
 }

@@ -53,7 +53,7 @@ probevolumes/PV_INDUSRect.cpp
 InputPack.cpp
 factory.cpp
 )
-target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-3.3.9/)
+target_include_directories(ANALYSIS PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../extern/eigen-5.0.0/)
 target_link_libraries(ANALYSIS PRIVATE TRAJLIB
                                PRIVATE TOOLS
                                PRIVATE INSTANT_INT
